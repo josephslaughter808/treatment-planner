@@ -15,7 +15,6 @@ import {
   type DiagnosisTemplate,
   type TreatmentOption
 } from "@/lib/clinical-catalog";
-import { buildMockPlan, type AnalysisResponse } from "@/lib/mock-analysis";
 
 const generalAssetCatalog = [
   {
@@ -96,44 +95,10 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
     initialOverride?.preferredMediaAssetIds ?? []
   );
 
-  const diagnosisPreview = useMemo<AnalysisResponse | null>(() => {
-    const diagnosisId = mode === "diagnosis" ? selectedDiagnosis?.id : selectedDiagnosisForTreatment?.id;
-    const treatmentIds =
-      mode === "diagnosis"
-        ? getTreatmentsForDiagnosis(selectedDiagnosis?.id ?? "")
-            .slice(0, 3)
-            .map((treatment) => treatment.id)
-        : selectedTreatment
-          ? [selectedTreatment.id]
-          : [];
-
-    if (!diagnosisId || treatmentIds.length === 0) {
-      return null;
-    }
-
-    return buildMockPlan(
-      {
-        patientName: "Preview patient",
-        patientEmail: "preview@clearpathcare.test",
-        dateOfBirth: "1990-01-01",
-        practiceId,
-        providerId: currentUser?.id ?? "preview-provider",
-        providerLabel: currentUser?.name ?? "Preview provider",
-        diagnosisId,
-        toothLabel: "",
-        selectedTreatmentIds: treatmentIds
-      },
-      []
-    );
-  }, [
-    currentUser?.id,
-    currentUser?.name,
-    mode,
-    practiceId,
-    selectedDiagnosis?.id,
-    selectedDiagnosisForTreatment?.id,
-    selectedTreatment
-  ]);
+  const diagnosisRelatedTreatments = useMemo(
+    () => (selectedDiagnosis ? getTreatmentsForDiagnosis(selectedDiagnosis.id) : []),
+    [selectedDiagnosis]
+  );
 
   const mediaAssets = useMemo(() => {
     if (mode === "treatment") {
@@ -149,19 +114,31 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
         }));
     }
 
-    return (diagnosisPreview?.mediaPlan ?? []).map((asset) => ({
-      id: `diagnosis-${asset.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+    const diagnosisMediaIds = new Set<string>([
+      ...(selectedDiagnosis?.mediaAssetIds ?? []),
+      ...preferredMediaAssetIds,
+      ...diagnosisRelatedTreatments.flatMap((treatment) => treatment.mediaAssetIds)
+    ]);
+
+    return [...diagnosisMediaIds]
+      .map((id) => mediaById[id])
+      .filter(Boolean)
+      .map((asset) => ({
+        id: `diagnosis-${asset.id}`,
       title: asset.title,
       type: asset.type,
       description: asset.description,
       duration: asset.duration
     }));
-  }, [diagnosisPreview?.mediaPlan, mode, selectedTreatment?.mediaAssetIds]);
+  }, [
+    diagnosisRelatedTreatments,
+    mode,
+    preferredMediaAssetIds,
+    selectedDiagnosis?.mediaAssetIds,
+    selectedTreatment?.mediaAssetIds
+  ]);
 
-  const diagnosisTreatmentCards = useMemo(
-    () => diagnosisPreview?.treatmentCards ?? [],
-    [diagnosisPreview?.treatmentCards]
-  );
+  const diagnosisTreatmentCards = useMemo(() => diagnosisRelatedTreatments, [diagnosisRelatedTreatments]);
   const commonQuestions = useMemo(
     () =>
       mode === "diagnosis"
@@ -630,7 +607,7 @@ function buildDiagnosisCarePage(input: {
   intro: string;
   commonQuestions: string[];
   mediaAssets: Array<{ id: string; title: string; type: string; description: string; duration?: string }>;
-  treatmentCards: AnalysisResponse["treatmentCards"];
+  treatmentCards: TreatmentOption[];
 }): CarePageContent {
   const education = input.diagnosis.educationSections;
   const heroMedia = input.mediaAssets[0] ?? {
