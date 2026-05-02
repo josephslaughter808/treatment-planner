@@ -380,6 +380,18 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
       ? infoPageIntro.trim() || selectedDiagnosis?.plainLanguageSummary || ""
       : infoPageIntro.trim() || selectedTreatment?.summary || "";
   const reviewDate = "07/03/2025";
+  const previewFacts =
+    mode === "diagnosis"
+      ? [
+          `${diagnosisTreatmentCards.length || getTreatmentsForDiagnosis(selectedDiagnosis?.id ?? "").length} treatment paths`,
+          `${mediaAssets.length} visual asset${mediaAssets.length === 1 ? "" : "s"}`,
+          `${commonQuestions.length || 3} patient questions addressed`
+        ]
+      : [
+          selectedTreatment?.optionGroupLabel || "Treatment guidance",
+          `${mediaAssets.length} visual asset${mediaAssets.length === 1 ? "" : "s"}`,
+          `${selectedTreatment?.visits.length ?? 0} visit milestone${selectedTreatment?.visits.length === 1 ? "" : "s"}`
+        ];
 
   return (
     <div className="treatment-library-layout">
@@ -435,7 +447,7 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
 
             <div className={`treatment-editor-workspace ${isEditing ? "editing" : ""}`}>
               <section
-                className="panel diagnosis-detail-screen provider-treatment-preview-panel"
+                className="panel diagnosis-detail-screen provider-treatment-preview-panel care-page-preview"
                 style={
                   {
                     "--treatment-heading-color": designControls.headingColor,
@@ -449,19 +461,36 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                   } as CSSProperties
                 }
               >
-                <div className="diagnosis-detail-header treatment-preview-header">
-                  <p className="eyebrow">{capitalize(mode)}</p>
-                  <h1>{previewTitle}</h1>
-                  <div className="treatment-page-meta">
-                    <span>Medically reviewed.</span>
-                    <span>Last updated on {reviewDate}.</span>
+                <section className="care-page-hero">
+                  <div className="care-page-hero-copy diagnosis-detail-header treatment-preview-header">
+                    <p className="eyebrow">{capitalize(mode)}</p>
+                    <h1>{previewTitle}</h1>
+                    <div className="treatment-page-meta">
+                      <span>Medically reviewed.</span>
+                      <span>Last updated on {reviewDate}.</span>
+                    </div>
+                    <p className="diagnosis-subtitle">{previewSubtitle}</p>
+                    <p className="diagnosis-descriptor">{previewDescriptor}</p>
                   </div>
-                  <p className="diagnosis-subtitle">{previewSubtitle}</p>
-                  <p className="diagnosis-descriptor">{previewDescriptor}</p>
-                </div>
 
-                <article className="saved-section-card treatment-contents-card">
-                  <div className="saved-section-header">
+                  <aside className="care-page-hero-aside">
+                    <p className="mini-label">Quick profile</p>
+                    <h3>What the patient sees first</h3>
+                    <div className="care-page-fact-list">
+                      {previewFacts.map((fact) => (
+                        <span className="care-page-fact-pill" key={fact}>
+                          {fact}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="care-page-hero-note">
+                      This layout is designed to feel calm, polished, and easy to trust while still guiding treatment decisions.
+                    </p>
+                  </aside>
+                </section>
+
+                <article className="saved-section-card treatment-contents-card care-page-contents-card">
+                  <div className="saved-section-header care-page-section-heading">
                     <div>
                       <p className="mini-label">Contents</p>
                       <h3>{mode === "diagnosis" ? "On this diagnosis page" : "On this treatment page"}</h3>
@@ -494,14 +523,14 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                 </div>
 
                 {activeTab === "primary" ? (
-                  <div className="dialogue-list">
+                  <div className="dialogue-list care-page-section-stack">
                     <ArticleSections sections={previewSections} />
                   </div>
                 ) : (
-                  <div className="article-flow">
+                  <div className="article-flow care-page-section-stack">
                     {mode === "diagnosis"
                       ? diagnosisTreatmentCards.map((option) => (
-                          <section className="article-section-block" key={option.label}>
+                          <section className="article-section-block care-page-treatment-block" key={option.label}>
                             <h2>{option.label}</h2>
                             <p>{option.summary}</p>
                             <h3>What the visit pattern usually looks like</h3>
@@ -522,28 +551,29 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                   </div>
                 )}
 
-                <section className="article-section-block">
+                <section className="article-section-block care-page-feature-band">
                   <h2>Media and diagrams</h2>
                   <p>
                     These visuals are included to help the patient understand the diagnosis or treatment without relying only on technical language.
                   </p>
                   <div className="article-media-list">
                     {mediaAssets.map((asset) => (
-                      <div className="article-media-item" key={asset.id}>
+                      <article className="article-media-item care-page-feature-card" key={asset.id}>
+                        <p className="mini-label">{asset.type}</p>
                         <h3>{asset.title}</h3>
                         <p>{asset.description}</p>
-                        <p><strong>Type:</strong> {asset.type}</p>
-                      </div>
+                      </article>
                     ))}
                   </div>
                 </section>
 
-                <section className="article-section-block">
+                <section className="article-section-block care-page-feature-band">
                   <h2>Additional common questions</h2>
                   {commonQuestions.length > 0 ? (
                     <div className="article-faq-list">
-                      {commonQuestions.map((question) => (
-                        <div key={question}>
+                      {commonQuestions.map((question, index) => (
+                        <div className="care-page-feature-card" key={question}>
+                          <p className="mini-label">Question {index + 1}</p>
                           <h3>{question}</h3>
                           <p>
                             This section gives the patient a direct answer in plain language so they can understand the topic without needing to search elsewhere.
@@ -560,7 +590,7 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
               </section>
 
               {isEditing ? (
-                <aside className="panel treatment-editor-sidebar">
+                <aside className="panel treatment-editor-sidebar treatment-editor-sidebar-shell">
                   <div className="section-intro">
                     <h3>Page editor</h3>
                     <p>Update the wording, styling, and asset selection for this {mode} page.</p>
@@ -821,7 +851,7 @@ function ArticleSections({ sections }: { sections: ArticleSection[] }) {
   return (
     <div className="article-flow">
       {sections.map((section) => (
-        <section className="article-section-block" key={section.title}>
+        <section className="article-section-block care-page-article-card" key={section.title}>
           <h2>{section.title}</h2>
           {section.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>

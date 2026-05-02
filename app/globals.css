@@ -436,6 +436,157 @@ label span {
   font-family: var(--treatment-font-family, inherit);
 }
 
+.care-page-preview {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(248, 210, 147, 0.18), transparent 22%),
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 251, 246, 0.98), rgba(247, 240, 229, 0.96));
+  border: 1px solid rgba(110, 82, 46, 0.1);
+  box-shadow:
+    0 28px 80px rgba(71, 52, 29, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.care-page-preview::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent 38%),
+    linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.22));
+  pointer-events: none;
+}
+
+.care-page-preview > * {
+  position: relative;
+  z-index: 1;
+}
+
+.care-page-hero,
+.compact-care-page-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.care-page-hero {
+  padding: 2px 0 8px;
+}
+
+.care-page-hero-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.care-page-hero-aside {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(247, 241, 232, 0.88));
+  border: 1px solid rgba(110, 82, 46, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.care-page-hero-aside h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.care-page-hero-note {
+  font-size: 0.96rem;
+}
+
+.care-page-fact-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.care-page-fact-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.08);
+  border: 1px solid rgba(15, 118, 110, 0.12);
+  color: #135953;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.care-page-contents-card,
+.care-page-feature-band,
+.care-page-article-card,
+.care-page-treatment-block {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(250, 245, 237, 0.92));
+  border: 1px solid rgba(110, 82, 46, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.care-page-section-heading {
+  margin-bottom: 12px;
+}
+
+.care-page-section-stack {
+  gap: 16px;
+}
+
+.care-page-article-card,
+.care-page-treatment-block {
+  border-top: 0;
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.care-page-article-card:first-child,
+.care-page-treatment-block:first-child {
+  padding-top: 22px;
+}
+
+.care-page-article-card h2,
+.care-page-treatment-block h2,
+.care-page-treatment-block h4 {
+  margin-top: 0;
+}
+
+.care-page-feature-band {
+  padding: 22px;
+  border-radius: 26px;
+}
+
+.care-page-feature-card {
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(110, 82, 46, 0.08);
+}
+
+.care-page-feature-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.article-media-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.article-faq-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.treatment-editor-sidebar-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(246, 239, 228, 0.98));
+  border: 1px solid rgba(110, 82, 46, 0.08);
+}
+
 .treatment-preview-header h1,
 .treatment-preview-card h4 {
   color: var(--treatment-heading-color, inherit);
@@ -844,6 +995,10 @@ textarea {
 .analysis-stack {
   display: grid;
   gap: 16px;
+}
+
+.provider-package-preview {
+  gap: 18px;
 }
 
 .highlight-card {
@@ -1755,6 +1910,13 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .care-page-hero,
+  .compact-care-page-hero,
+  .article-media-list,
+  .article-faq-list {
+    grid-template-columns: 1fr;
+  }
+
   .provider-patient-directory,
   .treatment-library-sidebar,
   .treatment-editor-sidebar {
@@ -1944,6 +2106,13 @@ textarea {
 
   .dialogue-card {
     padding: 16px;
+  }
+
+  .care-page-hero-aside,
+  .care-page-feature-band,
+  .care-page-article-card,
+  .care-page-treatment-block {
+    border-radius: 22px;
   }
 
   .catalog-summary p,

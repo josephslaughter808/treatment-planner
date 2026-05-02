@@ -786,18 +786,29 @@ function TreatmentPackageActivity({ diagnoses }: { diagnoses: DiagnosisEvent[] }
 
 function PackagePreview({ preview }: { preview: AnalysisResponse }) {
   return (
-    <div className="analysis-stack">
-      <div className="highlight-card">
-        <p className="mini-label">{preview.packageSource}</p>
-        <h3>{preview.headline}</h3>
-        <p>{preview.summary}</p>
-      </div>
+    <div className="analysis-stack care-page-preview provider-package-preview">
+      <section className="care-page-hero compact-care-page-hero">
+        <div className="care-page-hero-copy">
+          <p className="mini-label">{preview.packageSource}</p>
+          <h3>{preview.headline}</h3>
+          <p>{preview.summary}</p>
+        </div>
+        <aside className="care-page-hero-aside">
+          <p className="mini-label">Preview package</p>
+          <h3>Included in this view</h3>
+          <div className="care-page-fact-list">
+            <span className="care-page-fact-pill">{preview.diagnosisSections.length} diagnosis sections</span>
+            <span className="care-page-fact-pill">{preview.treatmentCards.length} treatment cards</span>
+            <span className="care-page-fact-pill">{preview.providerLabel}</span>
+          </div>
+        </aside>
+      </section>
 
-      <article>
+      <article className="care-page-feature-band">
         <h3>Diagnosis education page</h3>
         <div className="dialogue-list">
           {preview.diagnosisSections.map((section) => (
-            <div className="dialogue-card" key={section.title}>
+            <div className="dialogue-card care-page-article-card" key={section.title}>
               <h4>{section.title}</h4>
               <p>{section.body}</p>
             </div>
@@ -805,11 +816,11 @@ function PackagePreview({ preview }: { preview: AnalysisResponse }) {
         </div>
       </article>
 
-      <article>
+      <article className="care-page-feature-band">
         <h3>Treatment comparison cards</h3>
         <div className="dialogue-list">
           {preview.treatmentCards.map((card) => (
-            <div className="dialogue-card" key={card.label}>
+            <div className="dialogue-card care-page-treatment-block" key={card.label}>
               <h4>{card.label}</h4>
               <p>{card.summary}</p>
               <p><strong>Group:</strong> {card.optionGroupLabel}</p>
