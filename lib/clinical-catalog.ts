@@ -96,6 +96,25 @@ const diagnosis = (
   educationSections
 });
 
+const generalDiagnosis = (
+  id: string,
+  label: string,
+  plainLanguageSummary: string,
+  treatmentOptionIds: string[],
+  commonQuestions: string[],
+  mediaAssetIds: string[],
+  detail: {
+    means: string;
+    matters: string;
+    goal: string;
+  }
+): DiagnosisTemplate =>
+  diagnosis(id, "general-dentistry", label, plainLanguageSummary, treatmentOptionIds, commonQuestions, mediaAssetIds, [
+    section("What this diagnosis means", detail.means),
+    section("Why it matters", detail.matters),
+    section("Treatment goal", detail.goal)
+  ]);
+
 export const specialties: Specialty[] = [
   {
     id: "general-dentistry",
@@ -1293,6 +1312,396 @@ export const conditionCatalog: DiagnosisTemplate[] = [
       section("Why there can still be multiple paths", "Removable and implant-supported solutions differ in cost, surgery, stability, and timeline."),
       section("Treatment goal", "The office wants the patient to understand both the first delivery and the longer adaptation process.")
     ]
+  ),
+  generalDiagnosis(
+    "caries",
+    "Caries",
+    "A cavity has damaged the tooth and may continue to grow deeper if it is not monitored or treated in time.",
+    ["monitoring", "filling", "inlay-onlay", "crown"],
+    ["How deep is the cavity?", "Can this still be treated with a filling?", "What happens if I wait?"],
+    ["video-filling-overview", "diagram-filling-vs-crown", "handout-restorative-aftercare"],
+    {
+      means: "Tooth structure has been weakened by bacterial breakdown and the area is no longer fully healthy or sealed.",
+      matters: "Caries can start small and silent, then move deeper into the tooth until treatment becomes more involved.",
+      goal: "The office is trying to stop the damage and preserve the tooth with the most conservative predictable option."
+    }
+  ),
+  generalDiagnosis(
+    "pulp-necrosis",
+    "Pulp necrosis",
+    "The tissue inside the tooth is no longer healthy or alive, and infection can develop or spread from the root.",
+    ["root-canal", "extraction"],
+    ["How can a dead nerve still cause pain?", "Can the tooth still be saved?", "Will this spread if I do nothing?"],
+    ["video-root-canal-overview", "diagram-root-canal-steps", "handout-root-canal-aftercare"],
+    {
+      means: "The nerve tissue inside the tooth has lost vitality and can no longer recover on its own.",
+      matters: "Once the pulp becomes necrotic, the inside of the tooth can act as a source of bacteria and inflammation.",
+      goal: "Treatment focuses on removing the source inside the tooth or removing the tooth itself if saving it is not realistic."
+    }
+  ),
+  generalDiagnosis(
+    "condensing-osteitis",
+    "Condensing osteitis",
+    "The bone near the root has become denser in response to long-term irritation or low-grade inflammation from the tooth.",
+    ["root-canal", "extraction", "monitoring"],
+    ["Why does the bone look different on the x-ray?", "Does this always mean infection?", "Will the bone go back to normal after treatment?"],
+    ["diagram-root-canal-steps", "video-root-canal-overview", "handout-root-canal-aftercare"],
+    {
+      means: "The bone is reacting to ongoing irritation by becoming more sclerotic or dense around the tooth root.",
+      matters: "This often signals that the tooth has had a chronic pulpal problem even if the symptoms have been mild or intermittent.",
+      goal: "The office is identifying whether the tooth needs endodontic treatment, close review, or removal based on the full clinical picture."
+    }
+  ),
+  generalDiagnosis(
+    "periodontitis",
+    "Periodontitis",
+    "Gum disease has begun affecting the supporting tissues around the teeth and needs active control to protect long-term stability.",
+    ["scaling-root-planing", "periodontal-maintenance", "gum-graft", "extraction"],
+    ["Is this reversible?", "Why is this different from a regular cleaning?", "Will I need maintenance forever?"],
+    ["video-periodontal-therapy", "diagram-periodontal-charting", "handout-periodontal-maintenance"],
+    {
+      means: "Bacterial infection and inflammation are affecting the attachment and support around the teeth, not just the surface gums.",
+      matters: "Periodontitis can progress without dramatic pain, which is why patients are often surprised by the amount of support loss already present.",
+      goal: "The office is trying to reduce infection, stabilize the healthiest possible teeth, and create a long-term maintenance plan."
+    }
+  ),
+  generalDiagnosis(
+    "periodontal-abscess",
+    "Periodontal abscess",
+    "A localized infection has developed in the supporting gum tissues around a tooth and may cause pain, swelling, or drainage.",
+    ["scaling-root-planing", "periodontal-maintenance", "extraction"],
+    ["Is this the same as an abscess inside the tooth?", "Will antibiotics solve it by themselves?", "Does this mean the tooth is in danger?"],
+    ["video-periodontal-therapy", "diagram-periodontal-charting", "handout-periodontal-maintenance"],
+    {
+      means: "The infection is centered in the periodontal tissues around the tooth rather than only inside the tooth itself.",
+      matters: "This can become painful quickly and may signal deeper periodontal destruction or trapped bacteria that need active care.",
+      goal: "The office is trying to reduce the infection, evaluate the tooth's support, and decide whether the tooth is still stable enough to keep."
+    }
+  ),
+  generalDiagnosis(
+    "attrition",
+    "Attrition",
+    "Tooth structure has worn down from repeated tooth-to-tooth contact, often over time and under heavy biting forces.",
+    ["night-guard", "filling", "crown"],
+    ["Why are my teeth getting flatter?", "Is this from grinding?", "When does wear need to be rebuilt?"],
+    ["diagram-tooth-wear-night-guard", "video-crown-overview", "handout-restorative-aftercare"],
+    {
+      means: "The chewing surfaces are gradually wearing against each other and losing normal anatomy.",
+      matters: "Attrition can make teeth shorter, more sensitive, more fragile, and more likely to chip or crack later.",
+      goal: "The office is deciding whether the priority is protection, rebuilding, or a combination of both."
+    }
+  ),
+  generalDiagnosis(
+    "abrasion",
+    "Abrasion",
+    "Tooth structure has been worn away by external mechanical habits such as overly aggressive brushing or repeated friction.",
+    ["monitoring", "filling", "night-guard"],
+    ["Is this from brushing too hard?", "Why is the root area sensitive?", "Does this always need to be filled?"],
+    ["diagram-tooth-wear-night-guard", "handout-restorative-aftercare", "video-filling-overview"],
+    {
+      means: "The tooth surface has been mechanically worn down in a way that is not caused by decay.",
+      matters: "Abrasion can expose root areas, create sensitivity, and weaken the contour where the tooth meets the gumline.",
+      goal: "The office is trying to stop the habit causing the wear and restore the area if the damage is already significant."
+    }
+  ),
+  generalDiagnosis(
+    "erosion",
+    "Erosion",
+    "Acid exposure has softened and worn away tooth structure over time.",
+    ["monitoring", "filling", "crown"],
+    ["Is this from acid or reflux?", "Can enamel grow back?", "When does this become serious enough to rebuild?"],
+    ["diagram-tooth-wear-night-guard", "video-filling-overview", "handout-restorative-aftercare"],
+    {
+      means: "Chemical wear is dissolving the outer layers of the tooth and changing how the surface looks and feels.",
+      matters: "As erosion continues, teeth can become thin, sensitive, and more likely to chip or fracture.",
+      goal: "The office is addressing both the damage already present and the factors that keep exposing the teeth to acid."
+    }
+  ),
+  generalDiagnosis(
+    "abfraction",
+    "Abfraction",
+    "Stress-related tooth flexing has contributed to a notch or defect near the gumline.",
+    ["monitoring", "filling", "night-guard"],
+    ["Why is the defect near the gumline?", "Is this caused by bite forces?", "Will a filling solve the whole problem?"],
+    ["diagram-tooth-wear-night-guard", "video-filling-overview", "handout-restorative-aftercare"],
+    {
+      means: "The cervical area of the tooth is showing a wedge-like defect that may be related to stress and flexing over time.",
+      matters: "These defects can deepen, become sensitive, and sometimes continue to worsen if the forces are not addressed.",
+      goal: "The office is deciding whether the main need is protection, restoration, or force management."
+    }
+  ),
+  generalDiagnosis(
+    "tooth-fracture",
+    "Tooth fracture",
+    "A portion of the tooth has broken or weakened enough that the remaining structure may not be stable under normal chewing.",
+    ["filling", "inlay-onlay", "crown", "extraction"],
+    ["How bad is the break?", "Can the tooth still be saved?", "Why do some fractures need crowns and others extractions?"],
+    ["video-crown-overview", "diagram-crown-temporary", "diagram-filling-vs-crown"],
+    {
+      means: "The tooth has lost structural integrity and the amount and location of the break determines what treatment is still realistic.",
+      matters: "Some fractures stay limited, while others spread into the nerve area or below the gumline and change the outlook quickly.",
+      goal: "The office is trying to preserve the tooth if possible while being honest about how predictable the repair can be."
+    }
+  ),
+  generalDiagnosis(
+    "bruxism",
+    "Bruxism",
+    "Clenching or grinding forces are damaging the teeth, restorations, muscles, or joints over time.",
+    ["night-guard", "monitoring", "crown"],
+    ["Do I grind without knowing it?", "Will a night guard stop the damage?", "Why do my teeth and jaw both feel sore?"],
+    ["diagram-tooth-wear-night-guard", "handout-restorative-aftercare", "video-crown-overview"],
+    {
+      means: "The teeth and surrounding system are being overloaded by repeated heavy force, often during sleep or unconscious daytime clenching.",
+      matters: "Bruxism can flatten teeth, chip restorations, strain muscles, and contribute to fractures or jaw symptoms.",
+      goal: "The office is trying to reduce ongoing damage and decide whether the worn or broken teeth also need repair."
+    }
+  ),
+  generalDiagnosis(
+    "occlusal-trauma",
+    "Occlusal trauma",
+    "A tooth or group of teeth is being overloaded by biting forces in a way that can irritate the support structures.",
+    ["night-guard", "monitoring", "scaling-root-planing"],
+    ["Why does it feel sore to bite?", "Is this a bite problem or a gum problem?", "Can force alone damage the tooth support?"],
+    ["diagram-tooth-wear-night-guard", "diagram-periodontal-charting", "handout-restorative-aftercare"],
+    {
+      means: "The tooth support is reacting to excessive or poorly directed force rather than only infection or decay.",
+      matters: "Heavy bite stress can create mobility, soreness, wear, and inflammation around already vulnerable teeth.",
+      goal: "The office is trying to reduce the overload and protect the teeth and support structures from further breakdown."
+    }
+  ),
+  generalDiagnosis(
+    "impacted-tooth",
+    "Impacted tooth",
+    "A tooth does not have a normal path to erupt or remain healthy in its current position.",
+    ["wisdom-tooth-removal", "monitoring"],
+    ["Does it need to come out if it is not hurting now?", "Can it damage nearby teeth?", "What happens if we just watch it?"],
+    ["video-extraction-overview", "diagram-extraction-healing", "handout-extraction-aftercare"],
+    {
+      means: "The tooth is blocked, trapped, or positioned in a way that limits healthy eruption or hygiene.",
+      matters: "Impacted teeth can create pressure, gum problems, decay risk, or silent damage to nearby teeth over time.",
+      goal: "The office is balancing today's symptoms with future risk and whether removal is the most predictable long-term choice."
+    }
+  ),
+  generalDiagnosis(
+    "malocclusion",
+    "Malocclusion",
+    "The way the teeth fit together is not ideal and may affect function, hygiene, esthetics, or long-term wear.",
+    ["aligner-therapy", "monitoring"],
+    ["Is this mostly cosmetic or also functional?", "Can aligners help this type of bite?", "Will it keep causing wear if untreated?"],
+    ["video-aligner-overview", "handout-whitening-veneers", "diagram-tooth-wear-night-guard"],
+    {
+      means: "The relationship between the upper and lower teeth is off in a way that can influence how the bite works and how the teeth age.",
+      matters: "Malocclusion can contribute to crowding, uneven wear, cleaning difficulty, or functional strain over time.",
+      goal: "The office is helping the patient understand whether simple monitoring is enough or whether alignment treatment would improve long-term function."
+    }
+  ),
+  generalDiagnosis(
+    "crowding-spacing",
+    "Crowding / spacing",
+    "The teeth are misaligned because there is either not enough room or extra room in the arch.",
+    ["aligner-therapy", "monitoring"],
+    ["How long would alignment take?", "Can this affect cleaning and gum health?", "Will the teeth move back afterward?"],
+    ["video-aligner-overview", "handout-whitening-veneers", "diagram-periodontal-charting"],
+    {
+      means: "Tooth position is uneven enough that spacing or overlap is affecting appearance, function, or hygiene.",
+      matters: "Crowding and spacing can make brushing more difficult, trap food, and sometimes worsen inflammation or wear patterns.",
+      goal: "The office is showing what alignment treatment would change and what commitment the movement process requires."
+    }
+  ),
+  generalDiagnosis(
+    "ulcer",
+    "Ulcer (aphthous or traumatic)",
+    "A sore area has developed in the oral tissues from irritation, trauma, or a recurrent ulcer pattern.",
+    ["monitoring"],
+    ["Why does this spot hurt so much?", "How do you tell trauma from something more serious?", "When should I worry if it does not heal?"],
+    ["video-periodontal-therapy", "handout-periodontal-maintenance", "diagram-periodontal-charting"],
+    {
+      means: "The tissue has broken down locally and become inflamed, tender, or sensitive during normal speaking and eating.",
+      matters: "Many ulcers are self-limited, but persistent or unusual lesions need close follow-up to make sure they are healing normally.",
+      goal: "The office is deciding whether the sore area appears routine and self-limited or whether it needs re-evaluation."
+    }
+  ),
+  generalDiagnosis(
+    "soft-tissue-abscess",
+    "Abscess (soft tissue)",
+    "A localized soft tissue infection has developed in the gums or oral tissues and needs evaluation for source and spread.",
+    ["monitoring", "scaling-root-planing", "extraction"],
+    ["Is this coming from the gums or a tooth?", "Will it drain on its own?", "What signs mean it is getting worse?"],
+    ["video-periodontal-therapy", "diagram-periodontal-charting", "video-extraction-overview"],
+    {
+      means: "The infection is centered in the soft tissues and can create swelling, tenderness, or drainage.",
+      matters: "Soft tissue abscesses can worsen quickly, and the real treatment depends on whether the source is periodontal, dental, or another local cause.",
+      goal: "The office is identifying the source and deciding whether localized cleaning, tooth treatment, or close reassessment is needed."
+    }
+  ),
+  generalDiagnosis(
+    "candidiasis",
+    "Candidiasis",
+    "A fungal overgrowth is affecting the oral tissues and may create soreness, coating, redness, or altered taste.",
+    ["monitoring"],
+    ["Why did this develop now?", "Can it be related to dry mouth or antibiotics?", "How do we know it is fungal?"],
+    ["video-periodontal-therapy", "handout-periodontal-maintenance", "diagram-periodontal-charting"],
+    {
+      means: "The balance of normal oral organisms has shifted and yeast is overgrowing in a way that is causing visible or symptomatic changes.",
+      matters: "Candidiasis can reflect local irritation, medication effects, denture issues, or broader dry mouth and health patterns.",
+      goal: "The office is confirming the diagnosis and identifying any habits or conditions that may be making recurrence more likely."
+    }
+  ),
+  generalDiagnosis(
+    "herpetic-lesion",
+    "Herpetic lesion",
+    "A viral lesion is affecting the oral tissues and may cause clusters of painful sores or recurrent flare-ups.",
+    ["monitoring"],
+    ["Why does it come back in the same area?", "Is it contagious right now?", "When is it not just a cold sore?"],
+    ["video-periodontal-therapy", "handout-periodontal-maintenance", "diagram-periodontal-charting"],
+    {
+      means: "The lesion pattern suggests a viral process that affects the oral tissues in episodes or flare-ups.",
+      matters: "Herpetic lesions can be painful, recurrent, and easy to confuse with traumatic or aphthous lesions without context.",
+      goal: "The office is helping the patient understand the pattern, the triggers, and when a lesion needs more direct attention."
+    }
+  ),
+  generalDiagnosis(
+    "benign-lesion",
+    "Benign lesion (fibroma, mucocele, etc.)",
+    "A tissue finding appears nonaggressive, but it still needs documentation and follow-up when appropriate.",
+    ["monitoring"],
+    ["How do you know it looks benign?", "Does it need to be removed?", "What changes should make me come back sooner?"],
+    ["video-periodontal-therapy", "handout-periodontal-maintenance", "diagram-periodontal-charting"],
+    {
+      means: "The tissue change appears more consistent with a harmless reactive or cyst-like process than with an aggressive disease pattern.",
+      matters: "Even benign-looking lesions should be documented and watched if they change, persist, or begin interfering with function.",
+      goal: "The office is deciding whether observation is enough or whether removal or referral would make the most sense."
+    }
+  ),
+  generalDiagnosis(
+    "suspicious-lesion",
+    "Suspicious lesion (leukoplakia, etc.)",
+    "A tissue change does not look routine and should be watched closely or referred for further evaluation.",
+    ["monitoring"],
+    ["Why are you concerned about this area?", "What makes a lesion suspicious?", "How quickly should this be rechecked?"],
+    ["video-periodontal-therapy", "handout-periodontal-maintenance", "diagram-periodontal-charting"],
+    {
+      means: "The lesion has features that do not fit a simple routine sore or harmless reactive change.",
+      matters: "Persistent, changing, or unusual lesions need careful follow-up because early evaluation matters when something is not behaving normally.",
+      goal: "The office is documenting the lesion clearly and deciding whether observation, recheck, or referral is the safest next step."
+    }
+  ),
+  generalDiagnosis(
+    "tmd",
+    "TMD",
+    "The jaw joints, chewing muscles, or related bite forces are contributing to pain, tension, noise, or limited movement.",
+    ["night-guard", "monitoring"],
+    ["Is this my joint or my muscles?", "Why does my jaw click?", "Can clenching make this worse?"],
+    ["diagram-tooth-wear-night-guard", "handout-restorative-aftercare", "video-aligner-overview"],
+    {
+      means: "The symptoms are coming from the temporomandibular system rather than only from a single tooth.",
+      matters: "TMD can create jaw fatigue, headaches, joint sounds, and bite discomfort that patients often confuse with dental pain alone.",
+      goal: "The office is trying to reduce strain, protect the system, and decide whether the symptoms look stable or progressive."
+    }
+  ),
+  generalDiagnosis(
+    "missing-tooth",
+    "Missing tooth",
+    "A tooth is already absent, so the question is whether and how to replace it in a way that fits the patient's goals.",
+    ["implant", "bridge", "partial-denture"],
+    ["Do I need to replace it?", "How is an implant different from a bridge?", "Will waiting change my options later?"],
+    ["video-implant-overview", "diagram-bridge-vs-implant", "handout-prosthetic-adaptation"],
+    {
+      means: "The current concern is no longer saving a tooth but understanding the replacement choices and what each one requires.",
+      matters: "A missing tooth can affect chewing, drifting, esthetics, and how the neighboring teeth or bone change over time.",
+      goal: "The office is helping the patient compare replacement paths clearly enough to choose the one that best fits function, cost, and timeline."
+    }
+  ),
+  generalDiagnosis(
+    "failed-restoration",
+    "Failed restoration",
+    "A prior restorative treatment is no longer sealing, protecting, or supporting the tooth predictably.",
+    ["filling", "inlay-onlay", "crown"],
+    ["Why did the restoration fail?", "Can it be repaired instead of replaced?", "How do you know when the tooth needs more coverage?"],
+    ["video-filling-overview", "diagram-filling-vs-crown", "video-crown-overview"],
+    {
+      means: "The older restoration is leaking, breaking down, or no longer matching what the tooth needs structurally.",
+      matters: "Once a restoration fails, new decay, cracks, or deeper pulpal irritation can develop around it quietly.",
+      goal: "The office is deciding how conservatively the tooth can still be rebuilt while improving long-term predictability."
+    }
+  ),
+  generalDiagnosis(
+    "broken-restoration",
+    "Broken restoration (crown/filling/bridge)",
+    "A crown, filling, or bridge has fractured, come loose, or otherwise lost its normal function.",
+    ["filling", "crown", "bridge"],
+    ["Can it be recemented or repaired?", "What if the tooth underneath is also damaged?", "Why do some broken restorations need full replacement?"],
+    ["video-crown-overview", "diagram-crown-temporary", "diagram-bridge-vs-implant"],
+    {
+      means: "The existing restoration is no longer intact enough to protect the tooth or function normally.",
+      matters: "What looks like a simple broken restoration can sometimes hide decay, root issues, or lack of remaining tooth support.",
+      goal: "The office is evaluating whether the restoration can be repaired, replaced, or whether the underlying tooth has become a bigger part of the problem."
+    }
+  ),
+  generalDiagnosis(
+    "endo-perio-lesion",
+    "Endo-perio lesion",
+    "A tooth is showing both pulpal and periodontal involvement, which can make the diagnosis and prognosis more complex.",
+    ["root-canal", "scaling-root-planing", "extraction"],
+    ["Is this coming from the nerve or the gums?", "Which part gets treated first?", "Does this lower the chance of saving the tooth?"],
+    ["video-root-canal-overview", "diagram-periodontal-charting", "handout-root-canal-aftercare"],
+    {
+      means: "Both the inside of the tooth and the supporting tissues may be contributing to the current signs and symptoms.",
+      matters: "Combined lesions can be harder to diagnose and often carry more uncertainty than a single isolated endodontic or periodontal problem.",
+      goal: "The office is sorting out the main source, the order of treatment, and whether the tooth still has a predictable future."
+    }
+  ),
+  generalDiagnosis(
+    "luxation-injury",
+    "Luxation injury",
+    "A tooth has been displaced or traumatized without being completely knocked out.",
+    ["monitoring", "root-canal", "extraction"],
+    ["Will the tooth tighten back up?", "Can the nerve still survive this?", "What changes should I watch for after the injury?"],
+    ["video-root-canal-overview", "handout-root-canal-aftercare", "diagram-extraction-healing"],
+    {
+      means: "The tooth and its supporting ligament have been injured by trauma and may respond with mobility, soreness, or pulpal changes over time.",
+      matters: "Traumatic injuries can look better before they are fully stable, so follow-up is often just as important as the first visit.",
+      goal: "The office is monitoring healing, vitality, and support while deciding whether the tooth needs only time or more active care."
+    }
+  ),
+  generalDiagnosis(
+    "avulsion",
+    "Avulsion",
+    "A tooth has been completely displaced from the socket and requires urgent evaluation of the tooth and supporting tissues.",
+    ["monitoring", "root-canal", "extraction"],
+    ["Can the tooth be saved after being knocked out?", "What affects the prognosis the most?", "Why does follow-up matter even after replantation?"],
+    ["video-root-canal-overview", "diagram-extraction-healing", "handout-root-canal-aftercare"],
+    {
+      means: "The tooth has been fully displaced, which is one of the most serious forms of dental trauma.",
+      matters: "The amount of time out of the mouth and how the tooth was handled can change the long-term outlook dramatically.",
+      goal: "The office is focused on urgent stabilization, realistic prognosis, and the sequence of follow-up needed afterward."
+    }
+  ),
+  generalDiagnosis(
+    "xerostomia",
+    "Xerostomia",
+    "The mouth is dry enough to affect comfort, oral balance, and cavity risk.",
+    ["monitoring"],
+    ["Why is my mouth so dry?", "Can this increase cavities or irritation?", "Is this related to medications or health changes?"],
+    ["handout-restorative-aftercare", "video-periodontal-therapy", "diagram-periodontal-charting"],
+    {
+      means: "The oral tissues do not have enough moisture or salivary support to stay as comfortable and protected as they should be.",
+      matters: "Dry mouth can increase decay risk, make tissues sore, affect taste, and change how teeth and restorations age.",
+      goal: "The office is identifying possible causes and explaining how dry mouth changes the patient's long-term oral risk profile."
+    }
+  ),
+  generalDiagnosis(
+    "salivary-gland-disorder",
+    "Salivary gland disorder",
+    "A salivary gland issue may be affecting flow, swelling patterns, comfort, or oral moisture balance.",
+    ["monitoring"],
+    ["Why does the gland swell at certain times?", "Can this be a blockage or infection?", "When does it need more evaluation?"],
+    ["handout-periodontal-maintenance", "diagram-periodontal-charting", "video-periodontal-therapy"],
+    {
+      means: "The problem may involve how saliva is being produced, drained, or how the gland tissues themselves are responding.",
+      matters: "Salivary disorders can affect comfort, dryness, swelling, eating, and overall oral health in ways that are easy to underestimate.",
+      goal: "The office is deciding whether the pattern looks routine, obstructive, inflammatory, or in need of broader evaluation."
+    }
   )
 ];
 

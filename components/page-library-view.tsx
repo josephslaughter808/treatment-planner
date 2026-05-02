@@ -51,7 +51,7 @@ type DesignControls = {
   lineHeight: number;
 };
 
-const diagnosisWorkingSet = conditionCatalog.slice(0, 10);
+const diagnosisWorkingSet = conditionCatalog;
 const treatmentWorkingSet = treatmentCatalog.slice(0, 10);
 
 export function PageLibraryView({ mode }: { mode: LibraryMode }) {
