@@ -2457,7 +2457,7 @@ export const conditionCatalog: DiagnosisTemplate[] = [
   diagnosis(
     "apical-abscess",
     "endodontics",
-    "Apical abscess or endodontic infection",
+    "Apical abscess",
     "There is infection associated with the tooth root, and it can spread or flare if the source is not treated.",
     ["root-canal", "extraction"],
     ["Will antibiotics fix this by themselves?", "Is saving the tooth still realistic?", "What should I expect between urgent treatment and final care?"],
