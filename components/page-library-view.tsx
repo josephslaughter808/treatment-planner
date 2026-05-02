@@ -52,7 +52,7 @@ type DesignControls = {
 };
 
 const diagnosisWorkingSet = conditionCatalog;
-const treatmentWorkingSet = treatmentCatalog.slice(0, 10);
+const treatmentWorkingSet = treatmentCatalog;
 
 export function PageLibraryView({ mode }: { mode: LibraryMode }) {
   const { currentUser } = useAuth();
