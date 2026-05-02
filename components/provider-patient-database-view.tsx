@@ -2,10 +2,12 @@
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
+import { CarePageRenderer, type CarePageContent } from "@/components/care-page-renderer";
 import {
   conditionCatalog,
   conditionsById,
   getTreatmentsForDiagnosis,
+  mediaById,
   getProvidersForPractice,
   practiceCatalog,
   treatmentsById
@@ -785,51 +787,11 @@ function TreatmentPackageActivity({ diagnoses }: { diagnoses: DiagnosisEvent[] }
 }
 
 function PackagePreview({ preview }: { preview: AnalysisResponse }) {
+  const pageContent = buildPreviewCarePage(preview);
+
   return (
     <div className="analysis-stack care-page-preview provider-package-preview">
-      <section className="care-page-hero compact-care-page-hero">
-        <div className="care-page-hero-copy">
-          <p className="mini-label">{preview.packageSource}</p>
-          <h3>{preview.headline}</h3>
-          <p>{preview.summary}</p>
-        </div>
-        <aside className="care-page-hero-aside">
-          <p className="mini-label">Preview package</p>
-          <h3>Included in this view</h3>
-          <div className="care-page-fact-list">
-            <span className="care-page-fact-pill">{preview.diagnosisSections.length} diagnosis sections</span>
-            <span className="care-page-fact-pill">{preview.treatmentCards.length} treatment cards</span>
-            <span className="care-page-fact-pill">{preview.providerLabel}</span>
-          </div>
-        </aside>
-      </section>
-
-      <article className="care-page-feature-band">
-        <h3>Diagnosis education page</h3>
-        <div className="dialogue-list">
-          {preview.diagnosisSections.map((section) => (
-            <div className="dialogue-card care-page-article-card" key={section.title}>
-              <h4>{section.title}</h4>
-              <p>{section.body}</p>
-            </div>
-          ))}
-        </div>
-      </article>
-
-      <article className="care-page-feature-band">
-        <h3>Treatment comparison cards</h3>
-        <div className="dialogue-list">
-          {preview.treatmentCards.map((card) => (
-            <div className="dialogue-card care-page-treatment-block" key={card.label}>
-              <h4>{card.label}</h4>
-              <p>{card.summary}</p>
-              <p><strong>Group:</strong> {card.optionGroupLabel}</p>
-              <p><strong>Visits:</strong> {card.visits.join(" ")}</p>
-              <p><strong>Temporary phase:</strong> {card.temporaryNotes.join(" ")}</p>
-            </div>
-          ))}
-        </div>
-      </article>
+      <CarePageRenderer content={pageContent} />
     </div>
   );
 }
@@ -868,4 +830,102 @@ function formatDate(value: string) {
     month: "short",
     day: "numeric"
   });
+}
+
+function buildPreviewCarePage(preview: AnalysisResponse): CarePageContent {
+  const heroMedia = preview.mediaPlan[0] ?? {
+    title: "Preview hero visual",
+    type: "video",
+    description: "Lead explainer visual for the diagnosis and treatment package.",
+    duration: "2:00"
+  };
+
+  return {
+    pageKind: "Preview Package",
+    eyebrow: "Patient education package preview",
+    title: preview.headline,
+    intro: [
+      preview.summary,
+      "This preview should feel like a complete educational page the provider can trust before sending it to the patient."
+    ],
+    summary: `Package source: ${preview.packageSource}. Diagnosing provider: ${preview.providerLabel}.`,
+    heroMedia,
+    heroNote: "The provider should be able to see the diagnosis explanation and treatment storytelling exactly how the patient would experience it.",
+    ribbon: [
+      {
+        title: "Diagnosis sections",
+        body: `${preview.diagnosisSections.length} education section${preview.diagnosisSections.length === 1 ? "" : "s"} included.`
+      },
+      {
+        title: "Treatment options",
+        body: `${preview.treatmentCards.length} treatment card${preview.treatmentCards.length === 1 ? "" : "s"} prepared for review.`
+      },
+      {
+        title: "Media support",
+        body: `${preview.mediaPlan.length} visual or video asset${preview.mediaPlan.length === 1 ? "" : "s"} included to improve understanding.`
+      }
+    ],
+    sections: [
+      {
+        eyebrow: "Diagnosis page",
+        title: "The diagnosis explanation should feel calm, visual, and easy to trust.",
+        paragraphs: preview.diagnosisSections.slice(0, 2).map((section) => section.body),
+        bullets: preview.diagnosisSections.slice(2).map((section) => section.body),
+        labels: preview.diagnosisSections.map((section) => section.title).slice(0, 4),
+        media: preview.mediaPlan.slice(0, 1),
+        layout: "media-right"
+      },
+      {
+        eyebrow: "Treatment comparison",
+        title: "The treatment section should show options without feeling cluttered.",
+        paragraphs: [
+          "A premium provider package should give enough detail for understanding while still keeping the treatment choices calm and readable."
+        ],
+        storyItems: preview.treatmentCards.map((card) => ({
+          title: card.label,
+          body: `${card.summary} ${card.temporaryNotes[0] ?? ""}`.trim()
+        })),
+        labels: preview.treatmentCards.map((card) => card.optionGroupLabel).slice(0, 4),
+        media: preview.mediaPlan.slice(1, 2).length > 0 ? preview.mediaPlan.slice(1, 2) : preview.mediaPlan.slice(0, 1),
+        layout: "media-left"
+      }
+    ],
+    timeline: {
+      eyebrow: "Treatment path",
+      title: "The patient should understand the sequence, not just the name of the procedure.",
+      intro: "This is where the preview should walk the patient through what treatment and recovery actually look like.",
+      notes: [
+        "Good patient pages lower anxiety by showing order and pacing.",
+        "Videos and diagrams should support the explanation, not replace it.",
+        "The provider should feel comfortable sending this exactly as shown."
+      ],
+      steps: preview.treatmentCards.slice(0, 4).map((card, index) => ({
+        label: `Option ${index + 1}`,
+        title: card.label,
+        body: `${card.visits[0] ?? card.summary} ${card.temporaryNotes[0] ?? ""}`.trim()
+      }))
+    },
+    gallery: {
+      eyebrow: "Pictures and videos",
+      title: "A complete package should use several kinds of media",
+      intro: "This gallery is where the page becomes much easier for the patient to absorb and revisit later.",
+      items: preview.mediaPlan.slice(0, 4)
+    },
+    faqs: {
+      eyebrow: "Patient questions",
+      title: "These are the questions patients usually want answered before deciding",
+      intro: "A clean FAQ section helps the page feel thorough without turning it into a wall of text.",
+      items: (preview.commonQuestions.length > 0 ? preview.commonQuestions : ["What happens next?", "Will this take more than one visit?", "What should I expect after treatment?"])
+        .slice(0, 5)
+        .map((question) => ({
+          question,
+          answer: "This answer should be written in plain language and support the provider's explanation without sounding robotic or overly clinical."
+        }))
+    },
+    closing: {
+      title: "The package should feel premium enough to send as-is.",
+      body: "This preview is most effective when diagnosis explanation, treatment comparison, and media teaching all feel like one cohesive experience.",
+      note: "As we add real practice photos, x-rays, diagrams, and video embeds, this section will get even closer to the exact reference pages you shared."
+    }
+  };
 }

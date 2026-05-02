@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 import { useAuth } from "@/components/auth-provider";
+import { CarePageRenderer, type CarePageContent } from "@/components/care-page-renderer";
 import {
   conditionCatalog,
   conditionsById,
@@ -50,18 +51,8 @@ type DesignControls = {
   lineHeight: number;
 };
 
-type ArticleSection = {
-  title: string;
-  paragraphs: string[];
-  bulletItems?: string[];
-};
-
 const diagnosisWorkingSet = conditionCatalog.slice(0, 10);
 const treatmentWorkingSet = treatmentCatalog.slice(0, 10);
-const contentTabsByMode = {
-  diagnosis: { primary: "Overview", secondary: "Treatment options" },
-  treatment: { primary: "Overview", secondary: "Procedure details" }
-} as const;
 
 export function PageLibraryView({ mode }: { mode: LibraryMode }) {
   const { currentUser } = useAuth();
@@ -74,7 +65,6 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"primary" | "secondary">("primary");
   const [editorTab, setEditorTab] = useState<"item-assets" | "general-assets">("item-assets");
   const [designControls, setDesignControls] = useState<DesignControls>({
     fontFamily: "Source Sans 3",
@@ -145,127 +135,6 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
     selectedTreatment
   ]);
 
-  const treatmentSpecificSections = useMemo<ArticleSection[]>(() => {
-    if (!selectedTreatment) {
-      return [];
-    }
-
-    return [
-      {
-        title: "How this treatment works",
-        paragraphs: [selectedTreatment.summary]
-      },
-      {
-        title: "What to expect across visits",
-        paragraphs: ["Your provider will guide you through the timing and sequence of visits."],
-        bulletItems: selectedTreatment.visits
-      },
-      {
-        title: "Temporary phase and recovery",
-        paragraphs: [selectedTreatment.temporaryNotes.join(" ")]
-      },
-      {
-        title: "Why patients choose it",
-        paragraphs: [selectedTreatment.patientBenefits.join(" ")]
-      },
-      {
-        title: "Tradeoffs to understand",
-        paragraphs: [selectedTreatment.patientTradeoffs.join(" ")]
-      }
-    ];
-  }, [selectedTreatment]);
-
-  const diagnosisArticleSections = useMemo<ArticleSection[]>(() => {
-    if (!selectedDiagnosis) {
-      return [];
-    }
-
-    return [
-      {
-        title: "Overview",
-        paragraphs: [infoPageIntro.trim() || selectedDiagnosis.plainLanguageSummary]
-      },
-      {
-        title: "What this diagnosis means",
-        paragraphs: [
-          selectedDiagnosis.educationSections[0]?.body ||
-          "This section explains what your provider is seeing and why it matters."
-        ]
-      },
-      {
-        title: "What you may notice",
-        paragraphs: [
-          selectedDiagnosis.educationSections[1]?.body ||
-          "Patients may notice pain, swelling, sensitivity, changes when chewing, or sometimes very few symptoms at first."
-        ]
-      },
-      {
-        title: "Why treatment may be recommended",
-        paragraphs: [
-          selectedDiagnosis.educationSections[2]?.body ||
-          "Dental problems often do not heal on their own, and early treatment can help preserve more options."
-        ],
-        bulletItems: selectedDiagnosis.commonQuestions.slice(0, 3)
-      }
-    ];
-  }, [infoPageIntro, selectedDiagnosis]);
-
-  const treatmentArticleSections = useMemo<ArticleSection[]>(() => {
-    if (!selectedTreatment) {
-      return [];
-    }
-
-    return [
-      {
-        title: "Overview",
-        paragraphs: [infoPageIntro.trim() || selectedTreatment.summary]
-      },
-      {
-        title: "What this treatment does",
-        paragraphs: [
-          selectedTreatment.patientBenefits.join(" ") ||
-          "This treatment is meant to solve the immediate problem while protecting the tooth and surrounding tissues."
-        ]
-      },
-      {
-        title: "Procedure details",
-        paragraphs: [
-          "Your provider will walk through the procedure in steps so you know what happens before, during, and after treatment."
-        ],
-        bulletItems: selectedTreatment.visits
-      },
-      {
-        title: "Risks and tradeoffs",
-        paragraphs: [
-          selectedTreatment.patientTradeoffs.join(" ") ||
-          "Every treatment has tradeoffs, and your provider will review the important ones with you."
-        ]
-      },
-      {
-        title: "Recovery and outlook",
-        paragraphs: [
-          selectedTreatment.temporaryNotes.join(" ") ||
-          "Recovery depends on the procedure, but patients are usually given clear aftercare and follow-up instructions."
-        ]
-      },
-      {
-        title: "Why patients still choose this option",
-        paragraphs: [
-          selectedTreatment.patientBenefits.join(" ") ||
-          "This treatment can still be the best fit when the benefits line up with the tooth condition and the patient's goals."
-        ]
-      }
-    ];
-  }, [infoPageIntro, selectedTreatment]);
-
-  const previewSections = useMemo(() => {
-    return mode === "diagnosis" ? diagnosisArticleSections : treatmentArticleSections;
-  }, [
-    diagnosisArticleSections,
-    mode,
-    treatmentArticleSections
-  ]);
-
   const mediaAssets = useMemo(() => {
     if (mode === "treatment") {
       return (selectedTreatment?.mediaAssetIds ?? [])
@@ -275,7 +144,8 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
           id: asset.id,
           title: asset.title,
           type: asset.type,
-          description: asset.description
+          description: asset.description,
+          duration: asset.duration
         }));
     }
 
@@ -283,22 +153,22 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
       id: `diagnosis-${asset.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
       title: asset.title,
       type: asset.type,
-      description: asset.description
+      description: asset.description,
+      duration: asset.duration
     }));
   }, [diagnosisPreview?.mediaPlan, mode, selectedTreatment?.mediaAssetIds]);
 
-  const diagnosisTreatmentCards = diagnosisPreview?.treatmentCards ?? [];
-  const contents = useMemo(
+  const diagnosisTreatmentCards = useMemo(
+    () => diagnosisPreview?.treatmentCards ?? [],
+    [diagnosisPreview?.treatmentCards]
+  );
+  const commonQuestions = useMemo(
     () =>
       mode === "diagnosis"
-        ? ["Overview", "What this diagnosis means", "What you may notice", "Why treatment may be recommended", "Treatment options", "Common questions"]
-        : ["Overview", "What this treatment does", "Procedure details", "Risks and tradeoffs", "Recovery and outlook", "Common questions"],
-    [mode]
+        ? selectedDiagnosis?.commonQuestions ?? []
+        : selectedDiagnosisForTreatment?.commonQuestions ?? [],
+    [mode, selectedDiagnosis?.commonQuestions, selectedDiagnosisForTreatment?.commonQuestions]
   );
-  const commonQuestions =
-    mode === "diagnosis"
-      ? selectedDiagnosis?.commonQuestions ?? []
-      : selectedDiagnosisForTreatment?.commonQuestions ?? [];
 
   const listItems = mode === "diagnosis" ? diagnosisItems : treatmentItems;
 
@@ -321,7 +191,6 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
     setPreferredMediaAssetIds(override?.preferredMediaAssetIds ?? []);
     setIsEditing(false);
     setMessage(null);
-    setActiveTab("primary");
     setEditorTab("item-assets");
   }
 
@@ -380,18 +249,43 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
       ? infoPageIntro.trim() || selectedDiagnosis?.plainLanguageSummary || ""
       : infoPageIntro.trim() || selectedTreatment?.summary || "";
   const reviewDate = "07/03/2025";
-  const previewFacts =
-    mode === "diagnosis"
-      ? [
-          `${diagnosisTreatmentCards.length || getTreatmentsForDiagnosis(selectedDiagnosis?.id ?? "").length} treatment paths`,
-          `${mediaAssets.length} visual asset${mediaAssets.length === 1 ? "" : "s"}`,
-          `${commonQuestions.length || 3} patient questions addressed`
-        ]
-      : [
-          selectedTreatment?.optionGroupLabel || "Treatment guidance",
-          `${mediaAssets.length} visual asset${mediaAssets.length === 1 ? "" : "s"}`,
-          `${selectedTreatment?.visits.length ?? 0} visit milestone${selectedTreatment?.visits.length === 1 ? "" : "s"}`
-        ];
+  const pageContent = useMemo<CarePageContent | null>(() => {
+    if (mode === "diagnosis") {
+      if (!selectedDiagnosis) {
+        return null;
+      }
+
+      return buildDiagnosisCarePage({
+        diagnosis: selectedDiagnosis,
+        title: previewTitle,
+        intro: previewDescriptor,
+        commonQuestions,
+        mediaAssets,
+        treatmentCards: diagnosisTreatmentCards
+      });
+    }
+
+    if (!selectedTreatment) {
+      return null;
+    }
+
+    return buildTreatmentCarePage({
+      treatment: selectedTreatment,
+      title: previewTitle,
+      intro: previewDescriptor,
+      mediaAssets,
+      commonQuestions
+    });
+  }, [
+    commonQuestions,
+    diagnosisTreatmentCards,
+    mediaAssets,
+    mode,
+    previewDescriptor,
+    previewTitle,
+    selectedDiagnosis,
+    selectedTreatment
+  ]);
 
   return (
     <div className="treatment-library-layout">
@@ -461,132 +355,15 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                   } as CSSProperties
                 }
               >
-                <section className="care-page-hero">
-                  <div className="care-page-hero-copy diagnosis-detail-header treatment-preview-header">
-                    <p className="eyebrow">{capitalize(mode)}</p>
-                    <h1>{previewTitle}</h1>
-                    <div className="treatment-page-meta">
-                      <span>Medically reviewed.</span>
-                      <span>Last updated on {reviewDate}.</span>
-                    </div>
-                    <p className="diagnosis-subtitle">{previewSubtitle}</p>
-                    <p className="diagnosis-descriptor">{previewDescriptor}</p>
+                <div className="treatment-preview-meta">
+                  <div className="treatment-page-meta">
+                    <span>{capitalize(mode)} page preview</span>
+                    <span>Medically reviewed.</span>
+                    <span>Last updated on {reviewDate}.</span>
+                    <span>{previewSubtitle}</span>
                   </div>
-
-                  <aside className="care-page-hero-aside">
-                    <p className="mini-label">Quick profile</p>
-                    <h3>What the patient sees first</h3>
-                    <div className="care-page-fact-list">
-                      {previewFacts.map((fact) => (
-                        <span className="care-page-fact-pill" key={fact}>
-                          {fact}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="care-page-hero-note">
-                      This layout is designed to feel calm, polished, and easy to trust while still guiding treatment decisions.
-                    </p>
-                  </aside>
-                </section>
-
-                <article className="saved-section-card treatment-contents-card care-page-contents-card">
-                  <div className="saved-section-header care-page-section-heading">
-                    <div>
-                      <p className="mini-label">Contents</p>
-                      <h3>{mode === "diagnosis" ? "On this diagnosis page" : "On this treatment page"}</h3>
-                    </div>
-                  </div>
-                  <div className="treatment-contents-list">
-                    {contents.map((item) => (
-                      <span className="treatment-content-pill" key={item}>
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </article>
-
-                <div className="tab-row">
-                  <button
-                    className={`tab-button ${activeTab === "primary" ? "active" : ""}`}
-                    onClick={() => setActiveTab("primary")}
-                    type="button"
-                  >
-                    {contentTabsByMode[mode].primary}
-                  </button>
-                  <button
-                    className={`tab-button ${activeTab === "secondary" ? "active" : ""}`}
-                    onClick={() => setActiveTab("secondary")}
-                    type="button"
-                  >
-                    {contentTabsByMode[mode].secondary}
-                  </button>
                 </div>
-
-                {activeTab === "primary" ? (
-                  <div className="dialogue-list care-page-section-stack">
-                    <ArticleSections sections={previewSections} />
-                  </div>
-                ) : (
-                  <div className="article-flow care-page-section-stack">
-                    {mode === "diagnosis"
-                      ? diagnosisTreatmentCards.map((option) => (
-                          <section className="article-section-block care-page-treatment-block" key={option.label}>
-                            <h2>{option.label}</h2>
-                            <p>{option.summary}</p>
-                            <h3>What the visit pattern usually looks like</h3>
-                            <ul className="article-bullets">
-                              {option.visits.map((visit) => (
-                                <li key={visit}>{visit}</li>
-                              ))}
-                            </ul>
-                            <h3>Temporary phase and recovery</h3>
-                            <ul className="article-bullets">
-                              {option.temporaryNotes.map((note) => (
-                                <li key={note}>{note}</li>
-                              ))}
-                            </ul>
-                          </section>
-                        ))
-                      : <ArticleSections sections={treatmentSpecificSections.slice(2)} />}
-                  </div>
-                )}
-
-                <section className="article-section-block care-page-feature-band">
-                  <h2>Media and diagrams</h2>
-                  <p>
-                    These visuals are included to help the patient understand the diagnosis or treatment without relying only on technical language.
-                  </p>
-                  <div className="article-media-list">
-                    {mediaAssets.map((asset) => (
-                      <article className="article-media-item care-page-feature-card" key={asset.id}>
-                        <p className="mini-label">{asset.type}</p>
-                        <h3>{asset.title}</h3>
-                        <p>{asset.description}</p>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="article-section-block care-page-feature-band">
-                  <h2>Additional common questions</h2>
-                  {commonQuestions.length > 0 ? (
-                    <div className="article-faq-list">
-                      {commonQuestions.map((question, index) => (
-                        <div className="care-page-feature-card" key={question}>
-                          <p className="mini-label">Question {index + 1}</p>
-                          <h3>{question}</h3>
-                          <p>
-                            This section gives the patient a direct answer in plain language so they can understand the topic without needing to search elsewhere.
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p>
-                      Your provider will explain timing, recovery, and whether anything else needs to happen before or after this step.
-                    </p>
-                  )}
-                </section>
+                {pageContent ? <CarePageRenderer content={pageContent} /> : null}
               </section>
 
               {isEditing ? (
@@ -847,24 +624,323 @@ function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function ArticleSections({ sections }: { sections: ArticleSection[] }) {
-  return (
-    <div className="article-flow">
-      {sections.map((section) => (
-        <section className="article-section-block care-page-article-card" key={section.title}>
-          <h2>{section.title}</h2>
-          {section.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-          {section.bulletItems && section.bulletItems.length > 0 ? (
-            <ul className="article-bullets">
-              {section.bulletItems.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
-      ))}
-    </div>
-  );
+function buildDiagnosisCarePage(input: {
+  diagnosis: DiagnosisTemplate;
+  title: string;
+  intro: string;
+  commonQuestions: string[];
+  mediaAssets: Array<{ id: string; title: string; type: string; description: string; duration?: string }>;
+  treatmentCards: AnalysisResponse["treatmentCards"];
+}): CarePageContent {
+  const education = input.diagnosis.educationSections;
+  const heroMedia = input.mediaAssets[0] ?? {
+    id: "hero-diagnosis",
+    title: "Diagnosis hero visual",
+    type: "diagram",
+    description: "Large x-ray, clinical illustration, or calm explainer image for the diagnosis.",
+    duration: undefined
+  };
+  const galleryItems = input.mediaAssets.length > 0 ? input.mediaAssets : [heroMedia];
+  const treatmentCount = input.treatmentCards.length;
+
+  return {
+    pageKind: "Diagnosis Page",
+    eyebrow: "Your diagnosis explained simply",
+    title: input.title,
+    intro: [
+      input.intro,
+      "This page is meant to slow things down and explain what your provider is seeing in a way that feels clear, calm, and easy to understand."
+    ],
+    summary: toPlainLanguageSummary(input.diagnosis.plainLanguageSummary),
+    heroMedia,
+    heroNote: "This diagnosis page should help the patient understand what happened before treatment choices are compared.",
+    ribbon: [
+      {
+        title: "What happened",
+        body: education[0]?.body ?? "The problem developed gradually inside the tooth and surrounding tissues."
+      },
+      {
+        title: "Why it matters",
+        body: education[1]?.body ?? "Without treatment, discomfort, infection, or structural damage may continue to worsen."
+      },
+      {
+        title: "What comes next",
+        body:
+          treatmentCount > 0
+            ? `Your provider may review ${treatmentCount} treatment option${treatmentCount === 1 ? "" : "s"} based on the tooth condition and long-term predictability.`
+            : "Your provider will review the next recommended step based on the condition of the tooth."
+      }
+    ],
+    sections: [
+      {
+        eyebrow: "What this diagnosis means",
+        title: "The condition needs to make sense before treatment does.",
+        paragraphs: [
+          education[0]?.body ?? input.diagnosis.plainLanguageSummary,
+          education[2]?.body ?? "This section should connect the diagnosis to why your provider is concerned and what can happen next."
+        ],
+        bullets: education.map((item) => item.body).slice(0, 4),
+        labels: buildLabelsFromDiagnosis(input.diagnosis),
+        media: galleryItems.slice(0, 1),
+        layout: "media-right"
+      },
+      {
+        eyebrow: "Symptoms and signs",
+        title: "Some patients feel a lot. Others notice very little until it worsens.",
+        paragraphs: [
+          "Diagnosis pages should explain both the symptoms a patient might feel and the clinical signs your office may be seeing on imaging or exam."
+        ],
+        storyItems: buildDiagnosisStories(input.diagnosis),
+        labels: buildQuestionLabels(input.commonQuestions),
+        media: galleryItems.slice(1, 2).length > 0 ? galleryItems.slice(1, 2) : galleryItems.slice(0, 1),
+        layout: "media-left"
+      },
+      {
+        eyebrow: "Helpful visuals",
+        title: "Pictures and videos should make the diagnosis easier to understand at a glance.",
+        paragraphs: [
+          "This media section is where the office can place x-rays, tooth diagrams, short explainer videos, and annotated photos that reinforce the written explanation."
+        ],
+        media: galleryItems.slice(0, 2),
+        layout: "full-bleed"
+      }
+    ],
+    timeline:
+      treatmentCount > 0
+        ? {
+            eyebrow: "Treatment direction",
+            title: "What the conversation usually moves toward next",
+            intro:
+              "After the diagnosis is clear, the next part of the visit is usually about whether the tooth can be saved, what that takes, and what recovery would look like.",
+            notes: [
+              "Diagnosis pages should set up the treatment discussion without overwhelming the patient.",
+              "Equal treatment options should feel balanced and easy to compare.",
+              "If the tooth has a poor outlook, that should still be explained in simple language."
+            ],
+            steps: input.treatmentCards.slice(0, 4).map((card, index) => ({
+              label: `Option ${index + 1}`,
+              title: card.label,
+              body: `${card.summary} ${card.visits[0] ?? ""}`.trim()
+            }))
+          }
+        : undefined,
+    gallery: {
+      eyebrow: "Media gallery",
+      title: "Detailed visuals for complete understanding",
+      intro:
+        "The best diagnosis pages do not rely on one image. They use several visuals and short video moments so the patient can understand the problem from more than one angle.",
+      items: galleryItems.slice(0, 4)
+    },
+    faqs: {
+      eyebrow: "Common questions",
+      title: "Questions patients usually ask after hearing this diagnosis",
+      intro: "These answers should be short, direct, and reassuring without hiding the seriousness of the problem.",
+      items: buildFaqItems(input.commonQuestions, "diagnosis")
+    },
+    closing: {
+      title: "The goal is understanding before decision-making.",
+      body:
+        "A strong diagnosis page should help the patient understand what is happening, why your office is concerned, and why treatment recommendations make sense.",
+      note:
+        "This is where future office photos, x-rays, short videos, and branded explainers will make the page feel even more premium."
+    }
+  };
+}
+
+function buildTreatmentCarePage(input: {
+  treatment: TreatmentOption;
+  title: string;
+  intro: string;
+  mediaAssets: Array<{ id: string; title: string; type: string; description: string; duration?: string }>;
+  commonQuestions: string[];
+}): CarePageContent {
+  const heroMedia = input.mediaAssets[0] ?? {
+    id: "hero-treatment",
+    title: "Treatment hero visual",
+    type: "video",
+    description: "Large treatment explainer video or step-by-step overview visual.",
+    duration: "2:00"
+  };
+  const galleryItems = input.mediaAssets.length > 0 ? input.mediaAssets : [heroMedia];
+
+  return {
+    pageKind: "Treatment Page",
+    eyebrow: "Your treatment explained simply",
+    title: input.title,
+    intro: [
+      input.intro,
+      "Treatment pages should feel calm and high-end while also being extremely clear about what the procedure does, why it is recommended, and what recovery is like."
+    ],
+    summary: "In plain language: this page should show the patient what the treatment is, how it works, what to expect at each step, and where videos or diagrams can help them feel prepared.",
+    heroMedia,
+    heroNote: "This treatment page should make the procedure feel understandable instead of intimidating.",
+    ribbon: [
+      {
+        title: "What this treatment does",
+        body: input.treatment.summary
+      },
+      {
+        title: "Visit pattern",
+        body: input.treatment.visits[0] ?? "Your provider will guide you through the sequence of visits."
+      },
+      {
+        title: "Recovery focus",
+        body: input.treatment.temporaryNotes[0] ?? "Patients should know what is normal during the recovery period and when to call the office."
+      }
+    ],
+    sections: [
+      {
+        eyebrow: "How the treatment works",
+        title: "The patient should understand the procedure before the procedure happens.",
+        paragraphs: [
+          input.treatment.summary,
+          "A premium treatment page should explain the steps in simple language and pair that explanation with videos, diagrams, and recovery visuals."
+        ],
+        bullets: input.treatment.patientBenefits,
+        labels: [input.treatment.optionGroupLabel, "Explained simply", "Procedure overview"],
+        media: galleryItems.slice(0, 1),
+        layout: "media-right"
+      },
+      {
+        eyebrow: "Visit-by-visit expectations",
+        title: "Patients should be able to picture the treatment flow clearly.",
+        paragraphs: [
+          "This section should outline the sequence of visits so the patient understands what happens first, what may be temporary, and when the final outcome is expected."
+        ],
+        storyItems: input.treatment.visits.map((visit, index) => ({
+          title: `Visit ${index + 1}`,
+          body: visit
+        })),
+        media: galleryItems.slice(1, 2).length > 0 ? galleryItems.slice(1, 2) : galleryItems.slice(0, 1),
+        layout: "media-left"
+      },
+      {
+        eyebrow: "Recovery and tradeoffs",
+        title: "Patients need simple honesty about healing, discomfort, and limitations.",
+        paragraphs: [
+          input.treatment.temporaryNotes.join(" "),
+          input.treatment.patientTradeoffs.join(" ")
+        ],
+        bullets: input.treatment.patientTradeoffs,
+        labels: ["Recovery", "Temporary phase", "Aftercare"],
+        media: galleryItems.slice(0, 2),
+        layout: "full-bleed"
+      }
+    ],
+    timeline: {
+      eyebrow: "Treatment timeline",
+      title: "A step-by-step path makes the procedure easier to trust.",
+      intro:
+        "This is where the page should slow the patient down and show the treatment as a sequence instead of a single intimidating event.",
+      notes: [
+        "Each step should feel specific and easy to follow.",
+        "Temporary phases should be explained clearly.",
+        "The final restoration or healing milestone should feel like a destination."
+      ],
+      steps: input.treatment.visits.map((visit, index) => ({
+        label: `Step ${index + 1}`,
+        title: buildTimelineTitle(index, input.treatment.label),
+        body: visit
+      }))
+    },
+    gallery: {
+      eyebrow: "Pictures and videos",
+      title: "Media should do a lot of the teaching here",
+      intro:
+        "The ideal treatment page uses multiple visual blocks: a hero video, a procedure diagram, recovery photos, and simple handouts the patient can revisit later.",
+      items: galleryItems.slice(0, 4)
+    },
+    faqs: {
+      eyebrow: "Common questions",
+      title: "Questions patients usually ask before saying yes to treatment",
+      intro: "This is where we answer the practical concerns that affect confidence and follow-through.",
+      items: buildFaqItems(input.commonQuestions, "treatment")
+    },
+    closing: {
+      title: "Aesthetic and reassuring does not mean vague.",
+      body:
+        "The best treatment pages feel beautiful, simple, and clear while still being detailed enough that the patient understands what the office is recommending.",
+      note:
+        "Once we add real practice videos, x-rays, before-and-after images, and branded diagrams, these pages will feel much closer to the exact format you shared."
+    }
+  };
+}
+
+function buildDiagnosisStories(diagnosis: DiagnosisTemplate) {
+  const sections = diagnosis.educationSections;
+  return [
+    {
+      title: "What patients may feel",
+      body:
+        sections[1]?.body ??
+        "Patients may notice pain, pressure, swelling, sensitivity, or changes when chewing depending on how advanced the condition is."
+    },
+    {
+      title: "What your provider may see",
+      body:
+        sections[2]?.body ??
+        "Providers may see structural breakdown, infection, changes on x-ray, or signs that the tooth is no longer responding normally."
+    },
+    {
+      title: "Why early explanation matters",
+      body:
+        "When the condition is explained clearly with visuals, patients are more likely to understand the urgency and the reason for treatment."
+    }
+  ];
+}
+
+function buildLabelsFromDiagnosis(diagnosis: DiagnosisTemplate) {
+  const bits = diagnosis.label
+    .split(/[\s,]+/)
+    .filter((part) => part.length > 4)
+    .slice(0, 4);
+  return bits.length > 0 ? bits : ["Diagnosis", "Patient education"];
+}
+
+function buildQuestionLabels(questions: string[]) {
+  if (questions.length === 0) {
+    return ["Symptoms", "Pain", "Swelling", "What next"];
+  }
+
+  return questions.slice(0, 4).map((question) => {
+    const short = question.replace(/\?$/, "").split(" ").slice(0, 3).join(" ");
+    return short.length > 20 ? `${short.slice(0, 17)}...` : short;
+  });
+}
+
+function buildFaqItems(questions: string[], mode: "diagnosis" | "treatment"): { question: string; answer: string }[] {
+  const fallback =
+    mode === "diagnosis"
+      ? [
+          "How serious is this?",
+          "Can this heal on its own?",
+          "Why am I being shown treatment choices?"
+        ]
+      : [
+          "Will this hurt?",
+          "How many visits does this usually take?",
+          "What is recovery like?"
+        ];
+
+  return (questions.length > 0 ? questions : fallback).slice(0, 5).map((question) => ({
+    question,
+    answer:
+      mode === "diagnosis"
+        ? "This answer should be short, plain-language, and specific enough that the patient understands the condition without feeling overwhelmed."
+        : "This answer should focus on expectations, clarity, and confidence so the patient understands the procedure and what comes next."
+  }));
+}
+
+function buildTimelineTitle(index: number, label: string) {
+  if (index === 0) {
+    return `Getting started with ${label.toLowerCase()}`;
+  }
+  if (index === 1) {
+    return "Middle treatment phase";
+  }
+  return "Final healing or completion phase";
+}
+
+function toPlainLanguageSummary(summary: string) {
+  return `In plain language: ${summary.charAt(0).toLowerCase()}${summary.slice(1)}`;
 }
