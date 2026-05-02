@@ -7,6 +7,7 @@ import {
 } from "@/lib/clinical-catalog";
 import type { AccountProfile } from "@/lib/account-directory";
 import type { AnalysisResponse, IntakePayload } from "@/lib/mock-analysis";
+import type { RequestActor } from "@/lib/request-auth";
 import type { CheckInRecord, PatientVault, ShareLinkRecord } from "@/lib/patient-vault";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 
@@ -305,6 +306,7 @@ export async function savePatientVaultRecord(vault: PatientVault): Promise<SaveR
         conditions_snapshot: vault.medicalConditions,
         medications_snapshot: vault.medications,
         allergies_snapshot: vault.allergies,
+        clearances_snapshot: vault.clearanceDocuments,
         emergency_contact_snapshot: vault.emergencyContact,
         emergency_disclosure_snapshot: vault.emergencyDisclosure
       },
@@ -371,6 +373,8 @@ export async function getPatientVaultRecord(email: string) {
     medicalConditions: (vaultRow.conditions_snapshot as PatientVault["medicalConditions"]) || [],
     medications: (vaultRow.medications_snapshot as PatientVault["medications"]) || [],
     allergies: (vaultRow.allergies_snapshot as PatientVault["allergies"]) || [],
+    clearanceDocuments:
+      (vaultRow.clearances_snapshot as PatientVault["clearanceDocuments"]) || [],
     insurance: (vaultRow.insurance_snapshot as PatientVault["insurance"]) || {
       providerName: "",
       memberId: "",
@@ -897,6 +901,94 @@ export async function getPatientShareLinksRecord(input: {
     mode: "supabase" as const,
     shareLinks
   };
+}
+
+export async function createCaseFileSignedAccess(input: {
+  fileId: string;
+  actor: RequestActor;
+  expiresIn?: number;
+}) {
+  const supabase = createAdminSupabaseClient();
+
+  if (!supabase) {
+    return {
+      mode: "mock" as const,
+      signedUrl: null
+    };
+  }
+
+  const { data: fileRow, error: fileError } = await supabase
+    .from("case_files")
+    .select("id, case_id, storage_bucket, storage_path, original_name, cases!inner(practice_id, patient_id)")
+    .eq("id", input.fileId)
+    .maybeSingle();
+
+  if (fileError) {
+    throw new Error(fileError.message);
+  }
+
+  if (!fileRow) {
+    throw new Error("Requested file was not found.");
+  }
+
+  const casePracticeId = (fileRow.cases as { practice_id?: string } | null)?.practice_id ?? null;
+  if (!input.actor.practiceId || input.actor.practiceId !== casePracticeId) {
+    throw new Error("You do not have access to this file.");
+  }
+
+  const { data: signed, error: signedError } = await supabase.storage
+    .from(fileRow.storage_bucket as string)
+    .createSignedUrl(fileRow.storage_path as string, input.expiresIn ?? 120);
+
+  if (signedError || !signed?.signedUrl) {
+    throw new Error(signedError?.message || "Unable to generate a signed URL.");
+  }
+
+  await logAuditEvent({
+    actor: input.actor,
+    action: "case_file_accessed",
+    resourceType: "case_file",
+    resourceId: input.fileId,
+    practiceId: casePracticeId,
+    metadata: {
+      caseId: fileRow.case_id,
+      originalName: fileRow.original_name
+    }
+  });
+
+  return {
+    mode: "supabase" as const,
+    signedUrl: signed.signedUrl,
+    originalName: fileRow.original_name as string
+  };
+}
+
+export async function logAuditEvent(input: {
+  actor?: RequestActor | null;
+  action: string;
+  resourceType: string;
+  resourceId?: string | null;
+  practiceId?: string | null;
+  patientIdentityId?: string | null;
+  metadata?: Record<string, unknown>;
+}) {
+  const supabase = createAdminSupabaseClient();
+  if (!supabase) {
+    return;
+  }
+
+  await supabase.from("audit_logs").insert({
+    actor_auth_user_id: input.actor?.authUserId ?? null,
+    actor_email: input.actor?.email ?? null,
+    actor_role: input.actor?.role ?? null,
+    actor_app_user_id: input.actor?.appUserId ?? null,
+    practice_id: input.practiceId ?? input.actor?.practiceId ?? null,
+    patient_identity_id: input.patientIdentityId ?? null,
+    action: input.action,
+    resource_type: input.resourceType,
+    resource_id: input.resourceId ?? null,
+    metadata: input.metadata ?? {}
+  });
 }
 
 function toSlug(value: string) {

@@ -3,6 +3,8 @@ import {
   createPatientShareLinkRecord,
   getPatientShareLinksRecord
 } from "@/lib/persistence";
+import { getRequestActor, isProviderActor, isSameEmailActor } from "@/lib/request-auth";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   const patientEmail = request.nextUrl.searchParams.get("patientEmail") || undefined;
@@ -14,6 +16,18 @@ export async function GET(request: NextRequest) {
       { error: "patientEmail, practiceId, or accessCode is required." },
       { status: 400 }
     );
+  }
+
+  const actor = await getRequestActor(request);
+  if (isSupabaseConfigured() && !actor) {
+    return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  }
+  if (
+    isSupabaseConfigured() &&
+    !isProviderActor(actor) &&
+    !(patientEmail && isSameEmailActor(actor, patientEmail))
+  ) {
+    return NextResponse.json({ error: "You do not have access to these share links." }, { status: 403 });
   }
 
   const result = await getPatientShareLinksRecord({ patientEmail, practiceId, accessCode });
@@ -32,6 +46,14 @@ export async function POST(request: NextRequest) {
       { error: "patientEmail, practiceId, and expiresAt are required." },
       { status: 400 }
     );
+  }
+
+  const actor = await getRequestActor(request);
+  if (isSupabaseConfigured() && !actor) {
+    return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  }
+  if (isSupabaseConfigured() && !isProviderActor(actor) && !isSameEmailActor(actor, body.patientEmail)) {
+    return NextResponse.json({ error: "You do not have access to create this share link." }, { status: 403 });
   }
 
   const result = await createPatientShareLinkRecord({

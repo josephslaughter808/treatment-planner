@@ -1,6 +1,9 @@
 export const vaultStorageKey = "clearpath-patient-vault";
 export const officeCheckInStorageKey = "clearpath-office-checkins";
 export const patientShareLinkStorageKey = "clearpath-patient-share-links";
+export const integrationApprovalSessionStorageKey = "clearpath-integration-approval-session";
+export const patientTimelineStorageKey = "clearpath-patient-timeline";
+export const patientTimelineUpdatedEvent = "clearpath:timeline-updated";
 
 export type MedicationEntry = {
   id: string;
@@ -45,6 +48,38 @@ export type EmergencyDisclosure = {
   responderMessage: string;
 };
 
+export type ClearanceStatus =
+  | "not-requested"
+  | "requested"
+  | "received"
+  | "expired"
+  | "not-required";
+
+export type ClearanceDocument = {
+  id: string;
+  category:
+    | "cardiology-clearance"
+    | "primary-care-clearance"
+    | "medical-clearance"
+    | "lab-results"
+    | "imaging-report"
+    | "anesthesia-clearance"
+    | "other";
+  title: string;
+  requestedByPracticeId: string;
+  requestedByPracticeName: string;
+  requestedFromOffice: string;
+  requestedAt: string;
+  dueDate: string;
+  status: ClearanceStatus;
+  notes: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  fileDataUrl?: string;
+  uploadedAt?: string;
+};
+
 export type PatientVault = {
   profileId: string;
   fullName: string;
@@ -60,6 +95,7 @@ export type PatientVault = {
   insurance: InsuranceEntry;
   emergencyContact: EmergencyContact;
   emergencyDisclosure: EmergencyDisclosure;
+  clearanceDocuments: ClearanceDocument[];
   officeConnections: {
     practiceId: string;
     practiceName: string;
@@ -92,6 +128,55 @@ export type ShareLinkRecord = {
   createdAt: string;
   expiresAt: string;
 };
+
+export type IntegrationApprovalSession = {
+  id: string;
+  practiceId: string;
+  practiceName: string;
+  approvingWorker: string;
+  matchedAt: string;
+  source: "check-in" | "wallet-scan";
+  vault: PatientVault;
+};
+
+export type TimelineEvent =
+  | {
+      id: string;
+      type: "initial-history";
+      patientEmail: string;
+      patientName: string;
+      createdAt: string;
+      summary: string;
+    }
+  | {
+      id: string;
+      type: "diagnosis";
+      patientEmail: string;
+      patientName: string;
+      createdAt: string;
+      diagnosisId: string;
+      practiceId?: string;
+      diagnosisLabel: string;
+      commonName: string;
+      descriptor: string;
+      providerId?: string;
+      providerName: string;
+      diagnosisDate: string;
+      toothLabel?: string;
+      selectedTreatmentIds?: string[];
+      conditionSections: { title: string; body: string }[];
+      treatmentOptions: {
+        label: string;
+        summary: string;
+        optionGroupLabel: string;
+        visits: string[];
+        temporaryNotes: string[];
+        patientBenefits: string[];
+        patientTradeoffs: string[];
+      }[];
+      treatmentRejected?: boolean;
+      rejectedTreatmentLabels?: string[];
+    };
 
 export const emptyVault: PatientVault = {
   profileId: "vault-default",
@@ -126,6 +211,7 @@ export const emptyVault: PatientVault = {
     responderMessage:
       "This emergency view contains only the information I have approved for first responders in an emergency."
   },
+  clearanceDocuments: [],
   officeConnections: []
 };
 
@@ -208,6 +294,105 @@ export function writeShareLinksToStorage(records: ShareLinkRecord[]) {
   window.localStorage.setItem(patientShareLinkStorageKey, JSON.stringify(records));
 }
 
+export function readIntegrationApprovalSessionFromStorage() {
+  if (typeof window === "undefined") {
+    return null as IntegrationApprovalSession | null;
+  }
+
+  const raw = window.localStorage.getItem(integrationApprovalSessionStorageKey);
+  if (!raw) {
+    return null as IntegrationApprovalSession | null;
+  }
+
+  try {
+    return JSON.parse(raw) as IntegrationApprovalSession;
+  } catch {
+    return null as IntegrationApprovalSession | null;
+  }
+}
+
+export function writeIntegrationApprovalSessionToStorage(session: IntegrationApprovalSession) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(integrationApprovalSessionStorageKey, JSON.stringify(session));
+}
+
+export function clearIntegrationApprovalSessionFromStorage() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(integrationApprovalSessionStorageKey);
+}
+
+export function readTimelineFromStorage() {
+  if (typeof window === "undefined") {
+    return [] as TimelineEvent[];
+  }
+
+  const raw = window.localStorage.getItem(patientTimelineStorageKey);
+  if (!raw) {
+    return [] as TimelineEvent[];
+  }
+
+  try {
+    return JSON.parse(raw) as TimelineEvent[];
+  } catch {
+    return [] as TimelineEvent[];
+  }
+}
+
+export function writeTimelineToStorage(events: TimelineEvent[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(patientTimelineStorageKey, JSON.stringify(events));
+  window.dispatchEvent(new CustomEvent(patientTimelineUpdatedEvent));
+}
+
+export function upsertTimelineEvent(event: TimelineEvent) {
+  const existing = readTimelineFromStorage();
+  const next = [event, ...existing.filter((item) => item.id !== event.id)].sort(
+    (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+  );
+  writeTimelineToStorage(next);
+  return next;
+}
+
+export function deleteTimelineEvent(eventId: string) {
+  const next = readTimelineFromStorage().filter((event) => event.id !== eventId);
+  writeTimelineToStorage(next);
+  return next;
+}
+
+export function markTreatmentRejected(input: {
+  diagnosisEventId: string;
+  treatmentLabel: string;
+}) {
+  const events = readTimelineFromStorage();
+  const next = events.map((event) => {
+    if (event.type !== "diagnosis" || event.id !== input.diagnosisEventId) {
+      return event;
+    }
+
+    const rejectedTreatmentLabels = Array.from(
+      new Set([...(event.rejectedTreatmentLabels || []), input.treatmentLabel])
+    );
+
+    return {
+      ...event,
+      treatmentRejected: true,
+      rejectedTreatmentLabels
+    };
+  });
+
+  writeTimelineToStorage(next);
+  return next;
+}
+
 export function makeBlankMedication(): MedicationEntry {
   return { id: crypto.randomUUID(), name: "", dose: "", frequency: "" };
 }
@@ -218,4 +403,19 @@ export function makeBlankAllergy(): AllergyEntry {
 
 export function makeBlankCondition(): ConditionEntry {
   return { id: crypto.randomUUID(), name: "", notes: "" };
+}
+
+export function makeBlankClearanceDocument(): ClearanceDocument {
+  return {
+    id: crypto.randomUUID(),
+    category: "medical-clearance",
+    title: "",
+    requestedByPracticeId: "",
+    requestedByPracticeName: "",
+    requestedFromOffice: "",
+    requestedAt: "",
+    dueDate: "",
+    status: "requested",
+    notes: ""
+  };
 }

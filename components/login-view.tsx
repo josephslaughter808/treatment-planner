@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
-import { demoAccounts } from "@/lib/account-directory";
+import { demoAccounts, isPatientRole } from "@/lib/account-directory";
 
 export function LoginView() {
   const router = useRouter();
@@ -21,10 +21,15 @@ export function LoginView() {
     setMessage(result.message);
 
     if (result.ok) {
-      router.push("/");
+      router.push(result.redirectTo || "/");
     }
 
     setIsSubmitting(false);
+  }
+
+  function selectDemoAccount(nextEmail: string) {
+    setEmail(nextEmail);
+    setPassword("clearpath123");
   }
 
   return (
@@ -32,8 +37,8 @@ export function LoginView() {
       <form className="panel" onSubmit={handleSubmit}>
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Office access</p>
-            <h2>Sign in to the provider workspace</h2>
+            <p className="eyebrow">Secure access</p>
+            <h2>Sign in to ClearPath Care</h2>
           </div>
         </div>
 
@@ -55,7 +60,7 @@ export function LoginView() {
           <button className="primary-button" disabled={isSubmitting} type="submit">
             {isSubmitting ? "Logging in..." : "Log in"}
           </button>
-          <p>Use a demo account below or create a new office user profile for testing.</p>
+          <p>Provider and patient logins land in different app experiences automatically.</p>
         </div>
 
         {message ? <p className="info-text">{message}</p> : null}
@@ -67,18 +72,21 @@ export function LoginView() {
 
       <section className="panel">
         <p className="eyebrow">Demo users</p>
-        <h2>Ready-to-test office accounts</h2>
+        <h2>Tap a test account</h2>
         <div className="dialogue-list">
           {demoAccounts.map((account) => (
             <div className="dialogue-card" key={account.id}>
               <h4>{account.name}</h4>
-              <p>{account.title}</p>
+              <p>
+                {account.title}
+                {isPatientRole(account.role) ? " • patient app" : " • provider app"}
+              </p>
               <p>
                 <strong>Email:</strong> {account.email}
               </p>
-              <p>
-                <strong>Password:</strong> clearpath123
-              </p>
+              <button className="secondary-button" onClick={() => selectDemoAccount(account.email)} type="button">
+                Use this account
+              </button>
             </div>
           ))}
         </div>

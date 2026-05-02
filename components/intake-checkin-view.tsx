@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { practicesById } from "@/lib/clinical-catalog";
 import {
   readCheckInsFromStorage,
+  writeIntegrationApprovalSessionToStorage,
   readShareLinksFromStorage,
   readVaultFromStorage,
   writeCheckInsToStorage,
@@ -15,6 +17,7 @@ import {
 
 export function IntakeCheckInView() {
   const { currentUser, authMode } = useAuth();
+  const router = useRouter();
   const [vault] = useState<PatientVault>(() => readVaultFromStorage());
   const [email, setEmail] = useState(() => readVaultFromStorage().email);
   const [memberId, setMemberId] = useState(() => readVaultFromStorage().memberId);
@@ -69,6 +72,19 @@ export function IntakeCheckInView() {
 
     return emailMatch && memberMatch ? vault : localShareLinkMatch || approvedServerLink ? vault : null;
   }, [accessCode, currentUser, email, memberId, serverShareLink, vault]);
+
+  const pendingClearances = useMemo(
+    () =>
+      matched?.clearanceDocuments.filter(
+        (document) => document.status === "requested" || document.status === "expired"
+      ) ?? [],
+    [matched]
+  );
+
+  const receivedClearances = useMemo(
+    () => matched?.clearanceDocuments.filter((document) => document.status === "received") ?? [],
+    [matched]
+  );
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
@@ -126,6 +142,24 @@ export function IntakeCheckInView() {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function openIntegrationReview() {
+    if (!matched || !currentUser) {
+      setMessage("Match a patient profile first so the chart approval review opens on the correct patient.");
+      return;
+    }
+
+    writeIntegrationApprovalSessionToStorage({
+      id: crypto.randomUUID(),
+      practiceId: currentUser.practiceId,
+      practiceName: practicesById[currentUser.practiceId]?.name ?? "Office",
+      approvingWorker: currentUser.name,
+      matchedAt: new Date().toISOString(),
+      source: accessCode.trim() ? "wallet-scan" : "check-in",
+      vault: matched
+    });
+    router.push("/integrations");
   }
 
   return (
@@ -216,6 +250,9 @@ export function IntakeCheckInView() {
           <button className="primary-button" disabled={isSaving} onClick={saveCheckIn} type="button">
             {isSaving ? "Saving check-in..." : "Save office check-in"}
           </button>
+          <button className="secondary-button" disabled={!matched || !currentUser} onClick={openIntegrationReview} type="button">
+            Open chart approval review
+          </button>
           <p>This is the “tap once, verify changes, move on” workflow for returning patients.</p>
         </div>
 
@@ -231,6 +268,7 @@ export function IntakeCheckInView() {
               <p>{matched.email}</p>
               <p>DOB: {matched.dateOfBirth || "Not entered yet"}</p>
               <p>Insurance: {matched.insurance.providerName || "Not entered yet"}</p>
+              <p>{accessCode.trim() ? "Matched from practice access code" : "Matched from reusable office intake profile"}</p>
             </div>
             <div className="dialogue-card">
               <h4>Conditions</h4>
@@ -271,6 +309,37 @@ export function IntakeCheckInView() {
                   <li>No allergies entered yet.</li>
                 )}
               </ul>
+            </div>
+            <div className="dialogue-card">
+              <h4>Clearance blockers</h4>
+              {pendingClearances.length > 0 ? (
+                <ul>
+                  {pendingClearances.map((document) => (
+                    <li key={document.id}>
+                      {(document.title || document.category).replace(/-/g, " ")} from{" "}
+                      {document.requestedFromOffice || "outside office not entered"}.
+                      {document.dueDate ? ` Due ${document.dueDate}.` : ""}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No requested or expired clearances are currently flagged.</p>
+              )}
+            </div>
+            <div className="dialogue-card">
+              <h4>Received documents</h4>
+              {receivedClearances.length > 0 ? (
+                <ul>
+                  {receivedClearances.map((document) => (
+                    <li key={document.id}>
+                      {document.title || document.category}
+                      {document.fileName ? ` • ${document.fileName}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No clearance files have been marked received yet.</p>
+              )}
             </div>
           </div>
         ) : (

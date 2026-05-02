@@ -4,9 +4,11 @@ import { ProfileView } from "@/components/profile-view";
 export default function ProfilePage() {
   return (
     <AppShell
-      description="Edit the signed-in office user's name, title, contact details, bio, and profile photo."
+      audience="shared"
+      description="Edit the signed-in ClearPath profile, contact details, bio, and profile photo."
+      hidePageBanner
       pageLabel="Profile"
-      title="Manage the logged-in office profile"
+      title="Manage the signed-in profile"
     >
       <ProfileView />
     </AppShell>

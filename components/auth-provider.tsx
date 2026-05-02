@@ -13,10 +13,12 @@ import {
   authStorageKeys,
   demoAccounts,
   type AccountProfile,
+  isPatientRole,
   type UserRole
 } from "@/lib/account-directory";
 import {
   getSupabaseBrowserClient,
+  getSupabaseAuthHeaders,
   isSupabaseBrowserConfigured
 } from "@/lib/supabase-browser";
 
@@ -41,7 +43,7 @@ type ProfileUpdateInput = Partial<
   Pick<AccountProfile, "name" | "title" | "phone" | "bio" | "avatarDataUrl" | "avatarColor">
 >;
 
-type AuthResult = Promise<{ ok: boolean; message: string }>;
+type AuthResult = Promise<{ ok: boolean; message: string; redirectTo?: string }>;
 
 type AuthContextValue = {
   currentUser: AccountProfile | null;
@@ -153,12 +155,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!match) {
             return {
               ok: false,
-              message: "We could not find an office user with that email and password."
+              message: "We could not find a ClearPath account with that email and password."
             };
           }
 
           setCurrentUser(match);
-          return { ok: true, message: `Signed in as ${match.name}.` };
+          return {
+            ok: true,
+            message: `Signed in as ${match.name}.`,
+            redirectTo: isPatientRole(match.role) ? "/patient" : "/"
+          };
         }
 
         const supabase = getSupabaseBrowserClient();
@@ -193,7 +199,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setCurrentUser(profile);
         setAccounts((current) => mergeProfiles(current, profile));
-        return { ok: true, message: `Signed in as ${profile.name}.` };
+        return {
+          ok: true,
+          message: `Signed in as ${profile.name}.`,
+          redirectTo: isPatientRole(profile.role) ? "/patient" : "/"
+        };
       },
       async signUp(input) {
         if (authMode === "local") {
@@ -221,7 +231,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           setAccounts((current) => [...current, newAccount]);
           setCurrentUser(newAccount);
-          return { ok: true, message: "Your office account has been created." };
+          return {
+            ok: true,
+            message: "Your office account has been created.",
+            redirectTo: "/profile"
+          };
         }
 
         const supabase = getSupabaseBrowserClient();
@@ -264,7 +278,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setCurrentUser(profileResult.profile);
         setAccounts((current) => mergeProfiles(current, profileResult.profile!));
-        return { ok: true, message: "Your office account has been created in Supabase." };
+        return {
+          ok: true,
+          message: "Your office account has been created in Supabase.",
+          redirectTo: "/profile"
+        };
       },
       async signOut() {
         if (authMode === "local") {
@@ -366,7 +384,8 @@ function readStoredAccounts() {
   }
 
   try {
-    return JSON.parse(storedProfiles) as AccountProfile[];
+    const parsed = JSON.parse(storedProfiles) as AccountProfile[];
+    return mergeAccountLists(demoAccounts, parsed);
   } catch {
     return demoAccounts;
   }
@@ -391,6 +410,20 @@ function mergeProfiles(accounts: AccountProfile[], nextProfile: AccountProfile) 
   return [...withoutExisting, nextProfile];
 }
 
+function mergeAccountLists(baseAccounts: AccountProfile[], storedAccounts: AccountProfile[]) {
+  const byId = new Map<string, AccountProfile>();
+
+  for (const account of baseAccounts) {
+    byId.set(account.id, account);
+  }
+
+  for (const account of storedAccounts) {
+    byId.set(account.id, account);
+  }
+
+  return Array.from(byId.values());
+}
+
 async function fetchServerProfile(input: { authUserId?: string; email?: string }) {
   const params = new URLSearchParams();
   if (input.authUserId) {
@@ -400,7 +433,8 @@ async function fetchServerProfile(input: { authUserId?: string; email?: string }
     params.set("email", input.email);
   }
 
-  const response = await fetch(`/api/account-profiles?${params.toString()}`);
+  const headers = await getSupabaseAuthHeaders();
+  const response = await fetch(`/api/account-profiles?${params.toString()}`, { headers });
   const data = (await response.json()) as {
     profile?: AccountProfile | null;
     error?: string;
@@ -423,10 +457,12 @@ async function saveServerProfile(input: {
   avatarColor: string;
   avatarDataUrl?: string;
 }) {
+  const headers = await getSupabaseAuthHeaders();
   const response = await fetch("/api/account-profiles", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...headers
     },
     body: JSON.stringify(input)
   });

@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearPath Emergency Card Concepts</title>
+    <style>
+      :root {
+        --bg: #f4ecdf;
+        --panel: rgba(255, 250, 241, 0.92);
+        --ink: #1d1a17;
+        --muted: #6a6057;
+        --teal: #0f766e;
+        --teal-deep: #124b52;
+        --cream: #f6eddf;
+        --line: rgba(51, 40, 29, 0.1);
+        --shadow: 0 24px 50px rgba(35, 29, 21, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top, rgba(15, 118, 110, 0.14), transparent 24%),
+          linear-gradient(180deg, #faf5eb 0%, #f0e3cd 100%);
+      }
+
+      .wrap {
+        width: min(1100px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 36px 0 56px;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        font-family: "Iowan Old Style", Georgia, serif;
+        letter-spacing: -0.03em;
+      }
+
+      .intro,
+      .concept {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .intro {
+        margin-bottom: 26px;
+        padding: 24px;
+      }
+
+      .intro p,
+      .concept p {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .eyebrow {
+        margin: 0 0 6px;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--teal);
+      }
+
+      .grid {
+        display: grid;
+        gap: 22px;
+      }
+
+      .two-col {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .concept {
+        padding: 24px;
+      }
+
+      .card-shell {
+        margin-top: 18px;
+      }
+
+      .card {
+        width: min(100%, 390px);
+        aspect-ratio: 85.6 / 53.98;
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        box-shadow: 0 28px 46px rgba(15, 54, 52, 0.2);
+        background: var(--cream);
+      }
+
+      .diagonal-top {
+        position: absolute;
+        inset: 0;
+        background: var(--teal);
+        clip-path: polygon(0 0, 100% 0, 100% 70%, 0 32%);
+      }
+
+      .card-inner {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .mark-wrap {
+        display: grid;
+        place-items: center;
+        padding-top: 10px;
+      }
+
+      .mark-wrap img {
+        width: 132px;
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 14px 24px rgba(18, 34, 34, 0.16));
+      }
+
+      .card-copy {
+        text-align: center;
+      }
+
+      .card-copy h3 {
+        margin: 0;
+        font-family: "Iowan Old Style", Georgia, serif;
+        font-size: 1.55rem;
+        letter-spacing: -0.03em;
+      }
+
+      .card-copy p {
+        margin: 8px 0 0;
+        font-size: 0.95rem;
+      }
+
+      .card-copy .strong-line {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .variant-center .mark-wrap img {
+        width: 162px;
+      }
+
+      .variant-center .card-copy {
+        position: absolute;
+        left: 22px;
+        right: 22px;
+        bottom: 18px;
+        margin-top: 0;
+      }
+
+      .variant-bottom .mark-wrap {
+        padding-top: 0;
+        align-items: start;
+      }
+
+      .variant-bottom .card-copy {
+        text-align: left;
+      }
+
+      .variant-bottom .card-copy h3 {
+        font-size: 1.4rem;
+      }
+
+      .variant-badge .card-copy {
+        display: grid;
+        gap: 8px;
+      }
+
+      .variant-badge .meta-row {
+        display: inline-flex;
+        align-self: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(15, 118, 110, 0.08);
+        color: var(--teal-deep);
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .back-card {
+        width: min(100%, 390px);
+        aspect-ratio: 85.6 / 53.98;
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        box-shadow: 0 28px 46px rgba(15, 54, 52, 0.16);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 237, 223, 0.92)),
+          var(--cream);
+        border: 1px solid rgba(15, 118, 110, 0.12);
+      }
+
+      .back-inner {
+        height: 100%;
+        padding: 18px 18px 16px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .back-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .back-head h3 {
+        margin: 0;
+        font-family: "Iowan Old Style", Georgia, serif;
+        font-size: 1.15rem;
+        letter-spacing: -0.03em;
+      }
+
+      .responder-tag {
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(15, 118, 110, 0.1);
+        color: var(--teal-deep);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .person-block {
+        display: grid;
+        gap: 6px;
+      }
+
+      .person-name {
+        margin: 0;
+        font-size: 1.22rem;
+        font-weight: 800;
+        color: var(--ink);
+      }
+
+      .person-meta {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .info-cell {
+        padding: 10px 12px;
+        border-radius: 16px;
+        background: rgba(15, 118, 110, 0.06);
+        border: 1px solid rgba(15, 118, 110, 0.1);
+      }
+
+      .info-cell .label {
+        margin: 0 0 4px;
+        font-size: 0.66rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .info-cell .value {
+        margin: 0;
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .barcode {
+        height: 44px;
+        border-radius: 14px;
+        background:
+          repeating-linear-gradient(
+            90deg,
+            #1d1a17 0 2px,
+            transparent 2px 4px,
+            #1d1a17 4px 5px,
+            transparent 5px 9px,
+            #1d1a17 9px 12px,
+            transparent 12px 14px
+          ),
+          white;
+        border: 1px solid rgba(29, 26, 23, 0.14);
+      }
+
+      .barcode-caption {
+        margin: 6px 0 0;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+      }
+
+      .symbol-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .symbol-chip {
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(15, 118, 110, 0.08);
+        color: var(--teal-deep);
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .back-accent {
+        position: absolute;
+        right: -12px;
+        bottom: -24px;
+        width: 120px;
+        height: 120px;
+        opacity: 0.12;
+      }
+
+      .back-card-minimal .back-inner {
+        display: grid;
+        grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+        gap: 6px;
+        padding: 16px 18px 14px;
+        overflow: hidden;
+      }
+
+      .back-card-minimal .minimal-topline {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .back-card-minimal .minimal-topline h3 {
+        margin: 0;
+        font-family: "Iowan Old Style", Georgia, serif;
+        font-size: 1.18rem;
+        letter-spacing: -0.03em;
+      }
+
+      .back-card-minimal .person-block {
+        gap: 2px;
+      }
+
+      .back-card-minimal .person-name {
+        font-size: 1.18rem;
+      }
+
+      .back-card-minimal .person-meta {
+        font-size: 0.8rem;
+      }
+
+      .back-card-minimal .barcode {
+        height: 34px;
+      }
+
+      .back-card-minimal .barcode-caption {
+        margin-top: 3px;
+        font-size: 0.62rem;
+        line-height: 1.15;
+        min-height: 14px;
+      }
+
+      .back-card-minimal .symbol-row {
+        gap: 6px;
+      }
+
+      .back-card-minimal .symbol-chip {
+        padding: 7px 9px;
+        font-size: 0.68rem;
+      }
+
+      .back-card-minimal .minimal-status-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: -2px;
+      }
+
+      .back-card-minimal .condition-plain {
+        min-width: 0;
+        text-align: right;
+      }
+
+      .back-card-minimal .condition-plain .label {
+        margin: 0 0 6px;
+        font-size: 0.64rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .back-card-minimal .condition-list {
+        margin: 0;
+        padding-left: 0;
+        list-style: none;
+        font-size: 0.7rem;
+        line-height: 1.12;
+        color: var(--ink);
+        max-height: 72px;
+        overflow: hidden;
+      }
+
+      .back-card-minimal .condition-list li + li {
+        margin-top: 1px;
+      }
+
+      .back-card-minimal .flag-line {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+        padding-top: 0;
+        min-height: 20px;
+      }
+
+      .back-card-minimal .flag-text {
+        margin: 0;
+        font-size: 0.68rem;
+        line-height: 1.15;
+        color: var(--teal-deep);
+        font-weight: 700;
+      }
+
+      .back-card-minimal .flag-text strong {
+        color: var(--ink);
+      }
+
+      @media (max-width: 720px) {
+        .wrap {
+          width: min(100%, calc(100% - 20px));
+          padding: 18px 0 30px;
+        }
+
+        .intro,
+        .concept {
+          padding: 18px;
+          border-radius: 24px;
+        }
+
+        .card {
+          width: 100%;
+        }
+
+        .two-col,
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .back-card {
+          width: 100%;
+        }
+
+        .back-card-minimal .minimal-status-row {
+          flex-direction: column;
+        }
+
+        .back-card-minimal .condition-plain {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="intro">
+        <p class="eyebrow">Emergency Tap Card Concepts</p>
+        <h1>Simplified direction</h1>
+        <p>
+          This version stays much closer to your startup screen idea: diagonal green and cream,
+          ClearPath mark only, and one simple line underneath like <strong>Medical History &amp;
+          Insurance</strong> or <strong>Emergency Medical Info</strong>.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="concept">
+          <h2>Option 1</h2>
+          <p>The cleanest version. Logo centered, single line underneath.</p>
+          <div class="card-shell">
+            <div class="card variant-center">
+              <div class="diagonal-top"></div>
+              <div class="card-inner">
+                <div class="mark-wrap">
+                  <img src="/logo-outline.png" alt="ClearPath mark" />
+                </div>
+                <div class="card-copy">
+                  <h3>ClearPath Care</h3>
+                  <p class="strong-line">Medical History &amp; Insurance</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h2>Option 2</h2>
+          <p>Same idea, but more emergency-specific for a physical bracelet-style tap card.</p>
+          <div class="card-shell">
+            <div class="card variant-badge">
+              <div class="diagonal-top"></div>
+              <div class="card-inner">
+                <div class="mark-wrap">
+                  <img src="/icon.png" alt="ClearPath mark" />
+                </div>
+                <div class="card-copy">
+                  <h3>ClearPath Care</h3>
+                  <p class="strong-line">Emergency Medical Info</p>
+                  <span class="meta-row">Tap for responder-only profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h2>Option 3</h2>
+          <p>A slightly more card-like composition with the copy sitting lower and left-aligned.</p>
+          <div class="card-shell">
+            <div class="card variant-bottom">
+              <div class="diagonal-top"></div>
+              <div class="card-inner">
+                <div class="mark-wrap">
+                  <img src="/icon.png" alt="ClearPath mark" />
+                </div>
+                <div class="card-copy">
+                  <h3>ClearPath Care</h3>
+                  <p class="strong-line">Medical History &amp; Insurance</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="intro" style="margin-top: 28px">
+        <p class="eyebrow">Back Of Card</p>
+        <h1>Emergency responder side</h1>
+        <p>
+          These mockups assume the physical emergency card back is only for responder-facing basics:
+          name, date of birth, a scannable code, and a few high-value flags like organ donor or ICE.
+        </p>
+      </section>
+
+      <section class="grid two-col">
+        <article class="concept">
+          <h2>Back Option 1</h2>
+          <p>Balanced and readable. Probably the strongest default if you want this to feel official and easy to scan quickly.</p>
+          <div class="card-shell">
+            <div class="back-card">
+              <div class="back-inner">
+                <div class="back-head">
+                  <div>
+                    <p class="eyebrow">Emergency Profile</p>
+                    <h3>Responder access</h3>
+                  </div>
+                  <span class="responder-tag">Scan for details</span>
+                </div>
+                <div class="person-block">
+                  <p class="person-name">Olivia Carter</p>
+                  <p class="person-meta">DOB: January 12, 1994</p>
+                </div>
+                <div class="info-grid">
+                  <div class="info-cell">
+                    <p class="label">ICE</p>
+                    <p class="value">Claire Carter</p>
+                  </div>
+                  <div class="info-cell">
+                    <p class="label">Phone</p>
+                    <p class="value">(555) 208-4412</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="barcode"></div>
+                  <p class="barcode-caption">Emergency access barcode</p>
+                </div>
+                <div class="symbol-row">
+                  <span class="symbol-chip">Organ donor</span>
+                  <span class="symbol-chip">Penicillin allergy</span>
+                </div>
+              </div>
+              <img class="back-accent" src="/logo-outline.png" alt="" />
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h2>Back Option 2</h2>
+          <p>Cleaner and more minimal. Good if you want the back to feel like a true emergency credential, not a crowded info card.</p>
+          <div class="card-shell">
+            <div class="back-card back-card-minimal">
+              <div class="back-inner">
+                <div class="minimal-topline">
+                  <p class="person-name">Olivia Carter</p>
+                  <h3>ClearPath Care</h3>
+                </div>
+                <div class="person-block">
+                  <p class="person-meta">DOB: January 12, 1994</p>
+                </div>
+                <div class="back-head">
+                  <div>
+                    <p class="eyebrow">Emergency Tap Card</p>
+                  </div>
+                  <span class="responder-tag">Responder only</span>
+                </div>
+                <div>
+                  <div class="barcode"></div>
+                  <p class="barcode-caption">Scan for allergies, meds, ICE and conditions</p>
+                </div>
+                <div class="flag-line">
+                  <p class="flag-text"><strong>Severe allergy:</strong> Penicillin</p>
+                  <p class="flag-text"><strong>ICE:</strong> Claire Carter</p>
+                </div>
+              </div>
+              <img class="back-accent" src="/logo-outline.png" alt="" />
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h2>Back Option 2B</h2>
+          <p>Final direction using the preferred layout with conditions on the right and only a couple of universal bottom flags.</p>
+          <div class="card-shell">
+            <div class="back-card back-card-minimal">
+              <div class="back-inner">
+                <div class="minimal-topline">
+                  <p class="person-name">Olivia Carter</p>
+                  <h3>ClearPath Care</h3>
+                </div>
+                <div class="person-block">
+                  <p class="person-meta">DOB: January 12, 1994</p>
+                </div>
+                <div class="minimal-status-row">
+                  <div>
+                    <span class="responder-tag">Responder only</span>
+                    <div class="flag-line" style="margin-top: 8px">
+                      <p class="flag-text"><strong>Allergies:</strong> None listed</p>
+                      <p class="flag-text"><strong>Donor:</strong> Registered</p>
+                    </div>
+                  </div>
+                  <div class="condition-plain">
+                    <p class="label">Medical conditions</p>
+                    <ul class="condition-list">
+                      <li>Type 1 diabetes</li>
+                      <li>Seizure disorder</li>
+                      <li>Pacemaker</li>
+                      <li>Asthma</li>
+                      <li>Hypertension</li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                  <div class="barcode"></div>
+                  <p class="barcode-caption">Scan for full approved profile</p>
+                </div>
+              </div>
+              <img class="back-accent" src="/logo-outline.png" alt="" />
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h2>Back Option 2C</h2>
+          <p>Same layout, but with one medical alert and one donor/contact cue for the simplest mixed version.</p>
+          <div class="card-shell">
+            <div class="back-card back-card-minimal">
+              <div class="back-inner">
+                <div class="minimal-topline">
+                  <p class="person-name">Olivia Carter</p>
+                  <h3>ClearPath Care</h3>
+                </div>
+                <div class="person-block">
+                  <p class="person-meta">DOB: January 12, 1994</p>
+                </div>
+                <div class="back-head">
+                  <div>
+                    <p class="eyebrow">Emergency Tap Card</p>
+                  </div>
+                  <span class="responder-tag">Responder only</span>
+                </div>
+                <div>
+                  <div class="barcode"></div>
+                  <p class="barcode-caption">Scan for allergies, meds, ICE and conditions</p>
+                </div>
+                <div class="flag-line">
+                  <p class="flag-text"><strong>Alert:</strong> Anaphylaxis risk</p>
+                  <p class="flag-text"><strong>Donor:</strong> Registered</p>
+                </div>
+              </div>
+              <img class="back-accent" src="/logo-outline.png" alt="" />
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <h2>Back Option 3</h2>
+          <p>More informational up front. This is the easiest for someone glancing quickly without scanning first.</p>
+          <div class="card-shell">
+            <div class="back-card">
+              <div class="back-inner">
+                <div class="back-head">
+                  <div>
+                    <p class="eyebrow">Patient Emergency Info</p>
+                    <h3>Immediate identifiers</h3>
+                  </div>
+                  <span class="responder-tag">NFC + barcode</span>
+                </div>
+                <div class="person-block">
+                  <p class="person-name">Olivia Carter</p>
+                  <p class="person-meta">DOB: January 12, 1994</p>
+                </div>
+                <div class="info-grid">
+                  <div class="info-cell">
+                    <p class="label">Primary alert</p>
+                    <p class="value">Penicillin allergy</p>
+                  </div>
+                  <div class="info-cell">
+                    <p class="label">ICE</p>
+                    <p class="value">Claire Carter</p>
+                  </div>
+                </div>
+                <div>
+                  <div class="barcode"></div>
+                  <p class="barcode-caption">Scan for full approved profile</p>
+                </div>
+                <div class="symbol-row">
+                  <span class="symbol-chip">Organ donor</span>
+                  <span class="symbol-chip">Emergency contact</span>
+                </div>
+              </div>
+              <img class="back-accent" src="/logo-outline.png" alt="" />
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

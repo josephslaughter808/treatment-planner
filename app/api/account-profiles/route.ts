@@ -4,6 +4,8 @@ import {
   saveAppUserProfileRecord
 } from "@/lib/persistence";
 import type { AccountProfile } from "@/lib/account-directory";
+import { getRequestActor, isSameEmailActor } from "@/lib/request-auth";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   const authUserId = request.nextUrl.searchParams.get("authUserId") || undefined;
@@ -14,6 +16,20 @@ export async function GET(request: NextRequest) {
       { error: "authUserId or email is required." },
       { status: 400 }
     );
+  }
+
+  const actor = await getRequestActor(request);
+  if (isSupabaseConfigured() && !actor) {
+    return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  }
+  if (
+    isSupabaseConfigured() &&
+    actor &&
+    authUserId &&
+    actor.authUserId !== authUserId &&
+    !isSameEmailActor(actor, email)
+  ) {
+    return NextResponse.json({ error: "You do not have access to this profile." }, { status: 403 });
   }
 
   const result = await getAppUserProfileRecord({ authUserId, email });
@@ -39,6 +55,14 @@ export async function POST(request: NextRequest) {
       { error: "authUserId, practiceId, name, email, and role are required." },
       { status: 400 }
     );
+  }
+
+  const actor = await getRequestActor(request);
+  if (isSupabaseConfigured() && !actor) {
+    return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  }
+  if (isSupabaseConfigured() && actor && actor.authUserId !== body.authUserId) {
+    return NextResponse.json({ error: "You do not have access to update this profile." }, { status: 403 });
   }
 
   const result = await saveAppUserProfileRecord({

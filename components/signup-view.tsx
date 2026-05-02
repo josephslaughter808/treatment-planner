@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { practiceCatalog } from "@/lib/clinical-catalog";
-import { roles, type UserRole } from "@/lib/account-directory";
+import { officeRoles, type UserRole } from "@/lib/account-directory";
 
 export function SignupView() {
   const router = useRouter();
@@ -97,10 +97,10 @@ export function SignupView() {
         </div>
 
         <div className="grid two-up">
-          <label>
+              <label>
             Role
             <select onChange={(event) => setRole(event.target.value as UserRole)} value={role}>
-              {roles.map((option) => (
+              {officeRoles.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -151,7 +151,7 @@ export function SignupView() {
           <button className="primary-button" disabled={isSubmitting} type="submit">
             {isSubmitting ? "Creating account..." : "Create account"}
           </button>
-          <p>This prototype stores office accounts locally in the browser until Supabase auth is wired in.</p>
+          <p>Patient accounts are separate. This screen is only for office-side users.</p>
         </div>
 
         {message ? <p className="info-text">{message}</p> : null}

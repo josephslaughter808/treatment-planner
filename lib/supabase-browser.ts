@@ -24,3 +24,20 @@ export function getSupabaseBrowserClient() {
 
   return browserClient;
 }
+
+export async function getSupabaseAccessToken() {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token ?? null;
+}
+
+export async function getSupabaseAuthHeaders() {
+  const token = await getSupabaseAccessToken();
+  return token
+    ? ({ Authorization: `Bearer ${token}` } as Record<string, string>)
+    : ({} as Record<string, string>);
+}

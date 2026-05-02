@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "front-desk" | "provider";
+export type UserRole = "admin" | "front-desk" | "provider" | "patient";
 
 export type AccountProfile = {
   id: string;
@@ -86,6 +86,18 @@ export const demoAccounts: AccountProfile[] = [
     phone: "(555) 730-1182",
     avatarColor: "#be123c",
     bio: "Handles urgent infection cases and advanced endodontic treatment planning."
+  },
+  {
+    id: "patient-olivia",
+    practiceId: "clearpath-patient",
+    name: "Olivia Parker",
+    email: "olivia@clearpathdemo.com",
+    password: "clearpath123",
+    role: "patient",
+    title: "Patient test account",
+    phone: "(555) 882-9900",
+    avatarColor: "#0f4c81",
+    bio: "Uses ClearPath to review treatment packages, medical history, and emergency card settings."
   }
 ];
 
@@ -97,8 +109,19 @@ export const authStorageKeys = {
 export const roles: { value: UserRole; label: string }[] = [
   { value: "admin", label: "Practice admin" },
   { value: "front-desk", label: "Front desk" },
-  { value: "provider", label: "Provider" }
+  { value: "provider", label: "Provider" },
+  { value: "patient", label: "Patient" }
 ];
+
+export const officeRoles = roles.filter((role) => role.value !== "patient");
+
+export function isPatientRole(role: UserRole) {
+  return role === "patient";
+}
+
+export function isProviderWorkspaceRole(role: UserRole) {
+  return role === "admin" || role === "front-desk" || role === "provider";
+}
 
 export function getAccountsForPractice(practiceId: string, accounts: AccountProfile[] = demoAccounts) {
   return accounts.filter((account) => account.practiceId === practiceId);

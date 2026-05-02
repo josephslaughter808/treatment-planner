@@ -20,6 +20,7 @@ import {
   type StoredImagingAsset,
   type StoredPatientPreview
 } from "@/lib/package-preview";
+import { upsertTimelineEvent } from "@/lib/patient-vault";
 import { adultTeeth } from "@/lib/teeth";
 
 const defaultPracticeId = practiceCatalog[0]?.id ?? "";
@@ -104,6 +105,30 @@ export function IntakeExperience() {
       const data = (await response.json()) as { message?: string; error?: string };
       if (!response.ok) {
         throw new Error(data.error || "Unable to save the case.");
+      }
+
+      if (payload.patientEmail && payload.patientName && payload.diagnosisId) {
+        const diagnosisTimelineId = `diagnosis-${result.packageVersionId || new Date().toISOString()}`;
+        upsertTimelineEvent({
+          id: diagnosisTimelineId,
+          type: "diagnosis",
+          patientEmail: payload.patientEmail,
+          patientName: payload.patientName,
+          createdAt: new Date().toISOString(),
+          diagnosisId: payload.diagnosisId,
+          diagnosisLabel: conditionsById[payload.diagnosisId]?.label || payload.diagnosisId,
+          commonName: buildCommonName(
+            conditionsById[payload.diagnosisId]?.label || payload.diagnosisId,
+            conditionsById[payload.diagnosisId]?.plainLanguageSummary || ""
+          ),
+          descriptor:
+            conditionsById[payload.diagnosisId]?.plainLanguageSummary ||
+            "A diagnosis is on file and has active treatment information attached.",
+          providerName: payload.providerLabel || "Provider",
+          diagnosisDate: new Date().toISOString(),
+          conditionSections: result.diagnosisSections,
+          treatmentOptions: result.treatmentCards
+        });
       }
 
       setSaveMessage(data.message || "Case saved.");
@@ -583,6 +608,34 @@ function persistPatientPreview(preview: StoredPatientPreview) {
   }
 
   window.localStorage.setItem(patientPreviewStorageKey, JSON.stringify(preview));
+}
+
+function buildCommonName(label: string, plainLanguageSummary: string) {
+  const normalizedLabel = label.toLowerCase();
+
+  if (normalizedLabel.includes("abscess")) {
+    return "Infection";
+  }
+  if (normalizedLabel.includes("irreversible pulpitis")) {
+    return "Inflamed nerve";
+  }
+  if (normalizedLabel.includes("necrotic pulp")) {
+    return "Dead nerve";
+  }
+  if (normalizedLabel.includes("deep decay")) {
+    return "Cavity";
+  }
+  if (normalizedLabel.includes("cracked tooth")) {
+    return "Tooth crack";
+  }
+
+  const summary = plainLanguageSummary.replace(/\.$/, "").trim();
+  if (!summary) {
+    return "Condition";
+  }
+
+  const firstPhrase = summary.split(",")[0]?.split(".")[0]?.trim() || summary;
+  return firstPhrase.length > 36 ? `${firstPhrase.slice(0, 33)}...` : firstPhrase;
 }
 
 async function buildImagingAssets(files: File[]): Promise<StoredImagingAsset[]> {

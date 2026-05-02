@@ -2,21 +2,27 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState, type ReactNode } from "react";
 import clearPathLogo from "@/ClearPath-Care-logo.png";
+import cutoutLogo from "@/logo-outline.png";
 import { AvatarBadge } from "@/components/avatar-badge";
 import { useAuth } from "@/components/auth-provider";
+import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
-const navItems = [
-  { href: "/", label: "Cases" },
-  { href: "/vault", label: "Vault" },
-  { href: "/check-in", label: "Check-In" },
-  { href: "/emergency", label: "Emergency" },
+const providerNavItems = [
+  { href: "/", label: "Patients" },
+  { href: "/diagnoses", label: "Diagnoses" },
+  { href: "/treatments", label: "Treatments" },
   { href: "/team", label: "Team" },
-  { href: "/settings", label: "Settings" },
-  { href: "/profile", label: "Profile" },
-  { href: "/patient", label: "Patient View" }
+  { href: "/settings", label: "Settings" }
+];
+
+const patientNavItems = [
+  { href: "/patient", label: "My Care" },
+  { href: "/vault", label: "Health Vault" },
+  { href: "/emergency", label: "Emergency Card" },
+  { href: "/timeline", label: "Timeline" }
 ];
 
 type AppShellProps = {
@@ -24,24 +30,137 @@ type AppShellProps = {
   title: string;
   description: string;
   children: ReactNode;
+  audience?: "provider" | "patient" | "public" | "shared";
+  hidePageBanner?: boolean;
 };
 
-export function AppShell({ pageLabel, title, description, children }: AppShellProps) {
+export function AppShell({
+  pageLabel,
+  title,
+  description,
+  children,
+  audience = "provider",
+  hidePageBanner = false
+}: AppShellProps) {
   const pathname = usePathname();
-  const { currentUser, isReady, signOut } = useAuth();
+  const router = useRouter();
+  const { currentUser, isReady } = useAuth();
+  const [isDesktopViewport, setIsDesktopViewport] = useState(true);
 
-  async function handleSignOut() {
-    await signOut();
+  useEffect(() => {
+    if (!isReady) {
+      return;
+    }
+
+    if (audience === "public") {
+      return;
+    }
+
+    if (!currentUser) {
+      router.replace("/login");
+      return;
+    }
+
+    if (audience === "provider" && !isProviderWorkspaceRole(currentUser.role)) {
+      router.replace("/patient");
+      return;
+    }
+
+    if (audience === "patient" && !isPatientRole(currentUser.role)) {
+      router.replace("/");
+    }
+  }, [audience, currentUser, isReady, router]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const syncViewport = () => {
+      setIsDesktopViewport(window.innerWidth >= 1080);
+    };
+
+    syncViewport();
+    window.addEventListener("resize", syncViewport);
+    return () => window.removeEventListener("resize", syncViewport);
+  }, []);
+
+  if (!isReady && audience !== "public") {
+    return <main className="shell loading-shell"><section className="panel">Loading ClearPath Care...</section></main>;
+  }
+
+  if (audience !== "public" && !currentUser) {
+    return null;
+  }
+
+  if (
+    currentUser &&
+    ((audience === "provider" && !isProviderWorkspaceRole(currentUser.role)) ||
+      (audience === "patient" && !isPatientRole(currentUser.role)))
+  ) {
+    return null;
+  }
+
+  const resolvedAudience = resolveAudience(audience, currentUser?.role);
+  const desktopOnlyProvider = resolvedAudience === "provider" && audience !== "public";
+  const navItems = resolvedAudience === "patient" ? patientNavItems : providerNavItems;
+  const eyebrow = resolvedAudience === "patient" ? "Patient app" : "Provider workspace";
+  const shellClassName = [
+    "shell",
+    "shell-with-nav",
+    resolvedAudience === "patient" ? "patient-app-shell" : "provider-app-shell",
+    audience === "public" ? "public-app-shell" : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (audience === "public") {
+    return (
+      <main className={shellClassName}>
+        <section className="public-auth-header">
+          <Link className="brand-lockup brand-link" href="/login">
+            <Image alt="ClearPath Care logo" className="brand-logo" priority src={clearPathLogo} />
+            <div>
+              <p className="eyebrow">{pageLabel}</p>
+              <p className="brand-name">ClearPath Care</p>
+            </div>
+          </Link>
+          <div className="public-auth-copy">
+            <h1 className="page-title">{title}</h1>
+            <p className="lede">{description}</p>
+            <p className="catalog-note">
+              Office accounts are approved and provisioned by ClearPath. Patient access stays limited to patient pages only.
+            </p>
+          </div>
+        </section>
+
+        {children}
+      </main>
+    );
+  }
+
+  if (desktopOnlyProvider && !isDesktopViewport) {
+    return (
+      <main className={shellClassName}>
+        <section className="panel provider-desktop-locked">
+          <p className="eyebrow">Provider workspace</p>
+          <h1 className="page-title">Desktop access required</h1>
+          <p className="lede">
+            The provider program is designed for desktop charting only. Please open ClearPath Care on a desktop or laptop to manage patients, diagnoses, and treatment previews.
+          </p>
+        </section>
+      </main>
+    );
   }
 
   return (
-    <main className="shell shell-with-nav">
-      <header className="topbar panel">
+    <main className={shellClassName}>
+      <header className="topbar">
         <div className="topbar-brand">
-          <Link className="brand-lockup brand-link" href="/">
-            <Image alt="ClearPath Care logo" className="brand-logo" priority src={clearPathLogo} />
+          <Link className="brand-lockup brand-link" href={resolvedAudience === "patient" ? "/patient" : "/"}>
+            <Image alt="ClearPath Care logo" className="brand-logo topbar-logo" priority src={cutoutLogo} />
             <div>
-              <p className="eyebrow">Provider workspace</p>
+              <p className="eyebrow">{eyebrow}</p>
               <p className="brand-name">ClearPath Care</p>
             </div>
           </Link>
@@ -64,48 +183,68 @@ export function AppShell({ pageLabel, title, description, children }: AppShellPr
         <div className="topbar-user">
           {currentUser ? (
             <>
+              <div className="user-copy">
+                <Link className="user-profile-link" href="/profile">
+                  {currentUser.name}
+                </Link>
+                <span>
+                  {currentUser.title} • {currentUser.role}
+                </span>
+              </div>
               <AvatarBadge
                 accentColor={currentUser.avatarColor}
                 imageUrl={currentUser.avatarDataUrl}
                 name={currentUser.name}
                 size="sm"
               />
-              <div className="user-copy">
-                <strong>{currentUser.name}</strong>
-                <span>
-                  {currentUser.title} • {currentUser.role}
-                </span>
-              </div>
-              <button className="ghost-button" onClick={handleSignOut} type="button">
-                Sign out
-              </button>
             </>
-          ) : isReady ? (
+          ) : (
             <div className="auth-actions">
               <Link className="secondary-link" href="/login">
                 Log in
               </Link>
-              <Link className="primary-link" href="/signup">
-                Create account
-              </Link>
             </div>
-          ) : null}
+          )}
         </div>
       </header>
 
-      <section className="panel page-banner">
-        <p className="eyebrow">{pageLabel}</p>
-        <h1 className="page-title">{title}</h1>
-        <p className="lede">{description}</p>
-        {!currentUser ? (
-          <p className="catalog-note">
-            This prototype uses local demo auth until Supabase auth is connected. Sign in to test
-            provider, front desk, and admin flows.
-          </p>
-        ) : null}
-      </section>
+      {!hidePageBanner ? (
+        <section className="page-banner">
+          <p className="eyebrow">{pageLabel}</p>
+          <h1 className="page-title">{title}</h1>
+          <p className="lede">{description}</p>
+        </section>
+      ) : null}
 
-      {children}
+      <section className="shell-content">{children}</section>
+
+      {resolvedAudience === "patient" ? (
+        <nav className="mobile-tabbar" aria-label="Mobile navigation">
+          {navItems.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link className={`mobile-tab ${active ? "active" : ""}`} href={item.href} key={item.href}>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      ) : null}
     </main>
   );
+}
+
+function resolveAudience(
+  audience: AppShellProps["audience"],
+  role: UserRole | undefined
+): "provider" | "patient" {
+  if (audience === "patient") {
+    return "patient";
+  }
+
+  if (audience === "shared") {
+    return role && isPatientRole(role) ? "patient" : "provider";
+  }
+
+  return "provider";
 }

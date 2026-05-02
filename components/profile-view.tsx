@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { AvatarBadge } from "@/components/avatar-badge";
 import { useAuth } from "@/components/auth-provider";
 import { practicesById } from "@/lib/clinical-catalog";
 
 export function ProfileView() {
-  const { currentUser, updateProfile } = useAuth();
+  const router = useRouter();
+  const { currentUser, signOut, updateProfile } = useAuth();
   const [message, setMessage] = useState<string | null>(null);
   const [name, setName] = useState(currentUser?.name ?? "");
   const [title, setTitle] = useState(currentUser?.title ?? "");
@@ -55,8 +57,13 @@ export function ProfileView() {
     setIsSaving(false);
   }
 
+  async function handleSignOut() {
+    await signOut();
+    router.push("/login");
+  }
+
   return (
-    <section className="grid profile-layout">
+    <section className="grid profile-layout profile-screen">
       <article className="panel profile-card">
         <AvatarBadge
           accentColor={currentUser.avatarColor}
@@ -64,17 +71,22 @@ export function ProfileView() {
           name={name || currentUser.name}
           size="lg"
         />
-        <div>
+        <div className="profile-card-copy">
           <p className="mini-label">Live profile card</p>
           <h2>{name || currentUser.name}</h2>
           <p>{title || currentUser.title}</p>
-          <p className="catalog-note">{practicesById[currentUser.practiceId]?.name}</p>
-          <p className="catalog-note">{currentUser.email}</p>
-          <p className="catalog-note">{phone || currentUser.phone}</p>
+          <div className="profile-meta">
+            <p className="catalog-note">{practicesById[currentUser.practiceId]?.name}</p>
+            <p className="catalog-note">{currentUser.email}</p>
+            <p className="catalog-note">{phone || currentUser.phone}</p>
+          </div>
         </div>
+        <button className="secondary-button profile-logout-button" onClick={handleSignOut} type="button">
+          Log out
+        </button>
       </article>
 
-      <form className="panel" onSubmit={handleSubmit}>
+      <form className="panel form-card" onSubmit={handleSubmit}>
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Profile settings</p>
