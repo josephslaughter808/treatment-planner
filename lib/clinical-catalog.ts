@@ -53,10 +53,13 @@ export type DiagnosisTemplate = {
 
 export type PracticeOverride = {
   diagnosisId: string;
+  contentType?: "diagnosis" | "treatment";
   infoPageTitle: string;
   infoPageIntro: string;
   consentIntro: string;
   preferredMediaAssetIds: string[];
+  generalAssetIds?: string[];
+  designConfig?: Record<string, unknown>;
   consentTemplateId?: string;
 };
 
@@ -3141,8 +3144,21 @@ export function getTreatmentsForDiagnosis(diagnosisId: string) {
     .filter((option): option is TreatmentOption => Boolean(option));
 }
 
-export function getPracticeOverride(practiceId: string, diagnosisId: string) {
-  return practicesById[practiceId]?.overrides.find((override) => override.diagnosisId === diagnosisId);
+export function getPracticeOverride(
+  practiceId: string,
+  contentId: string,
+  contentType: "diagnosis" | "treatment" = "diagnosis"
+) {
+  const overrides = practicesById[practiceId]?.overrides ?? [];
+  const prefixedId = `${contentType}:${contentId}`;
+
+  return overrides.find((override) => {
+    if (override.contentType && override.contentType !== contentType) {
+      return false;
+    }
+
+    return override.diagnosisId === contentId || override.diagnosisId === prefixedId;
+  });
 }
 
 export function getProvidersForPractice(practiceId: string) {

@@ -197,11 +197,14 @@ export async function saveCaseRecord(
 
 export async function savePracticeOverrideRecord(input: {
   practiceId: string;
-  diagnosisId: string;
+  contentId: string;
+  contentType: "diagnosis" | "treatment";
   infoPageTitle: string;
   infoPageIntro: string;
   consentIntro: string;
   preferredMediaAssetIds: string[];
+  generalAssetIds: string[];
+  designConfig: Record<string, unknown>;
 }): Promise<SaveResult> {
   const supabase = createAdminSupabaseClient();
 
@@ -240,11 +243,13 @@ export async function savePracticeOverrideRecord(input: {
     .upsert(
       {
         practice_id: practiceRow.id,
-        diagnosis_id: input.diagnosisId,
+        diagnosis_id: `${input.contentType}:${input.contentId}`,
         info_page_title: input.infoPageTitle,
         info_page_intro: input.infoPageIntro,
         consent_intro: input.consentIntro,
-        preferred_media_asset_ids: input.preferredMediaAssetIds
+        preferred_media_asset_ids: input.preferredMediaAssetIds,
+        general_asset_ids: input.generalAssetIds,
+        design_config: input.designConfig
       },
       { onConflict: "practice_id,diagnosis_id" }
     )
@@ -258,7 +263,7 @@ export async function savePracticeOverrideRecord(input: {
   return {
     mode: "supabase",
     overrideId: data.id,
-    message: "The practice-specific info page and consent defaults were saved."
+    message: "A practice-specific copy of this patient page was saved and is now the default for this practice."
   };
 }
 
