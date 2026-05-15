@@ -97,6 +97,7 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
   const [pageDraft, setPageDraft] = useState<CarePageContent | null>(null);
   const [consentIntro, setConsentIntro] = useState("");
   const [isLoadingOverride, setIsLoadingOverride] = useState(false);
+  const [pageSource, setPageSource] = useState<"library" | "practice">("library");
 
   const diagnosisRelatedTreatments = useMemo(
     () => (selectedDiagnosis ? getTreatmentsForDiagnosis(selectedDiagnosis.id) : []),
@@ -249,6 +250,7 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
         setConsentIntro(override?.consentIntro ?? "");
         setPreferredMediaAssetIds(nextPreferredMedia);
         setGeneralAssetIds(nextGeneralMedia);
+        setPageSource(override ? "practice" : "library");
         setIsLoadingOverride(false);
       };
 
@@ -335,6 +337,7 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
       }
 
       setMessage(data.message || `${capitalize(mode)} page saved.`);
+      setPageSource("practice");
       setIsEditing(false);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : `Unable to save the ${mode} page.`);
@@ -396,6 +399,132 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
     );
   }
 
+  function addRibbonCard() {
+    updateDraft((current) => ({
+      ...current,
+      ribbon: [
+        ...current.ribbon,
+        {
+          title: "New highlight",
+          body: "Add the key point you want the patient to notice here."
+        }
+      ]
+    }));
+  }
+
+  function removeRibbonCard(index: number) {
+    updateDraft((current) => ({
+      ...current,
+      ribbon: current.ribbon.filter((_, entryIndex) => entryIndex !== index)
+    }));
+  }
+
+  function addSection() {
+    updateDraft((current) => ({
+      ...current,
+      sections: [
+        ...current.sections,
+        {
+          eyebrow: "New section",
+          title: "Add a new section title",
+          paragraphs: ["Add the patient-facing explanation for this section."],
+          bullets: [],
+          labels: [],
+          layout: "media-right"
+        }
+      ]
+    }));
+  }
+
+  function removeSection(index: number) {
+    updateDraft((current) => ({
+      ...current,
+      sections: current.sections.filter((_, sectionIndex) => sectionIndex !== index)
+    }));
+  }
+
+  function addFaq() {
+    updateDraft((current) => ({
+      ...current,
+      faqs: {
+        ...current.faqs,
+        items: [
+          ...current.faqs.items,
+          {
+            question: "Add a patient question",
+            answer: "Add a short, clear answer here."
+          }
+        ]
+      }
+    }));
+  }
+
+  function removeFaq(index: number) {
+    updateDraft((current) => ({
+      ...current,
+      faqs: {
+        ...current.faqs,
+        items: current.faqs.items.filter((_, itemIndex) => itemIndex !== index)
+      }
+    }));
+  }
+
+  function addTimelineStep() {
+    updateDraft((current) =>
+      current.timeline
+        ? {
+            ...current,
+            timeline: {
+              ...current.timeline,
+              steps: [
+                ...current.timeline.steps,
+                {
+                  label: `Step ${current.timeline.steps.length + 1}`,
+                  title: "Add a new step",
+                  body: "Explain what happens in this part of care."
+                }
+              ]
+            }
+          }
+        : current
+    );
+  }
+
+  function removeTimelineStep(index: number) {
+    updateDraft((current) =>
+      current.timeline
+        ? {
+            ...current,
+            timeline: {
+              ...current.timeline,
+              steps: current.timeline.steps.filter((_, stepIndex) => stepIndex !== index)
+            }
+          }
+        : current
+    );
+  }
+
+  function toggleTimelineSection() {
+    updateDraft((current) => ({
+      ...current,
+      timeline: current.timeline
+        ? undefined
+        : {
+            eyebrow: "Timeline",
+            title: "What happens next",
+            intro: "Use this section to break the care path into simple steps.",
+            notes: ["Add a note the patient should keep in mind."],
+            steps: [
+              {
+                label: "Step 1",
+                title: "Add the first step",
+                body: "Explain what happens first."
+              }
+            ]
+          }
+    }));
+  }
+
   return (
     <div className="treatment-library-layout">
       <aside className="panel treatment-library-sidebar">
@@ -437,6 +566,9 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                 <h2>{previewTitle}</h2>
                 <p className="catalog-note">
                   This preview mirrors the patient-facing structure for the selected {mode}.
+                </p>
+                <p className={`page-source-pill ${pageSource === "practice" ? "practice" : "library"}`}>
+                  {pageSource === "practice" ? "Using practice copy" : "Using library default"}
                 </p>
               </div>
               <button
@@ -480,6 +612,11 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                   <div className="section-intro">
                     <h3>Page editor</h3>
                     <p>Edit the patient page directly. Every change updates the live preview on the left.</p>
+                    <p className={`page-source-pill ${pageSource === "practice" ? "practice" : "library"}`}>
+                      {pageSource === "practice"
+                        ? "This office is editing its own saved default copy."
+                        : "This office is currently editing from the shared library default."}
+                    </p>
                   </div>
 
                   {pageDraft ? (
@@ -545,10 +682,21 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
 
                       <div className="section-intro">
                         <h3>Ribbon cards</h3>
+                        <button className="secondary-button" onClick={addRibbonCard} type="button">
+                          Add ribbon card
+                        </button>
                       </div>
 
                       {pageDraft.ribbon.map((item, index) => (
                         <div className="saved-entry-card" key={`${item.title}-${index}`}>
+                          <div className="editor-card-header">
+                            <p className="saved-entry-subtitle">Ribbon card {index + 1}</p>
+                            {pageDraft.ribbon.length > 1 ? (
+                              <button className="secondary-button" onClick={() => removeRibbonCard(index)} type="button">
+                                Remove
+                              </button>
+                            ) : null}
+                          </div>
                           <label>
                             Card title
                             <input
@@ -583,11 +731,21 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
 
                       <div className="section-intro">
                         <h3>Story sections</h3>
+                        <button className="secondary-button" onClick={addSection} type="button">
+                          Add section
+                        </button>
                       </div>
 
                       {pageDraft.sections.map((section, index) => (
                         <div className="saved-entry-card" key={`${section.title}-${index}`}>
-                          <p className="saved-entry-subtitle">Section {index + 1}</p>
+                          <div className="editor-card-header">
+                            <p className="saved-entry-subtitle">Section {index + 1}</p>
+                            {pageDraft.sections.length > 1 ? (
+                              <button className="secondary-button" onClick={() => removeSection(index)} type="button">
+                                Remove
+                              </button>
+                            ) : null}
+                          </div>
                           <label>
                             Eyebrow
                             <input
@@ -663,6 +821,14 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                         <>
                           <div className="section-intro">
                             <h3>Timeline</h3>
+                            <div className="editor-inline-actions">
+                              <button className="secondary-button" onClick={addTimelineStep} type="button">
+                                Add step
+                              </button>
+                              <button className="secondary-button" onClick={toggleTimelineSection} type="button">
+                                Remove timeline
+                              </button>
+                            </div>
                           </div>
 
                           <label>
@@ -703,7 +869,14 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
 
                           {pageDraft.timeline.steps.map((step, index) => (
                             <div className="saved-entry-card" key={`${step.title}-${index}`}>
-                              <p className="saved-entry-subtitle">Step {index + 1}</p>
+                              <div className="editor-card-header">
+                                <p className="saved-entry-subtitle">Step {index + 1}</p>
+                                {pageDraft.timeline && pageDraft.timeline.steps.length > 1 ? (
+                                  <button className="secondary-button" onClick={() => removeTimelineStep(index)} type="button">
+                                    Remove
+                                  </button>
+                                ) : null}
+                              </div>
                               <label>
                                 Step label
                                 <input
@@ -731,12 +904,32 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                         </>
                       ) : null}
 
+                      {!pageDraft.timeline ? (
+                        <div className="section-intro">
+                          <h3>Timeline</h3>
+                          <button className="secondary-button" onClick={toggleTimelineSection} type="button">
+                            Add timeline
+                          </button>
+                        </div>
+                      ) : null}
+
                       <div className="section-intro">
                         <h3>Questions and answers</h3>
+                        <button className="secondary-button" onClick={addFaq} type="button">
+                          Add question
+                        </button>
                       </div>
 
                       {pageDraft.faqs.items.map((item, index) => (
                         <div className="saved-entry-card" key={`${item.question}-${index}`}>
+                          <div className="editor-card-header">
+                            <p className="saved-entry-subtitle">Question {index + 1}</p>
+                            {pageDraft.faqs.items.length > 1 ? (
+                              <button className="secondary-button" onClick={() => removeFaq(index)} type="button">
+                                Remove
+                              </button>
+                            ) : null}
+                          </div>
                           <label>
                             Question
                             <input onChange={(event) => updateFaq(index, "question", event.target.value)} value={item.question} />

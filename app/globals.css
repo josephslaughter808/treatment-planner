@@ -777,9 +777,23 @@ label span {
   margin-bottom: 14px;
 }
 
+.section-intro,
+.editor-card-header,
+.editor-inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .section-intro h3 {
   margin: 0 0 6px;
   font-size: 1.15rem;
+}
+
+.section-intro p {
+  margin: 0;
 }
 
 label {
@@ -879,6 +893,31 @@ textarea {
 .catalog-summary p,
 .catalog-note {
   margin-top: 8px;
+}
+
+.page-source-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.page-source-pill.library {
+  background: rgba(194, 140, 44, 0.14);
+  color: #8b5e1a;
+  border: 1px solid rgba(194, 140, 44, 0.22);
+}
+
+.page-source-pill.practice {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f5f5a;
+  border: 1px solid rgba(15, 118, 110, 0.2);
 }
 
 .option-grid {
@@ -1771,6 +1810,10 @@ textarea {
   color: var(--text);
   font-weight: 700;
   line-height: 1.35;
+}
+
+.editor-card-header .saved-entry-subtitle {
+  margin: 0;
 }
 
 .saved-entry-list {
