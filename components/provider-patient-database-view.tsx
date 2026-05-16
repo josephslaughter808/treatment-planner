@@ -89,6 +89,22 @@ export function ProviderPatientDatabaseView() {
 
   const selectedDiagnosis = selectedPatient?.diagnoses.find((event) => event.id === selectedDiagnosisId) ?? null;
 
+  const providerStats = useMemo(() => {
+    const diagnosisCount = patients.reduce((sum, patient) => sum + patient.diagnoses.length, 0);
+    const preparedCount = patients.filter((patient) => patient.diagnoses.length > 0).length;
+    const clearanceCount = patients.reduce(
+      (sum, patient) => sum + patient.clearanceDocuments.filter((item) => item.status === "received").length,
+      0
+    );
+
+    return {
+      patientCount: patients.length,
+      diagnosisCount,
+      preparedCount,
+      clearanceCount
+    };
+  }, [patients]);
+
   const preview = useMemo(() => {
     if (editorPayload && editorPayload.diagnosisId && editorPayload.selectedTreatmentIds.length > 0) {
       return buildMockPlan(editorPayload, []);
@@ -191,21 +207,37 @@ export function ProviderPatientDatabaseView() {
   return (
     <div className="provider-desktop-layout">
       <aside className="panel provider-patient-directory">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">Patient database</p>
-            <h2>Search patients</h2>
-          </div>
+        <div className="provider-directory-hero">
+          <p className="eyebrow">Patient database</p>
+          <h2>Search today&apos;s patients</h2>
+          <p className="catalog-note">
+            Start with the patient, then move into diagnosis, chart review, and treatment page preview.
+          </p>
+          <label className="provider-search-field provider-command-search">
+            <span>Search patient</span>
+            <input
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by name, email, or diagnosis"
+              value={search}
+            />
+          </label>
+          <p className="search-meta">{filteredPatients.length} matching patient{filteredPatients.length === 1 ? "" : "s"}</p>
         </div>
 
-        <label className="provider-search-field">
-          Search patient
-          <input
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name or email"
-            value={search}
-          />
-        </label>
+        <div className="provider-sidebar-stats">
+          <article className="provider-stat-card patient-stat">
+            <strong>{providerStats.patientCount}</strong>
+            <span>tracked patients</span>
+          </article>
+          <article className="provider-stat-card diagnosis-stat">
+            <strong>{providerStats.diagnosisCount}</strong>
+            <span>office diagnoses</span>
+          </article>
+          <article className="provider-stat-card readiness-stat">
+            <strong>{providerStats.preparedCount}</strong>
+            <span>active charts</span>
+          </article>
+        </div>
 
         {filteredPatients.length > 0 ? (
           <div className="provider-patient-list">
@@ -243,6 +275,32 @@ export function ProviderPatientDatabaseView() {
       <section className="provider-chart-stack">
         {selectedPatient ? (
           <>
+            <section className="panel provider-command-banner">
+              <div className="provider-command-banner-copy">
+                <p className="eyebrow">Daily patients</p>
+                <h2>{selectedPatient.fullName}</h2>
+                <p className="catalog-note">
+                  {selectedPatient.diagnoses.length > 0
+                    ? "The patient chart is active and ready for diagnosis review, treatment preview, and office edits."
+                    : "No office diagnosis has been attached yet. Start by adding a diagnosis to open the treatment-page flow."}
+                </p>
+              </div>
+              <div className="provider-command-stats">
+                <article className="provider-stat-card aqua-stat">
+                  <strong>{selectedPatient.diagnoses.length}</strong>
+                  <span>diagnoses on file</span>
+                </article>
+                <article className="provider-stat-card gold-stat">
+                  <strong>{selectedPatient.clearanceDocuments.length}</strong>
+                  <span>clearance items</span>
+                </article>
+                <article className="provider-stat-card green-stat">
+                  <strong>{providerStats.clearanceCount}</strong>
+                  <span>received clearances</span>
+                </article>
+              </div>
+            </section>
+
             <section className="panel provider-chart-panel">
               <div className="panel-heading">
                 <div>

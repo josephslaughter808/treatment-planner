@@ -2131,6 +2131,342 @@ textarea {
   color: #f9fffd;
 }
 
+.provider-app-shell {
+  width: min(1380px, calc(100% - 28px));
+  padding-top: 28px;
+}
+
+.provider-app-shell .topbar {
+  border-radius: 34px;
+  padding: 18px 22px;
+  background:
+    radial-gradient(circle at top left, rgba(86, 198, 168, 0.14), transparent 24%),
+    radial-gradient(circle at top right, rgba(131, 215, 238, 0.12), transparent 18%),
+    linear-gradient(135deg, #1b2529, #11181b 72%);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(143, 201, 187, 0.14);
+}
+
+.provider-app-shell .topnav-link {
+  color: rgba(238, 245, 241, 0.78);
+  border-color: transparent;
+}
+
+.provider-app-shell .topnav-link.active {
+  color: #f6fffb;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.provider-app-shell .page-title,
+.provider-app-shell .panel h2 {
+  letter-spacing: -0.04em;
+}
+
+.provider-patient-directory,
+.provider-chart-panel,
+.provider-treatment-workspace .panel,
+.provider-command-banner {
+  border-radius: 32px;
+  border-color: rgba(126, 168, 156, 0.14);
+  background:
+    radial-gradient(circle at top left, rgba(86, 198, 168, 0.07), transparent 24%),
+    linear-gradient(180deg, rgba(28, 38, 42, 0.96), rgba(17, 23, 26, 0.96));
+  color: #edf4f0;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.22);
+}
+
+.provider-patient-directory p,
+.provider-chart-panel p,
+.provider-treatment-workspace .panel p,
+.provider-command-banner p,
+.provider-patient-row span,
+.provider-patient-row small {
+  color: #99aca5;
+}
+
+.provider-patient-directory .eyebrow,
+.provider-chart-panel .eyebrow,
+.provider-treatment-workspace .eyebrow,
+.provider-command-banner .eyebrow {
+  color: #78d9ca;
+}
+
+.provider-directory-hero {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.provider-command-search {
+  margin: 0;
+  padding: 18px;
+  border-radius: 28px;
+  border: 1px solid rgba(144, 191, 177, 0.14);
+  background: linear-gradient(180deg, rgba(36, 49, 54, 0.92), rgba(20, 27, 31, 0.92));
+}
+
+.provider-command-search span,
+.search-meta {
+  color: #9fb2ab;
+}
+
+.provider-command-search input {
+  border-radius: 999px;
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #edf4f0;
+  padding: 16px 18px;
+}
+
+.provider-command-search input::placeholder {
+  color: rgba(237, 244, 240, 0.42);
+}
+
+.provider-sidebar-stats,
+.provider-command-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.provider-command-stats {
+  min-width: 340px;
+}
+
+.provider-stat-card {
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(36, 48, 53, 0.96), rgba(20, 27, 31, 0.96));
+}
+
+.provider-stat-card strong {
+  display: block;
+  font-size: 1.7rem;
+  color: #f4fbf8;
+}
+
+.provider-stat-card span {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #97aca4;
+}
+
+.patient-stat { box-shadow: inset 0 3px 0 #58c7a9; }
+.diagnosis-stat { box-shadow: inset 0 3px 0 #89dced; }
+.readiness-stat { box-shadow: inset 0 3px 0 #d7bc7d; }
+.aqua-stat { box-shadow: inset 0 3px 0 #89dced; }
+.gold-stat { box-shadow: inset 0 3px 0 #d7bc7d; }
+.green-stat { box-shadow: inset 0 3px 0 #58c7a9; }
+
+.provider-patient-row {
+  border-radius: 24px;
+  border-color: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(34, 46, 51, 0.94), rgba(20, 27, 31, 0.94));
+}
+
+.provider-patient-row strong {
+  color: #eef6f2;
+}
+
+.provider-patient-row.active {
+  border-color: rgba(120, 217, 202, 0.36);
+  background:
+    radial-gradient(circle at top left, rgba(120, 217, 202, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(31, 50, 54, 0.98), rgba(19, 30, 34, 0.98));
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.16);
+}
+
+.provider-command-banner {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.provider-command-banner-copy {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.provider-command-banner-copy .catalog-note {
+  max-width: 58ch;
+}
+
+.provider-chart-grid .saved-section-card,
+.provider-diagnosis-section,
+.saved-entry-card,
+.saved-value-card,
+.provider-clearance-item,
+.provider-diagnosis-card {
+  border-radius: 24px;
+}
+
+.provider-chart-grid .saved-section-card,
+.provider-diagnosis-section,
+.saved-value-card,
+.saved-entry-card,
+.provider-diagnosis-card,
+.provider-clearance-item {
+  background: linear-gradient(180deg, rgba(35, 46, 51, 0.86), rgba(23, 30, 34, 0.86));
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.provider-chart-grid .saved-section-card h3,
+.provider-diagnosis-card strong,
+.saved-value-text,
+.saved-entry-title,
+.saved-entry-card strong {
+  color: #f4fbf8;
+}
+
+.provider-diagnosis-card.active {
+  background:
+    radial-gradient(circle at top left, rgba(120, 217, 202, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(31, 50, 54, 0.98), rgba(19, 30, 34, 0.98));
+}
+
+.patient-app-shell {
+  width: min(100%, 430px);
+  padding-top: 14px;
+}
+
+.patient-app-shell .topbar {
+  position: sticky;
+  top: 10px;
+  z-index: 40;
+  margin: 0 12px;
+  padding: 12px 14px;
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(24, 70, 78, 0.26), rgba(24, 70, 78, 0.58)),
+    radial-gradient(circle at top left, rgba(126, 215, 223, 0.28), transparent 30%),
+    url("https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80") center/cover;
+  box-shadow: 0 18px 46px rgba(74, 52, 31, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.patient-app-shell .topbar .eyebrow,
+.patient-app-shell .topnav,
+.patient-app-shell .user-copy span {
+  display: none;
+}
+
+.patient-app-shell .brand-name,
+.patient-app-shell .user-profile-link {
+  color: #fffaf3;
+}
+
+.patient-app-shell .brand-name {
+  font-size: 1.02rem;
+}
+
+.patient-app-shell .shell-content {
+  padding: 0 12px;
+}
+
+.patient-app-shell .page-banner {
+  padding: 0 16px;
+}
+
+.patient-care-space,
+.patient-diagnosis-detail-space {
+  display: grid;
+  gap: 16px;
+}
+
+.patient-care-hero,
+.patient-care-detail-panel,
+.patient-care-empty {
+  border-radius: 32px;
+  overflow: hidden;
+  border-color: rgba(107, 81, 52, 0.12);
+  background:
+    linear-gradient(135deg, rgba(20, 42, 50, 0.18), rgba(20, 42, 50, 0.62)),
+    radial-gradient(circle at top left, rgba(126, 215, 223, 0.28), transparent 30%),
+    url("https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80") center/cover;
+  color: #fff8f1;
+  box-shadow: 0 20px 46px rgba(74, 52, 31, 0.16);
+}
+
+.patient-care-hero .eyebrow,
+.patient-care-detail-panel .eyebrow,
+.patient-care-empty .eyebrow {
+  color: rgba(255, 250, 243, 0.84);
+}
+
+.patient-care-hero h2,
+.patient-care-empty h2 {
+  color: #fffaf4;
+  max-width: 10ch;
+  font-size: clamp(2rem, 8vw, 2.9rem);
+  line-height: 0.98;
+}
+
+.patient-care-hero .lede,
+.patient-care-empty .lede {
+  color: rgba(255, 248, 241, 0.88);
+  margin: 14px 0 0;
+  max-width: 32ch;
+}
+
+.patient-care-pill-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.patient-care-pill-row span {
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fffaf4;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.patient-diagnosis-card-list {
+  gap: 14px;
+}
+
+.patient-diagnosis-card {
+  padding: 18px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top left, rgba(25, 109, 103, 0.08), transparent 28%),
+    rgba(255, 255, 255, 0.82);
+  border-color: rgba(107, 81, 52, 0.1);
+  box-shadow: 0 18px 34px rgba(74, 52, 31, 0.08);
+}
+
+.patient-diagnosis-card h3 {
+  font-size: 1.55rem;
+}
+
+.patient-diagnosis-link {
+  display: inline-flex;
+  margin-top: 14px;
+  color: #16655f;
+  font-weight: 700;
+}
+
+.patient-treatment-options-list {
+  gap: 14px;
+}
+
+.patient-treatment-option-card {
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(107, 81, 52, 0.1);
+  box-shadow: 0 18px 34px rgba(74, 52, 31, 0.08);
+}
+
 .patient-app-content {
   display: grid;
   gap: 18px;

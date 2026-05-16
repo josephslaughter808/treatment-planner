@@ -26,11 +26,13 @@ export function PatientDiagnosisDetailView({ eventId }: { eventId: string }) {
   const pageContent = buildPatientDiagnosisCarePage(event);
 
   return (
-    <section className="panel diagnosis-detail-screen care-page-preview">
-      <CarePageRenderer content={pageContent} />
-      <div className="dialogue-list care-page-action-list">
+    <section className="patient-diagnosis-detail-space">
+      <section className="panel diagnosis-detail-screen care-page-preview patient-care-detail-panel">
+        <CarePageRenderer content={pageContent} />
+      </section>
+      <div className="dialogue-list care-page-action-list patient-treatment-options-list">
         {event.treatmentOptions.map((option) => (
-          <article className="dialogue-card care-page-treatment-block" key={option.label}>
+          <article className="dialogue-card care-page-treatment-block patient-treatment-option-card" key={option.label}>
             <h4>{option.label}</h4>
             <p>{option.summary}</p>
             <p><strong>Visits:</strong> {option.visits.join(" ")}</p>
@@ -84,7 +86,7 @@ function buildPatientDiagnosisCarePage(
     title: event.diagnosisLabel,
     intro: [
       event.descriptor,
-      "This page is designed to help you understand what your provider found before you compare the next possible treatment steps."
+      "This page is here to make the diagnosis and treatment path feel calmer, clearer, and easier to understand."
     ],
     summary: `In plain language: ${event.commonName.toLowerCase()}.`,
     heroMedia,
@@ -106,7 +108,7 @@ function buildPatientDiagnosisCarePage(
     sections: [
       {
         eyebrow: "What this means",
-        title: "The goal is to make the condition easier to understand.",
+        title: "The goal is to help you understand the condition before making decisions.",
         paragraphs: event.conditionSections.slice(0, 2).map((section) => section.body),
         bullets: event.conditionSections.slice(2).map((section) => section.body),
         labels: [event.commonName, event.toothLabel || "Tooth-specific", "Diagnosis explanation"],
@@ -115,9 +117,9 @@ function buildPatientDiagnosisCarePage(
       },
       {
         eyebrow: "Treatment direction",
-        title: "Once the diagnosis is clear, the next question is what to do about it.",
+        title: "Once the diagnosis is clear, the next question is what the treatment path looks like.",
         paragraphs: [
-          "This section should connect the diagnosis to the treatment conversation in simple language before the patient reviews the actual options."
+          "This section connects the diagnosis to the treatment conversation in simple language before you review the actual options."
         ],
         storyItems: event.treatmentOptions.map((option) => ({
           title: option.label,
@@ -162,7 +164,7 @@ function buildPatientDiagnosisCarePage(
     closing: {
       title: "A clear diagnosis page builds confidence.",
       body: "The best version of this page combines a simple explanation, rich visuals, and clear transitions into treatment options.",
-      note: "As we add real x-rays, office images, and short explainer videos, this page will feel much closer to the exact format you referenced."
+      note: "If anything still feels unclear, your provider can walk through these steps with you."
     }
   };
 }
