@@ -44,11 +44,11 @@ export function PatientDiagnosisDetailView({ eventId }: { eventId: string }) {
                   diagnosisEventId: event.id,
                   treatmentLabel: option.label
                 });
-                setMessage(`${option.label} marked as rejected.`);
+                setMessage(`${option.label} saved as not preferred right now.`);
               }}
               type="button"
             >
-              Mark treatment rejected
+              Not preferred right now
             </button>
           </article>
         ))}
@@ -158,7 +158,7 @@ function buildPatientDiagnosisCarePage(
         .slice(0, 5)
         .map((question) => ({
           question,
-          answer: "This answer should stay simple, direct, and reassuring while still being honest about the condition and what comes next."
+          answer: answerPatientDiagnosisQuestion(question, event)
         }))
     },
     closing: {
@@ -167,4 +167,34 @@ function buildPatientDiagnosisCarePage(
       note: "If anything still feels unclear, your provider can walk through these steps with you."
     }
   };
+}
+
+function answerPatientDiagnosisQuestion(
+  question: string,
+  event: Extract<ReturnType<typeof readTimelineFromStorage>[number], { type: "diagnosis" }>
+) {
+  const normalized = question.toLowerCase();
+  const diagnosis = event.diagnosisLabel.toLowerCase();
+
+  if (normalized.includes("serious")) {
+    return `${event.diagnosisLabel} can range from manageable to more urgent depending on how far it has progressed. Your provider will explain how concerned they are based on your symptoms, exam, and imaging.`;
+  }
+
+  if (normalized.includes("save") || normalized.includes("saved")) {
+    return `In many situations the tooth can still be treated, but that depends on how much healthy structure and support remain. Your provider is showing you options so you can understand what is still realistic.`;
+  }
+
+  if (normalized.includes("why am i seeing treatment options") || normalized.includes("what are my options")) {
+    return `You are seeing treatment options because there may be more than one reasonable way to manage ${diagnosis}. The goal is to help you understand what each path involves before you decide with your provider.`;
+  }
+
+  if (normalized.includes("wait")) {
+    return `Waiting may allow ${diagnosis} to worsen, which can mean fewer conservative choices later. If timing matters, your provider will tell you that clearly.`;
+  }
+
+  if (normalized.includes("hurt") || normalized.includes("pain")) {
+    return `Some diagnoses cause pain, and some are found before they become very uncomfortable. Your provider can connect what you are feeling to what they found and explain what is likely to change if treatment is delayed.`;
+  }
+
+  return `${event.descriptor} Your provider will help you understand how that applies to your tooth, your symptoms, and the treatment choices in front of you.`;
 }

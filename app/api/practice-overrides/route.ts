@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { practicesById } from "@/lib/clinical-catalog";
-import { savePracticeOverrideRecord } from "@/lib/persistence";
+import { deletePracticeOverrideRecord, savePracticeOverrideRecord } from "@/lib/persistence";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 
 export async function POST(request: NextRequest) {
@@ -102,4 +102,27 @@ export async function GET(request: NextRequest) {
       designConfig: override.design_config || {}
     }
   });
+}
+
+export async function DELETE(request: NextRequest) {
+  const body = (await request.json()) as {
+    practiceId?: string;
+    contentId?: string;
+    contentType?: "diagnosis" | "treatment";
+  };
+
+  if (!body.practiceId || !body.contentId || !body.contentType) {
+    return NextResponse.json(
+      { error: "Practice and page details are required to reset a saved page." },
+      { status: 400 }
+    );
+  }
+
+  const result = await deletePracticeOverrideRecord({
+    practiceId: body.practiceId,
+    contentId: body.contentId,
+    contentType: body.contentType
+  });
+
+  return NextResponse.json(result);
 }

@@ -73,9 +73,21 @@ export function ProviderPatientDatabaseView() {
       return patients;
     }
 
-    return patients.filter((patient) =>
-      [patient.fullName, patient.email].some((value) => value.toLowerCase().includes(query))
-    );
+    return patients.filter((patient) => {
+      const searchableBits = [
+        patient.fullName,
+        patient.email,
+        ...patient.diagnoses.flatMap((diagnosis) => [
+          diagnosis.diagnosisLabel,
+          diagnosis.commonName,
+          diagnosis.descriptor,
+          diagnosis.toothLabel ?? "",
+          ...diagnosis.treatmentOptions.map((option) => option.label)
+        ])
+      ];
+
+      return searchableBits.some((value) => value.toLowerCase().includes(query));
+    });
   }, [deferredSearch, patients]);
 
   const resolvedSelectedPatientEmail = filteredPatients.some(

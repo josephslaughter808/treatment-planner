@@ -267,6 +267,61 @@ export async function savePracticeOverrideRecord(input: {
   };
 }
 
+export async function deletePracticeOverrideRecord(input: {
+  practiceId: string;
+  contentId: string;
+  contentType: "diagnosis" | "treatment";
+}): Promise<SaveResult> {
+  const supabase = createAdminSupabaseClient();
+
+  if (!supabase) {
+    return {
+      mode: "mock",
+      message:
+        "Supabase environment variables are not set yet. The page reset flow is ready, but it cannot remove practice copies until credentials are configured."
+    };
+  }
+
+  const practice = practicesById[input.practiceId];
+  if (!practice) {
+    throw new Error("Selected practice profile was not found.");
+  }
+
+  const slug = toSlug(practice.name);
+  const { data: practiceRow, error: practiceError } = await supabase
+    .from("practices")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (practiceError) {
+    throw new Error(practiceError.message);
+  }
+
+  if (!practiceRow) {
+    return {
+      mode: "supabase",
+      message: "This page is already using the shared library default for this practice."
+    };
+  }
+
+  const key = `${input.contentType}:${input.contentId}`;
+  const { error } = await supabase
+    .from("practice_overrides")
+    .delete()
+    .eq("practice_id", practiceRow.id)
+    .eq("diagnosis_id", key);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    mode: "supabase",
+    message: "The saved practice copy was removed. This office is now using the shared library default again."
+  };
+}
+
 export async function savePatientVaultRecord(vault: PatientVault): Promise<SaveResult> {
   const supabase = createAdminSupabaseClient();
 

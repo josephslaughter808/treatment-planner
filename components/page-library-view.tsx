@@ -52,6 +52,18 @@ type DesignControls = {
 
 type PersistedDesignConfig = {
   pageContent?: CarePageContent;
+  designControls?: DesignControls;
+};
+
+const defaultDesignControls: DesignControls = {
+  fontFamily: "Source Sans 3",
+  headingSize: 36,
+  bodySize: 17,
+  headingColor: "#2f261f",
+  bodyColor: "#605246",
+  sectionSpacing: 20,
+  cardRadius: 22,
+  lineHeight: 1.65
 };
 
 const diagnosisWorkingSet = conditionCatalog;
@@ -68,17 +80,9 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [editorTab, setEditorTab] = useState<"item-assets" | "general-assets">("item-assets");
-  const [designControls, setDesignControls] = useState<DesignControls>({
-    fontFamily: "Source Sans 3",
-    headingSize: 36,
-    bodySize: 17,
-    headingColor: "#2f261f",
-    bodyColor: "#605246",
-    sectionSpacing: 20,
-    cardRadius: 22,
-    lineHeight: 1.65
-  });
+  const [designControls, setDesignControls] = useState<DesignControls>(defaultDesignControls);
 
   const selectedDiagnosis = mode === "diagnosis" ? conditionsById[selectedId] : undefined;
   const selectedTreatment = mode === "treatment" ? treatmentsById[selectedId] : undefined;
@@ -98,6 +102,11 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
   const [consentIntro, setConsentIntro] = useState("");
   const [isLoadingOverride, setIsLoadingOverride] = useState(false);
   const [pageSource, setPageSource] = useState<"library" | "practice">("library");
+  const [loadedDraft, setLoadedDraft] = useState<CarePageContent | null>(null);
+  const [loadedConsentIntro, setLoadedConsentIntro] = useState("");
+  const [loadedPreferredMediaAssetIds, setLoadedPreferredMediaAssetIds] = useState<string[]>([]);
+  const [loadedGeneralAssetIds, setLoadedGeneralAssetIds] = useState<string[]>([]);
+  const [loadedDesignControls, setLoadedDesignControls] = useState<DesignControls>(defaultDesignControls);
 
   const diagnosisRelatedTreatments = useMemo(
     () => (selectedDiagnosis ? getTreatmentsForDiagnosis(selectedDiagnosis.id) : []),
@@ -237,6 +246,7 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
           : applyLegacyOverride(resolvedBasePageContent, override);
         const nextPreferredMedia = override?.preferredMediaAssetIds ?? [];
         const nextGeneralMedia = override?.generalAssetIds ?? [];
+        const nextDesignControls = mergeDesignControls(config.designControls);
         const draftWithMedia = syncPageMedia(
           nextDraft,
           resolveMediaPanels([...baseMediaAssetIds, ...nextPreferredMedia, ...nextGeneralMedia])
@@ -250,6 +260,12 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
         setConsentIntro(override?.consentIntro ?? "");
         setPreferredMediaAssetIds(nextPreferredMedia);
         setGeneralAssetIds(nextGeneralMedia);
+        setLoadedDraft(draftWithMedia);
+        setLoadedConsentIntro(override?.consentIntro ?? "");
+        setLoadedPreferredMediaAssetIds(nextPreferredMedia);
+        setLoadedGeneralAssetIds(nextGeneralMedia);
+        setDesignControls(nextDesignControls);
+        setLoadedDesignControls(nextDesignControls);
         setPageSource(override ? "practice" : "library");
         setIsLoadingOverride(false);
       };
@@ -326,7 +342,8 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
           preferredMediaAssetIds,
           generalAssetIds,
           designConfig: {
-            pageContent: pageDraft
+            pageContent: pageDraft,
+            designControls
           }
         })
       });
@@ -337,6 +354,11 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
       }
 
       setMessage(data.message || `${capitalize(mode)} page saved.`);
+      setLoadedDraft(pageDraft);
+      setLoadedConsentIntro(consentIntro);
+      setLoadedPreferredMediaAssetIds(preferredMediaAssetIds);
+      setLoadedGeneralAssetIds(generalAssetIds);
+      setLoadedDesignControls(designControls);
       setPageSource("practice");
       setIsEditing(false);
     } catch (error) {
@@ -356,6 +378,83 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
 
   const reviewDate = "07/03/2025";
   const pageContent = pageDraft;
+  const hasUnsavedChanges = useMemo(() => {
+    return (
+      JSON.stringify(pageDraft) !== JSON.stringify(loadedDraft) ||
+      consentIntro !== loadedConsentIntro ||
+      JSON.stringify(preferredMediaAssetIds) !== JSON.stringify(loadedPreferredMediaAssetIds) ||
+      JSON.stringify(generalAssetIds) !== JSON.stringify(loadedGeneralAssetIds) ||
+      JSON.stringify(designControls) !== JSON.stringify(loadedDesignControls)
+    );
+  }, [
+    consentIntro,
+    designControls,
+    generalAssetIds,
+    loadedConsentIntro,
+    loadedDesignControls,
+    loadedDraft,
+    loadedGeneralAssetIds,
+    loadedPreferredMediaAssetIds,
+    pageDraft,
+    preferredMediaAssetIds
+  ]);
+
+  function restoreLoadedState() {
+    setPageDraft(loadedDraft);
+    setConsentIntro(loadedConsentIntro);
+    setPreferredMediaAssetIds(loadedPreferredMediaAssetIds);
+    setGeneralAssetIds(loadedGeneralAssetIds);
+    setDesignControls(loadedDesignControls);
+    setMessage(`Reverted unsaved ${mode} page edits.`);
+  }
+
+  async function handleResetToLibraryDefault() {
+    if (!contentId) {
+      return;
+    }
+
+    setIsResetting(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/practice-overrides", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          practiceId,
+          contentId,
+          contentType: mode
+        })
+      });
+
+      const data = (await response.json()) as { message?: string; error?: string };
+      if (!response.ok) {
+        throw new Error(data.error || `Unable to reset the ${mode} page.`);
+      }
+
+      if (basePageContent) {
+        const resetDraft = syncPageMedia(basePageContent, resolveMediaPanels(baseMediaAssetIds));
+        setPageDraft(resetDraft);
+        setLoadedDraft(resetDraft);
+      }
+      setConsentIntro("");
+      setLoadedConsentIntro("");
+      setPreferredMediaAssetIds([]);
+      setLoadedPreferredMediaAssetIds([]);
+      setGeneralAssetIds([]);
+      setLoadedGeneralAssetIds([]);
+      setDesignControls(defaultDesignControls);
+      setLoadedDesignControls(defaultDesignControls);
+      setPageSource("library");
+      setMessage(data.message || `${capitalize(mode)} page reset to library default.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : `Unable to reset the ${mode} page.`);
+    } finally {
+      setIsResetting(false);
+    }
+  }
 
   function updateDraft(updater: (current: CarePageContent) => CarePageContent) {
     setPageDraft((current) => (current ? updater(current) : current));
@@ -616,6 +715,9 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                       {pageSource === "practice"
                         ? "This office is editing its own saved default copy."
                         : "This office is currently editing from the shared library default."}
+                    </p>
+                    <p className={`page-source-pill ${hasUnsavedChanges ? "practice" : "library"}`}>
+                      {hasUnsavedChanges ? "Unsaved changes in editor" : "All page changes are saved"}
                     </p>
                   </div>
 
@@ -1178,8 +1280,24 @@ export function PageLibraryView({ mode }: { mode: LibraryMode }) {
                       </div>
 
                       <div className="form-footer">
-                        <button className="primary-button" disabled={isSaving} onClick={handleSave} type="button">
+                        <button className="primary-button" disabled={isSaving || isResetting} onClick={handleSave} type="button">
                           {isSaving ? `Saving ${mode} page copy...` : `Save practice copy`}
+                        </button>
+                        <button
+                          className="secondary-button"
+                          disabled={!hasUnsavedChanges || isSaving || isResetting}
+                          onClick={restoreLoadedState}
+                          type="button"
+                        >
+                          Discard unsaved edits
+                        </button>
+                        <button
+                          className="secondary-button"
+                          disabled={pageSource !== "practice" || isSaving || isResetting}
+                          onClick={handleResetToLibraryDefault}
+                          type="button"
+                        >
+                          {isResetting ? "Resetting to library..." : "Reset to library default"}
                         </button>
                         <p>This saves a practice-specific copy and makes it the default page for this content at your office.</p>
                       </div>
@@ -1259,6 +1377,13 @@ function splitStoryItems(value: string) {
 
 function joinStoryItems(values: Array<{ title: string; body: string }>) {
   return values.map((item) => `${item.title} | ${item.body}`).join("\n");
+}
+
+function mergeDesignControls(override?: Partial<DesignControls>) {
+  return {
+    ...defaultDesignControls,
+    ...override
+  };
 }
 
 function resolveMediaPanels(ids: string[]) {
