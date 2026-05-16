@@ -116,6 +116,7 @@ export function IntakeExperience() {
           patientName: payload.patientName,
           createdAt: new Date().toISOString(),
           diagnosisId: payload.diagnosisId,
+          practiceId: payload.practiceId,
           diagnosisLabel: conditionsById[payload.diagnosisId]?.label || payload.diagnosisId,
           commonName: buildCommonName(
             conditionsById[payload.diagnosisId]?.label || payload.diagnosisId,

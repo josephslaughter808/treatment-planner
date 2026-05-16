@@ -1,12 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { CarePageRenderer, type CarePageContent } from "@/components/care-page-renderer";
 import { conditionsById, mediaById } from "@/lib/clinical-catalog";
 import { markTreatmentRejected, readTimelineFromStorage } from "@/lib/patient-vault";
 
 export function PatientDiagnosisDetailView({ eventId }: { eventId: string }) {
   const [message, setMessage] = useState<string | null>(null);
+  const [practicePageState, setPracticePageState] = useState<{
+    eventId: string;
+    content: CarePageContent | null;
+    designControls: PatientDesignControls;
+  } | null>(null);
   const event = useMemo(
     () =>
       readTimelineFromStorage().find(
@@ -14,6 +19,55 @@ export function PatientDiagnosisDetailView({ eventId }: { eventId: string }) {
       ),
     [eventId]
   );
+
+  useEffect(() => {
+    if (!event || event.type !== "diagnosis" || !event.practiceId) {
+      return;
+    }
+
+    let cancelled = false;
+    const nextBaseContent = buildPatientDiagnosisCarePage(event);
+    const practiceId = event.practiceId;
+    const diagnosisId = event.diagnosisId;
+    const currentEventId = event.id;
+
+    async function loadPracticeCopy() {
+      try {
+        const response = await fetch(
+          `/api/practice-overrides?practiceId=${encodeURIComponent(practiceId)}&contentId=${encodeURIComponent(diagnosisId)}&contentType=diagnosis`
+        );
+        const data = (await response.json()) as {
+          override?: {
+            designConfig?: {
+              pageContent?: CarePageContent;
+              designControls?: Partial<PatientDesignControls>;
+            };
+          } | null;
+        };
+
+        if (!response.ok || cancelled) {
+          return;
+        }
+
+        const overrideContent = data.override?.designConfig?.pageContent;
+        const overrideDesignControls = data.override?.designConfig?.designControls;
+
+        setPracticePageState({
+          eventId: currentEventId,
+          content: overrideContent ? mergePageContent(nextBaseContent, overrideContent) : nextBaseContent,
+          designControls: mergePatientDesignControls(overrideDesignControls)
+        });
+      } catch {
+        // Fall back to the built-in patient page if the practice copy cannot be loaded.
+      }
+    }
+
+    loadPracticeCopy();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [event]);
 
   if (!event || event.type !== "diagnosis") {
     return (
@@ -24,11 +78,29 @@ export function PatientDiagnosisDetailView({ eventId }: { eventId: string }) {
   }
 
   const pageContent = buildPatientDiagnosisCarePage(event);
+  const resolvedContent =
+    practicePageState?.eventId === event.id ? practicePageState.content ?? pageContent : pageContent;
+  const designControls =
+    practicePageState?.eventId === event.id ? practicePageState.designControls : defaultPatientDesignControls;
 
   return (
     <section className="patient-diagnosis-detail-space">
-      <section className="panel diagnosis-detail-screen care-page-preview patient-care-detail-panel">
-        <CarePageRenderer content={pageContent} />
+      <section
+        className="panel diagnosis-detail-screen care-page-preview patient-care-detail-panel"
+        style={
+          {
+            "--treatment-heading-color": designControls.headingColor,
+            "--treatment-body-color": designControls.bodyColor,
+            "--treatment-heading-size": `${designControls.headingSize}px`,
+            "--treatment-body-size": `${designControls.bodySize}px`,
+            "--treatment-section-gap": `${designControls.sectionSpacing}px`,
+            "--treatment-card-radius": `${designControls.cardRadius}px`,
+            "--treatment-line-height": `${designControls.lineHeight}`,
+            "--treatment-font-family": designControls.fontFamily
+          } as CSSProperties
+        }
+      >
+        <CarePageRenderer content={resolvedContent} />
       </section>
       <div className="dialogue-list care-page-action-list patient-treatment-options-list">
         {event.treatmentOptions.map((option) => (
@@ -166,6 +238,50 @@ function buildPatientDiagnosisCarePage(
       body: "The best version of this page combines a simple explanation, rich visuals, and clear transitions into treatment options.",
       note: "If anything still feels unclear, your provider can walk through these steps with you."
     }
+  };
+}
+
+type PatientDesignControls = {
+  fontFamily: string;
+  headingSize: number;
+  bodySize: number;
+  headingColor: string;
+  bodyColor: string;
+  sectionSpacing: number;
+  cardRadius: number;
+  lineHeight: number;
+};
+
+const defaultPatientDesignControls: PatientDesignControls = {
+  fontFamily: "Source Sans 3",
+  headingSize: 36,
+  bodySize: 17,
+  headingColor: "#2f261f",
+  bodyColor: "#605246",
+  sectionSpacing: 20,
+  cardRadius: 22,
+  lineHeight: 1.65
+};
+
+function mergePatientDesignControls(override?: Partial<PatientDesignControls>) {
+  return {
+    ...defaultPatientDesignControls,
+    ...override
+  };
+}
+
+function mergePageContent(baseContent: CarePageContent, overrideContent: CarePageContent) {
+  return {
+    ...baseContent,
+    ...overrideContent,
+    heroMedia: overrideContent.heroMedia ?? baseContent.heroMedia,
+    intro: overrideContent.intro?.length ? overrideContent.intro : baseContent.intro,
+    ribbon: overrideContent.ribbon?.length ? overrideContent.ribbon : baseContent.ribbon,
+    sections: overrideContent.sections?.length ? overrideContent.sections : baseContent.sections,
+    timeline: overrideContent.timeline ?? baseContent.timeline,
+    gallery: overrideContent.gallery ?? baseContent.gallery,
+    faqs: overrideContent.faqs?.items?.length ? overrideContent.faqs : baseContent.faqs,
+    closing: overrideContent.closing ?? baseContent.closing
   };
 }
 
