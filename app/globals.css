@@ -931,6 +931,106 @@ textarea {
   margin-bottom: 18px;
 }
 
+.patient-select-launcher {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(30, 41, 37, 0.12);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.patient-select-launcher h3 {
+  margin: 2px 0 6px;
+}
+
+.patient-select-launcher p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.patient-finder-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: start center;
+  padding: 48px 24px;
+  overflow-y: auto;
+  background: rgba(13, 21, 18, 0.58);
+  backdrop-filter: blur(12px);
+}
+
+.patient-finder-dialog {
+  width: min(1120px, 100%);
+  border: 1px solid rgba(30, 41, 37, 0.16);
+  border-radius: 16px;
+  background: #f8f7f1;
+  box-shadow: 0 28px 80px rgba(12, 20, 17, 0.28);
+}
+
+.patient-finder-header,
+.patient-finder-results-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.patient-finder-header {
+  padding: 22px 24px;
+  border-bottom: 1px solid rgba(30, 41, 37, 0.12);
+}
+
+.patient-finder-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 22px 24px;
+  border-bottom: 1px solid rgba(30, 41, 37, 0.12);
+}
+
+.patient-finder-wide {
+  grid-column: span 2;
+}
+
+.patient-finder-results {
+  display: grid;
+  gap: 12px;
+  padding: 22px 24px 24px;
+}
+
+.patient-finder-results-header {
+  color: var(--muted);
+}
+
+.patient-finder-results-header strong {
+  color: var(--text);
+}
+
+.patient-finder-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(30, 41, 37, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.patient-finder-row h4 {
+  margin: 0 0 6px;
+}
+
+.patient-finder-row p {
+  margin: 0 0 4px;
+  color: var(--muted);
+}
+
 .patient-match-card {
   display: grid;
   grid-template-columns: 46px 1fr;

@@ -22,6 +22,17 @@ export function IntakeCheckInView() {
   const [email, setEmail] = useState(() => readVaultFromStorage().email);
   const [memberId, setMemberId] = useState(() => readVaultFromStorage().memberId);
   const [accessCode, setAccessCode] = useState("");
+  const [isPatientFinderOpen, setIsPatientFinderOpen] = useState(false);
+  const [patientSearch, setPatientSearch] = useState({
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    phone: "",
+    address: "",
+    email: "",
+    memberId: "",
+    accessCode: ""
+  });
   const [insuranceConfirmed, setInsuranceConfirmed] = useState(true);
   const [historyConfirmed, setHistoryConfirmed] = useState(true);
   const [medicationConfirmed, setMedicationConfirmed] = useState(true);
@@ -78,6 +89,10 @@ export function IntakeCheckInView() {
       ? "share-code"
       : "share-code-pending"
     : "identity";
+  const patientFinderResults = useMemo(
+    () => buildPatientFinderResults(vault, patientSearch, currentUser?.practiceId, serverShareLink),
+    [currentUser?.practiceId, patientSearch, serverShareLink, vault]
+  );
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
@@ -155,6 +170,29 @@ export function IntakeCheckInView() {
     router.push("/integrations");
   }
 
+  function openPatientFinder() {
+    setPatientSearch((current) => ({
+      ...current,
+      email,
+      memberId,
+      accessCode
+    }));
+    setIsPatientFinderOpen(true);
+  }
+
+  function selectPatientFromFinder(result: PatientFinderResult) {
+    if (result.matchType === "access-code") {
+      setAccessCode(result.accessCode);
+    } else {
+      setEmail(result.email);
+      setMemberId(result.memberId || result.walletCode);
+      setAccessCode("");
+    }
+
+    setMessage(null);
+    setIsPatientFinderOpen(false);
+  }
+
   return (
     <div className="grid checkin-layout">
       <section className="panel">
@@ -165,50 +203,19 @@ export function IntakeCheckInView() {
           </div>
         </div>
 
-        <div className="patient-match-workflow">
-          <section className="patient-match-card primary">
-            <div className="match-step-badge">1</div>
-            <div>
-              <label>
-                Patient email
-                <input
-                  autoComplete="email"
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="patient@example.com"
-                  type="email"
-                  value={email}
-                />
-              </label>
-            </div>
-          </section>
-
-          <section className="patient-match-card">
-            <div className="match-step-badge">2</div>
-            <div>
-              <label>
-                Secondary identifier
-                <input
-                  onChange={(event) => setMemberId(event.target.value)}
-                  placeholder="Member ID or wallet code"
-                  value={memberId}
-                />
-              </label>
-            </div>
-          </section>
-
-          <section className="patient-match-card alternate">
-            <div className="match-step-badge">Alt</div>
-            <div>
-              <label>
-                Practice access code
-                <input
-                  onChange={(event) => setAccessCode(event.target.value)}
-                  placeholder="Use only when patient has a share code"
-                  value={accessCode}
-                />
-              </label>
-            </div>
-          </section>
+        <div className="patient-select-launcher">
+          <div>
+            <p className="eyebrow">Patient selection</p>
+            <h3>{matched ? matched.fullName : "No patient selected"}</h3>
+            <p>
+              {matched
+                ? `${matched.email} ${matched.dateOfBirth ? `• DOB ${matched.dateOfBirth}` : ""}`
+                : "Open patient selection to search by name, birthday, phone, address, email, or ID."}
+            </p>
+          </div>
+          <button className="primary-button" onClick={openPatientFinder} type="button">
+            Select patient
+          </button>
         </div>
 
         <div className={`patient-match-status ${matched ? "matched" : "unmatched"}`}>
@@ -289,6 +296,125 @@ export function IntakeCheckInView() {
         {message ? <p className="info-text">{message}</p> : null}
       </section>
 
+      {isPatientFinderOpen ? (
+        <div className="patient-finder-backdrop" role="presentation">
+          <section
+            aria-label="Select patient"
+            aria-modal="true"
+            className="patient-finder-dialog"
+            role="dialog"
+          >
+            <div className="patient-finder-header">
+              <div>
+                <p className="eyebrow">Select patient</p>
+                <h2>Patient finder</h2>
+              </div>
+              <button className="secondary-button" onClick={() => setIsPatientFinderOpen(false)} type="button">
+                Close
+              </button>
+            </div>
+
+            <div className="patient-finder-grid">
+              <label>
+                First name
+                <input
+                  onChange={(event) => setPatientSearch((current) => ({ ...current, firstName: event.target.value }))}
+                  value={patientSearch.firstName}
+                />
+              </label>
+              <label>
+                Last name
+                <input
+                  onChange={(event) => setPatientSearch((current) => ({ ...current, lastName: event.target.value }))}
+                  value={patientSearch.lastName}
+                />
+              </label>
+              <label>
+                Birthday
+                <input
+                  onChange={(event) => setPatientSearch((current) => ({ ...current, dateOfBirth: event.target.value }))}
+                  type="date"
+                  value={patientSearch.dateOfBirth}
+                />
+              </label>
+              <label>
+                Phone number
+                <input
+                  onChange={(event) => setPatientSearch((current) => ({ ...current, phone: event.target.value }))}
+                  value={patientSearch.phone}
+                />
+              </label>
+              <label className="patient-finder-wide">
+                Address
+                <input
+                  onChange={(event) => setPatientSearch((current) => ({ ...current, address: event.target.value }))}
+                  placeholder="Street, city, or ZIP"
+                  value={patientSearch.address}
+                />
+              </label>
+              <label>
+                Email
+                <input
+                  autoComplete="email"
+                  onChange={(event) => setPatientSearch((current) => ({ ...current, email: event.target.value }))}
+                  type="email"
+                  value={patientSearch.email}
+                />
+              </label>
+              <label>
+                Member ID / wallet code
+                <input
+                  onChange={(event) => setPatientSearch((current) => ({ ...current, memberId: event.target.value }))}
+                  value={patientSearch.memberId}
+                />
+              </label>
+              <label className="patient-finder-wide">
+                Practice access code
+                <input
+                  onChange={(event) => {
+                    setPatientSearch((current) => ({ ...current, accessCode: event.target.value }));
+                    setAccessCode(event.target.value);
+                  }}
+                  placeholder="Use only when patient presents a code"
+                  value={patientSearch.accessCode}
+                />
+              </label>
+            </div>
+
+            <div className="patient-finder-results">
+              <div className="patient-finder-results-header">
+                <strong>Patients</strong>
+                <span>{patientFinderResults.length} result{patientFinderResults.length === 1 ? "" : "s"}</span>
+              </div>
+              {patientFinderResults.length > 0 ? (
+                patientFinderResults.map((result) => (
+                  <article className="patient-finder-row" key={result.id}>
+                    <div>
+                      <h4>{result.fullName}</h4>
+                      <p>{result.email || "Email not available"}</p>
+                      <p>
+                        {[
+                          result.dateOfBirth ? `DOB ${result.dateOfBirth}` : "",
+                          result.phone ? `Phone ${result.phone}` : "",
+                          result.memberId ? `Member ${result.memberId}` : result.walletCode ? `Wallet ${result.walletCode}` : ""
+                        ]
+                          .filter(Boolean)
+                          .join(" • ")}
+                      </p>
+                    </div>
+                    <button className="secondary-button" onClick={() => selectPatientFromFinder(result)} type="button">
+                      Use patient
+                    </button>
+                  </article>
+                ))
+              ) : (
+                <p className="info-text">No matching patients found. Add more details or use a practice access code.</p>
+              )}
+            </div>
+          </section>
+        </div>
+      ) : null}
+
       <section className="panel">
         <p className="eyebrow">Matched profile</p>
         {matched ? (
@@ -347,4 +473,142 @@ export function IntakeCheckInView() {
       </section>
     </div>
   );
+}
+
+type PatientFinderResult = {
+  id: string;
+  matchType: "patient" | "access-code";
+  fullName: string;
+  email: string;
+  dateOfBirth: string;
+  phone: string;
+  address: string;
+  memberId: string;
+  walletCode: string;
+  accessCode: string;
+};
+
+function buildPatientFinderResults(
+  vault: PatientVault,
+  search: {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    phone: string;
+    address: string;
+    email: string;
+    memberId: string;
+    accessCode: string;
+  },
+  practiceId: string | undefined,
+  serverShareLink: ShareLinkRecord | null
+) {
+  const candidates: PatientFinderResult[] = hasPatientIdentity(vault)
+    ? [
+        {
+          id: vault.profileId || vault.email || "local-vault",
+          matchType: "patient",
+          fullName: vault.fullName || "Unnamed patient",
+          email: vault.email,
+          dateOfBirth: vault.dateOfBirth,
+          phone: vault.phone,
+          address: "",
+          memberId: vault.memberId,
+          walletCode: vault.walletCode,
+          accessCode: ""
+        }
+      ]
+    : [];
+
+  const accessCode = normalize(search.accessCode);
+  const matchingShareLink = accessCode
+    ? readShareLinksFromStorage().find(
+        (link) =>
+          normalize(link.accessCode) === accessCode &&
+          link.status === "active" &&
+          (!practiceId || link.practiceId === practiceId)
+      ) ?? (serverShareLink && normalize(serverShareLink.accessCode) === accessCode ? serverShareLink : null)
+    : null;
+
+  if (matchingShareLink && hasPatientIdentity(vault)) {
+    candidates.unshift({
+      id: `share-${matchingShareLink.id}`,
+      matchType: "access-code",
+      fullName: vault.fullName || "Shared patient",
+      email: vault.email || matchingShareLink.patientEmail,
+      dateOfBirth: vault.dateOfBirth,
+      phone: vault.phone,
+      address: "",
+      memberId: vault.memberId,
+      walletCode: vault.walletCode,
+      accessCode: matchingShareLink.accessCode
+    });
+  }
+
+  const filtered = candidates.filter((candidate) => patientMatchesSearch(candidate, search));
+  return dedupePatientFinderResults(filtered.length > 0 || hasSearchCriteria(search) ? filtered : candidates);
+}
+
+function patientMatchesSearch(candidate: PatientFinderResult, search: {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  phone: string;
+  address: string;
+  email: string;
+  memberId: string;
+  accessCode: string;
+}) {
+  const names = candidate.fullName.trim().split(/\s+/);
+  const firstName = names[0] ?? "";
+  const lastName = names.slice(1).join(" ");
+  const memberOrWallet = [candidate.memberId, candidate.walletCode].map(normalize);
+
+  return [
+    fuzzyIncludes(firstName, search.firstName),
+    fuzzyIncludes(lastName, search.lastName),
+    fuzzyIncludes(candidate.dateOfBirth, search.dateOfBirth),
+    fuzzyIncludes(candidate.phone, search.phone),
+    fuzzyIncludes(candidate.address, search.address),
+    fuzzyIncludes(candidate.email, search.email),
+    !search.memberId.trim() || memberOrWallet.some((value) => value.includes(normalize(search.memberId))),
+    fuzzyIncludes(candidate.accessCode, search.accessCode)
+  ].every(Boolean);
+}
+
+function hasPatientIdentity(vault: PatientVault) {
+  return Boolean(vault.email || vault.fullName || vault.memberId || vault.walletCode);
+}
+
+function hasSearchCriteria(search: {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  phone: string;
+  address: string;
+  email: string;
+  memberId: string;
+  accessCode: string;
+}) {
+  return Object.values(search).some((value) => value.trim());
+}
+
+function fuzzyIncludes(value: string, query: string) {
+  return !query.trim() || normalize(value).includes(normalize(query));
+}
+
+function normalize(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function dedupePatientFinderResults(results: PatientFinderResult[]) {
+  const seen = new Set<string>();
+  return results.filter((result) => {
+    const key = `${result.matchType}:${result.email}:${result.memberId}:${result.accessCode}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
 }
