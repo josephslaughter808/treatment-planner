@@ -5,9 +5,9 @@ export default function VaultPage() {
   return (
     <AppShell
       audience="patient"
-      description="Store a reusable patient medical history, medications, allergies, insurance details, and a wallet-style intake identity."
-      pageLabel="Patient vault"
-      title="Build a reusable medical history profile"
+      description="Update the medical history, medications, allergies, and insurance details your office needs before visits."
+      pageLabel="Patient check-in"
+      title="Update medical history and insurance"
     >
       <PatientVaultView />
     </AppShell>

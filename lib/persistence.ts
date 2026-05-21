@@ -10,6 +10,7 @@ import type { AnalysisResponse, IntakePayload } from "@/lib/mock-analysis";
 import type { RequestActor } from "@/lib/request-auth";
 import type { CheckInRecord, PatientVault, ShareLinkRecord } from "@/lib/patient-vault";
 import { createAdminSupabaseClient } from "@/lib/supabase";
+import { decryptJsonField, decryptTextField, encryptJsonField, encryptTextField } from "@/lib/field-encryption";
 
 const storageBucket = process.env.SUPABASE_STORAGE_BUCKET || "case-files";
 
@@ -362,13 +363,14 @@ export async function savePatientVaultRecord(vault: PatientVault): Promise<SaveR
         phone: vault.phone || null,
         member_id: vault.memberId || null,
         wallet_code: vault.walletCode || null,
-        insurance_snapshot: vault.insurance,
-        conditions_snapshot: vault.medicalConditions,
-        medications_snapshot: vault.medications,
-        allergies_snapshot: vault.allergies,
-        clearances_snapshot: vault.clearanceDocuments,
-        emergency_contact_snapshot: vault.emergencyContact,
-        emergency_disclosure_snapshot: vault.emergencyDisclosure
+        insurance_snapshot: encryptJsonField(vault.insurance),
+        conditions_snapshot: encryptJsonField(vault.medicalConditions),
+        medications_snapshot: encryptJsonField(vault.medications),
+        allergies_snapshot: encryptJsonField(vault.allergies),
+        clearances_snapshot: encryptJsonField(vault.clearanceDocuments),
+        emergency_contact_snapshot: encryptJsonField(vault.emergencyContact),
+        emergency_disclosure_snapshot: encryptJsonField(vault.emergencyDisclosure),
+        office_connections_snapshot: encryptJsonField(vault.officeConnections)
       },
       { onConflict: "patient_identity_id" }
     )
@@ -430,25 +432,25 @@ export async function getPatientVaultRecord(email: string) {
     memberId: vaultRow.member_id || "",
     walletCode: vaultRow.wallet_code || "",
     lastUpdatedAt: vaultRow.updated_at || "",
-    medicalConditions: (vaultRow.conditions_snapshot as PatientVault["medicalConditions"]) || [],
-    medications: (vaultRow.medications_snapshot as PatientVault["medications"]) || [],
-    allergies: (vaultRow.allergies_snapshot as PatientVault["allergies"]) || [],
+    medicalConditions: decryptJsonField<PatientVault["medicalConditions"]>(vaultRow.conditions_snapshot, []),
+    medications: decryptJsonField<PatientVault["medications"]>(vaultRow.medications_snapshot, []),
+    allergies: decryptJsonField<PatientVault["allergies"]>(vaultRow.allergies_snapshot, []),
     clearanceDocuments:
-      (vaultRow.clearances_snapshot as PatientVault["clearanceDocuments"]) || [],
-    insurance: (vaultRow.insurance_snapshot as PatientVault["insurance"]) || {
+      decryptJsonField<PatientVault["clearanceDocuments"]>(vaultRow.clearances_snapshot, []),
+    insurance: decryptJsonField<PatientVault["insurance"]>(vaultRow.insurance_snapshot, {
       providerName: "",
       memberId: "",
       groupNumber: "",
       subscriberName: ""
-    },
+    }),
     emergencyContact:
-      (vaultRow.emergency_contact_snapshot as PatientVault["emergencyContact"]) || {
+      decryptJsonField<PatientVault["emergencyContact"]>(vaultRow.emergency_contact_snapshot, {
         name: "",
         relationship: "",
         phone: ""
-      },
+      }),
     emergencyDisclosure:
-      (vaultRow.emergency_disclosure_snapshot as PatientVault["emergencyDisclosure"]) || {
+      decryptJsonField<PatientVault["emergencyDisclosure"]>(vaultRow.emergency_disclosure_snapshot, {
         enabled: true,
         showAllergies: true,
         showConditions: true,
@@ -456,8 +458,8 @@ export async function getPatientVaultRecord(email: string) {
         showEmergencyContact: true,
         showBloodThinners: true,
         responderMessage: ""
-      },
-    officeConnections: []
+      }),
+    officeConnections: decryptJsonField<PatientVault["officeConnections"]>(vaultRow.office_connections_snapshot, [])
   };
 
   return { mode: "supabase" as const, vault };
@@ -518,7 +520,7 @@ export async function saveOfficeCheckInRecord(
       insurance_confirmed: input.insuranceConfirmed,
       history_confirmed: input.historyConfirmed,
       medication_confirmed: input.medicationConfirmed,
-      notes: input.notes || null,
+      notes: input.notes ? encryptTextField(input.notes) : null,
       created_by_user_id: input.createdByUserId || null
     })
     .select("id")
@@ -601,7 +603,7 @@ export async function getOfficeCheckInRecords(input: {
       insuranceConfirmed: Boolean(row.insurance_confirmed),
       historyConfirmed: Boolean(row.history_confirmed),
       medicationConfirmed: Boolean(row.medication_confirmed),
-      notes: (row.notes as string) || ""
+      notes: decryptTextField(row.notes)
     })) || [];
 
   return {

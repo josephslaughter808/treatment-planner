@@ -11,18 +11,14 @@ import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
 const providerNavItems = [
-  { href: "/", label: "Patients" },
-  { href: "/diagnoses", label: "Diagnoses" },
-  { href: "/treatments", label: "Treatments" },
+  { href: "/", label: "Check-in" },
   { href: "/team", label: "Team" },
   { href: "/settings", label: "Settings" }
 ];
 
 const patientNavItems = [
-  { href: "/patient", label: "My Care" },
-  { href: "/vault", label: "Health Vault" },
-  { href: "/emergency", label: "Emergency Card" },
-  { href: "/timeline", label: "Timeline" }
+  { href: "/vault", label: "Health Profile" },
+  { href: "/profile", label: "Account" }
 ];
 
 type AppShellProps = {
@@ -146,7 +142,7 @@ export function AppShell({
           <p className="eyebrow">Provider workspace</p>
           <h1 className="page-title">Desktop access required</h1>
           <p className="lede">
-            The provider program is designed for desktop charting only. Please open ClearPath Care on a desktop or laptop to manage patients, diagnoses, and treatment previews.
+            The provider program is designed for desktop check-in work only. Please open ClearPath Care on a desktop or laptop to review medical history and insurance updates.
           </p>
         </section>
       </main>

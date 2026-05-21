@@ -22,10 +22,9 @@ export function PracticeSettingsView() {
             <p className="brand-name">ClearPath Care</p>
           </div>
         </div>
-        <h1 className="patient-title">Practice education defaults</h1>
+        <h1 className="patient-title">Medical check-in setup</h1>
         <p className="lede">
-          Use settings for office-level setup, connector planning, and default practice controls.
-          Treatment-page editing now lives in the dedicated Treatments area.
+          Use settings for office identity, connector planning, and the first launch workflow: medical history and insurance updates.
         </p>
         {practice ? <p className="catalog-note">Signed in practice: {practice.name}</p> : null}
       </section>
@@ -38,11 +37,9 @@ export function PracticeSettingsView() {
             <p>{practice?.description || "Office profile description not entered yet."}</p>
           </article>
           <article className="dialogue-card">
-            <h4>Default package source</h4>
+            <h4>Launch focus</h4>
             <p>
-              {practice?.defaultPackageSource === "custom"
-                ? "Practice-customized package library"
-                : "ClearPath default library"}
+              Medical history, medication, allergy, and insurance confirmation.
             </p>
             <p>{practice?.brandNote || "No practice brand note set yet."}</p>
           </article>

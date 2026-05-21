@@ -57,7 +57,8 @@ export function IntakeCheckInView() {
 
   const matched = useMemo(() => {
     const emailMatch = vault.email.toLowerCase() === email.trim().toLowerCase();
-    const memberMatch = vault.memberId === memberId.trim();
+    const normalizedMemberId = memberId.trim();
+    const memberMatch = vault.memberId === normalizedMemberId || vault.walletCode === normalizedMemberId;
     const localShareLinkMatch = readShareLinksFromStorage().find(
       (link) =>
         link.accessCode.toLowerCase() === accessCode.trim().toLowerCase() &&
@@ -72,19 +73,6 @@ export function IntakeCheckInView() {
 
     return emailMatch && memberMatch ? vault : localShareLinkMatch || approvedServerLink ? vault : null;
   }, [accessCode, currentUser, email, memberId, serverShareLink, vault]);
-
-  const pendingClearances = useMemo(
-    () =>
-      matched?.clearanceDocuments.filter(
-        (document) => document.status === "requested" || document.status === "expired"
-      ) ?? [],
-    [matched]
-  );
-
-  const receivedClearances = useMemo(
-    () => matched?.clearanceDocuments.filter((document) => document.status === "received") ?? [],
-    [matched]
-  );
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
@@ -310,40 +298,9 @@ export function IntakeCheckInView() {
                 )}
               </ul>
             </div>
-            <div className="dialogue-card">
-              <h4>Clearance blockers</h4>
-              {pendingClearances.length > 0 ? (
-                <ul>
-                  {pendingClearances.map((document) => (
-                    <li key={document.id}>
-                      {(document.title || document.category).replace(/-/g, " ")} from{" "}
-                      {document.requestedFromOffice || "outside office not entered"}.
-                      {document.dueDate ? ` Due ${document.dueDate}.` : ""}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No requested or expired clearances are currently flagged.</p>
-              )}
-            </div>
-            <div className="dialogue-card">
-              <h4>Received documents</h4>
-              {receivedClearances.length > 0 ? (
-                <ul>
-                  {receivedClearances.map((document) => (
-                    <li key={document.id}>
-                      {document.title || document.category}
-                      {document.fileName ? ` • ${document.fileName}` : ""}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No clearance files have been marked received yet.</p>
-              )}
-            </div>
           </div>
         ) : (
-          <p>Enter the patient email and member ID, or use an approved practice access code, to simulate a wallet-based office autofill check-in.</p>
+          <p>Enter the patient email and member ID, or use an approved practice access code, to open the patient check-in profile.</p>
         )}
       </section>
     </div>
