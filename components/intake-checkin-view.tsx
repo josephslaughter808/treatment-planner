@@ -73,6 +73,11 @@ export function IntakeCheckInView() {
 
     return emailMatch && memberMatch ? vault : localShareLinkMatch || approvedServerLink ? vault : null;
   }, [accessCode, currentUser, email, memberId, serverShareLink, vault]);
+  const lookupMethod = accessCode.trim()
+    ? serverShareLink || readShareLinksFromStorage().some((link) => link.accessCode.toLowerCase() === accessCode.trim().toLowerCase())
+      ? "share-code"
+      : "share-code-pending"
+    : "identity";
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
@@ -156,29 +161,66 @@ export function IntakeCheckInView() {
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Office intake</p>
-            <h2>Reusable patient check-in</h2>
+            <h2>Find the correct patient</h2>
           </div>
         </div>
 
-        <div className="grid two-up">
-          <label>
-            Patient email
-            <input onChange={(event) => setEmail(event.target.value)} type="email" value={email} />
-          </label>
-          <label>
-            Member ID or wallet code
-            <input onChange={(event) => setMemberId(event.target.value)} value={memberId} />
-          </label>
+        <div className="patient-match-workflow">
+          <section className="patient-match-card primary">
+            <div className="match-step-badge">1</div>
+            <div>
+              <label>
+                Patient email
+                <input
+                  autoComplete="email"
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="patient@example.com"
+                  type="email"
+                  value={email}
+                />
+              </label>
+            </div>
+          </section>
+
+          <section className="patient-match-card">
+            <div className="match-step-badge">2</div>
+            <div>
+              <label>
+                Secondary identifier
+                <input
+                  onChange={(event) => setMemberId(event.target.value)}
+                  placeholder="Member ID or wallet code"
+                  value={memberId}
+                />
+              </label>
+            </div>
+          </section>
+
+          <section className="patient-match-card alternate">
+            <div className="match-step-badge">Alt</div>
+            <div>
+              <label>
+                Practice access code
+                <input
+                  onChange={(event) => setAccessCode(event.target.value)}
+                  placeholder="Use only when patient has a share code"
+                  value={accessCode}
+                />
+              </label>
+            </div>
+          </section>
         </div>
 
-        <label>
-          Practice access code
-          <input
-            onChange={(event) => setAccessCode(event.target.value)}
-            placeholder="Optional practice share code"
-            value={accessCode}
-          />
-        </label>
+        <div className={`patient-match-status ${matched ? "matched" : "unmatched"}`}>
+          <strong>{matched ? "Patient matched" : "No patient matched yet"}</strong>
+          <span>
+            {matched
+              ? lookupMethod === "share-code"
+                ? "Matched by approved practice access code."
+                : "Matched by email plus secondary identifier."
+              : "Use email with member ID or wallet code. Use the access code only when the patient presents one."}
+          </span>
+        </div>
 
         <div className="grid two-up">
           <label>

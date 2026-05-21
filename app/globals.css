@@ -925,6 +925,72 @@ textarea {
   gap: 12px;
 }
 
+.patient-match-workflow {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.patient-match-card {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(30, 41, 37, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.patient-match-card.primary {
+  border-left: 4px solid var(--accent);
+}
+
+.patient-match-card.alternate {
+  background: rgba(15, 118, 110, 0.07);
+}
+
+.match-step-badge {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #17201c;
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.patient-match-card.alternate .match-step-badge {
+  background: rgba(15, 118, 110, 0.16);
+  color: var(--accent-strong);
+}
+
+.patient-match-status {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(30, 41, 37, 0.13);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.patient-match-status span {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.patient-match-status.matched {
+  border-color: rgba(15, 118, 110, 0.28);
+  background: rgba(15, 118, 110, 0.1);
+}
+
+.patient-match-status.matched strong {
+  color: var(--accent-strong);
+}
+
 .option-card {
   display: grid;
   grid-template-columns: auto 1fr;
