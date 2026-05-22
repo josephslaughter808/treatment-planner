@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import startupOutlineLogo from "@/logo-outline.png";
 
 export function StartupSplash() {
   const [visible, setVisible] = useState(true);
@@ -27,7 +26,7 @@ export function StartupSplash() {
       <div className="startup-diagonal startup-diagonal-upper" />
       <div className="startup-diagonal startup-diagonal-lower" />
       <div className="startup-logo-stage">
-        <Image alt="ClearPath Care" className="startup-logo" priority src={startupOutlineLogo} />
+        <Image alt="ClearPath Care" className="startup-logo" height={520} priority src="/clearpath-silhouette-logo.svg" width={420} />
       </div>
     </div>
   );
