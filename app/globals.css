@@ -3328,3 +3328,273 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* v0 product theme pass */
+:root {
+  --bg: #eef2ed;
+  --bg-strong: #dfe9e2;
+  --panel: rgba(255, 255, 255, 0.76);
+  --panel-strong: #ffffff;
+  --text: #151b18;
+  --muted: #5f6d67;
+  --line: rgba(21, 27, 24, 0.1);
+  --accent: #0d766f;
+  --accent-strong: #0a4f4a;
+  --accent-soft: rgba(157, 217, 200, 0.2);
+  --gold: #d5a843;
+  --shadow: 0 24px 70px rgba(15, 24, 20, 0.13);
+  --serif: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+html {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(159, 217, 200, 0.35), transparent 30%),
+    radial-gradient(circle at 90% 8%, rgba(238, 128, 103, 0.18), transparent 26%),
+    linear-gradient(180deg, #f7f8f2 0%, #e8eee7 100%);
+}
+
+body {
+  background:
+    radial-gradient(circle at 80% 0%, rgba(213, 168, 67, 0.14), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(232, 238, 231, 0.76));
+}
+
+.provider-app-shell.shell-with-nav {
+  width: min(1480px, calc(100% - 32px));
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 24px;
+  padding-top: 24px;
+}
+
+.provider-app-shell .topbar {
+  position: sticky;
+  top: 24px;
+  min-height: calc(100vh - 48px);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 12px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top, rgba(159, 217, 200, 0.15), transparent 42%),
+    #07110f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 26px 80px rgba(8, 16, 14, 0.2);
+}
+
+.provider-app-shell .topbar-brand,
+.provider-app-shell .brand-lockup,
+.provider-app-shell .topnav,
+.provider-app-shell .topbar-user {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+
+.provider-app-shell .brand-lockup {
+  color: #f2fff9;
+  text-align: center;
+}
+
+.provider-app-shell .brand-lockup div {
+  display: none;
+}
+
+.provider-app-shell .topbar-logo {
+  width: 58px;
+  height: 58px;
+  padding: 11px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9fd9c8, #fff0ad);
+  box-shadow: 0 16px 32px rgba(159, 217, 200, 0.18);
+}
+
+.provider-app-shell .topnav {
+  margin-top: 4px;
+}
+
+.provider-app-shell .topnav-link {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  padding: 10px 8px;
+  color: rgba(242, 255, 249, 0.68);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.provider-app-shell .topnav-link.active,
+.provider-app-shell .topnav-link:hover {
+  color: #06110e;
+  background: #9fd9c8;
+}
+
+.provider-app-shell .topbar-user {
+  color: rgba(242, 255, 249, 0.72);
+}
+
+.provider-app-shell .user-copy {
+  display: none;
+}
+
+.provider-app-shell .shell-content {
+  grid-column: 2;
+}
+
+.provider-app-shell .v0-command-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+  min-height: 410px;
+  padding: 30px;
+  border-radius: 34px;
+  background:
+    linear-gradient(125deg, rgba(7, 17, 15, 0.95), rgba(15, 31, 27, 0.78) 56%, rgba(7, 17, 15, 0.9)),
+    url("https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1600&q=80") center/cover;
+}
+
+.provider-app-shell .v0-command-hero h2 {
+  max-width: 11ch;
+  font-size: clamp(3.4rem, 7vw, 6.4rem);
+}
+
+.provider-app-shell .v0-command-metrics {
+  align-self: start;
+}
+
+.v0-flow-bars {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  height: 116px;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.v0-flow-bars span {
+  flex: 1;
+  min-height: 24px;
+  border-radius: 999px 999px 12px 12px;
+  background: linear-gradient(180deg, #9fd9c8, #ee8067);
+  box-shadow: 0 14px 28px rgba(159, 217, 200, 0.14);
+}
+
+.provider-app-shell .v0-checkin-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.68fr);
+}
+
+.provider-app-shell .v0-lookup-panel,
+.provider-app-shell .v0-profile-panel {
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.06)),
+    #101b18;
+  box-shadow: 0 24px 70px rgba(8, 16, 14, 0.18);
+}
+
+.provider-app-shell input,
+.provider-app-shell textarea,
+.provider-app-shell select {
+  color: #f2fff9;
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.provider-app-shell input:focus,
+.provider-app-shell textarea:focus,
+.provider-app-shell select:focus {
+  outline-color: rgba(159, 217, 200, 0.36);
+  border-color: rgba(159, 217, 200, 0.42);
+}
+
+.provider-app-shell .primary-button {
+  color: #06110e;
+  background: linear-gradient(135deg, #9fd9c8, #fff0ad);
+  box-shadow: 0 18px 34px rgba(159, 217, 200, 0.2);
+}
+
+.provider-app-shell .secondary-button,
+.provider-app-shell .secondary-link {
+  color: #eafdf6;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.patient-app-shell.shell-with-nav {
+  width: min(980px, calc(100% - 22px));
+}
+
+.patient-app-shell {
+  --bg: #fbfcf8;
+  --panel: rgba(255, 255, 255, 0.86);
+  --text: #18211d;
+  --muted: #64716b;
+}
+
+.patient-app-shell .topbar {
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(21, 27, 24, 0.08);
+  box-shadow: 0 20px 50px rgba(38, 48, 43, 0.08);
+}
+
+.patient-app-shell .topbar-logo {
+  padding: 8px;
+  border-radius: 18px;
+  background: #f2f6ef;
+}
+
+.patient-app-shell .v0-patient-health-hero {
+  border-radius: 34px;
+  background:
+    linear-gradient(rgba(12, 23, 20, 0.06), rgba(12, 23, 20, 0.84)),
+    url("https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=1200&q=80") center/cover;
+}
+
+.patient-app-shell .mobile-tabbar {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(21, 27, 24, 0.08);
+  box-shadow: 0 -18px 46px rgba(38, 48, 43, 0.1);
+}
+
+.patient-app-shell .mobile-tab.active {
+  color: #06110e;
+  background: linear-gradient(135deg, #9fd9c8, #fff0ad);
+}
+
+@media (max-width: 1080px) {
+  .provider-app-shell.shell-with-nav {
+    display: block;
+    width: min(1200px, calc(100% - 32px));
+  }
+
+  .provider-app-shell .topbar {
+    position: static;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .patient-app-shell.shell-with-nav {
+    width: min(100%, calc(100% - 18px));
+    padding-top: 12px;
+  }
+
+  .patient-app-shell .topbar {
+    display: none;
+  }
+
+  .patient-app-shell .v0-patient-health-hero {
+    border-radius: 30px;
+  }
+}

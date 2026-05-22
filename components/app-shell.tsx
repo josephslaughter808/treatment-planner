@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import clearPathLogo from "@/ClearPath-Care-logo.png";
-import cutoutLogo from "@/logo-outline.png";
 import { AvatarBadge } from "@/components/avatar-badge";
 import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
@@ -154,7 +153,7 @@ export function AppShell({
       <header className="topbar">
         <div className="topbar-brand">
           <Link className="brand-lockup brand-link" href={resolvedAudience === "patient" ? "/patient" : "/"}>
-            <Image alt="ClearPath Care logo" className="brand-logo topbar-logo" priority src={cutoutLogo} />
+            <Image alt="ClearPath Care logo" className="brand-logo topbar-logo" height={56} priority src="/clearpath-silhouette-logo.svg" width={56} />
             <div>
               <p className="eyebrow">{eyebrow}</p>
               <p className="brand-name">ClearPath Care</p>

@@ -225,6 +225,15 @@ export function IntakeCheckInView() {
             <strong>{reviewCount}</strong>
           </div>
         </div>
+        <div className="v0-flow-bars" aria-label="Daily check-in rhythm">
+          <span style={{ height: "42%" }} />
+          <span style={{ height: "64%" }} />
+          <span style={{ height: "49%" }} />
+          <span style={{ height: "78%" }} />
+          <span style={{ height: "58%" }} />
+          <span style={{ height: "92%" }} />
+          <span style={{ height: "70%" }} />
+        </div>
       </section>
 
       <div className="grid checkin-layout v0-checkin-layout">
