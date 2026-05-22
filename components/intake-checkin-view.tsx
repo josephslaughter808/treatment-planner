@@ -38,6 +38,7 @@ export function IntakeCheckInView() {
   const [medicationConfirmed, setMedicationConfirmed] = useState(true);
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<CheckInRecord["status"]>("confirmed-no-changes");
+  const [checkIns, setCheckIns] = useState(() => readCheckInsFromStorage());
   const [message, setMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [serverShareLink, setServerShareLink] = useState<ShareLinkRecord | null>(null);
@@ -93,6 +94,11 @@ export function IntakeCheckInView() {
     () => buildPatientFinderResults(vault, patientSearch, currentUser?.practiceId, serverShareLink),
     [currentUser?.practiceId, patientSearch, serverShareLink, vault]
   );
+  const confirmedCount = checkIns.filter((entry) => entry.status === "confirmed-no-changes").length;
+  const updatedCount = checkIns.filter((entry) => entry.status === "updated").length;
+  const reviewCount = checkIns.filter(
+    (entry) => !entry.insuranceConfirmed || !entry.historyConfirmed || !entry.medicationConfirmed
+  ).length;
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
@@ -117,7 +123,9 @@ export function IntakeCheckInView() {
     };
 
     const existing = readCheckInsFromStorage();
-    writeCheckInsToStorage([nextRecord, ...existing]);
+    const nextCheckIns = [nextRecord, ...existing];
+    writeCheckInsToStorage(nextCheckIns);
+    setCheckIns(nextCheckIns);
 
     try {
       const response = await fetch("/api/check-ins", {
@@ -194,8 +202,33 @@ export function IntakeCheckInView() {
   }
 
   return (
-    <div className="grid checkin-layout">
-      <section className="panel">
+    <div className="v0-checkin-stage">
+      <section className="v0-command-hero">
+        <div>
+          <p className="eyebrow">Medical check-in</p>
+          <h2>Today&apos;s patient flow</h2>
+          <p>
+            Select the patient, verify the updated history, and clear the record before the appointment starts.
+          </p>
+        </div>
+        <div className="v0-command-metrics" aria-label="Check-in summary">
+          <div>
+            <span>Confirmed</span>
+            <strong>{confirmedCount}</strong>
+          </div>
+          <div>
+            <span>Updated</span>
+            <strong>{updatedCount}</strong>
+          </div>
+          <div>
+            <span>Needs review</span>
+            <strong>{reviewCount}</strong>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid checkin-layout v0-checkin-layout">
+      <section className="panel v0-lookup-panel">
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Office intake</p>
@@ -415,7 +448,7 @@ export function IntakeCheckInView() {
         </div>
       ) : null}
 
-      <section className="panel">
+      <section className="panel v0-profile-panel">
         <p className="eyebrow">Matched profile</p>
         {matched ? (
           <div className="dialogue-list">
@@ -471,6 +504,7 @@ export function IntakeCheckInView() {
           <p>Enter the patient email and member ID, or use an approved practice access code, to open the patient check-in profile.</p>
         )}
       </section>
+      </div>
     </div>
   );
 }

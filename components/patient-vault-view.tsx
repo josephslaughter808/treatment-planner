@@ -251,8 +251,8 @@ export function PatientVaultView() {
   }
 
   return (
-    <div className="vault-layout">
-      <section className="panel wallet-card-panel">
+    <div className="vault-layout v0-patient-vault">
+      <section className="panel wallet-card-panel v0-patient-health-hero">
         <p className="eyebrow">Wallet-style pass</p>
         <div className="wallet-card">
           <div>
@@ -267,10 +267,27 @@ export function PatientVaultView() {
             <strong>{vault.walletCode}</strong>
           </div>
         </div>
-        <p className="catalog-note">Use your wallet pass at the office to share your history with a tap.</p>
+        <div className="v0-patient-quick-status">
+          <div>
+            <span>Conditions</span>
+            <strong>{vault.medicalConditions.length}</strong>
+          </div>
+          <div>
+            <span>Medications</span>
+            <strong>{vault.medications.length}</strong>
+          </div>
+          <div>
+            <span>Allergies</span>
+            <strong>{vault.allergies.length}</strong>
+          </div>
+          <div>
+            <span>Insurance</span>
+            <strong>{vault.insurance.providerName ? "Added" : "Open"}</strong>
+          </div>
+        </div>
       </section>
 
-      <section className="panel">
+      <section className="panel v0-health-profile-panel">
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Patient profile</p>
