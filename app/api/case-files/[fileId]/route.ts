@@ -1,24 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createCaseFileSignedAccess } from "@/lib/persistence";
-import { getRequestActor } from "@/lib/request-auth";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { NextResponse } from "next/server";
 
 export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ fileId: string }> }
+  _request: Request,
+  _context: { params: Promise<{ fileId: string }> }
 ) {
-  const actor = await getRequestActor(request);
-
-  if (isSupabaseConfigured() && !actor) {
-    return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
-  }
-
-  const { fileId } = await context.params;
-  const result = await createCaseFileSignedAccess({
-    fileId,
-    actor: actor!,
-    expiresIn: 120
-  });
-
-  return NextResponse.json(result);
+  return NextResponse.json(
+    { error: "Case file access is outside the phase-one pilot scope." },
+    { status: 404 }
+  );
 }

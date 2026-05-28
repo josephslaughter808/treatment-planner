@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPatientVaultRecord, savePatientVaultRecord } from "@/lib/persistence";
 import type { PatientVault } from "@/lib/patient-vault";
-import { getRequestActor, isProviderActor, isSameEmailActor } from "@/lib/request-auth";
+import {
+  getRequestActor,
+  isPatientActor,
+  isSameEmailActor,
+  isSamePracticeActor
+} from "@/lib/request-auth";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   const email = request.nextUrl.searchParams.get("email");
+  const practiceId = request.nextUrl.searchParams.get("practiceId");
   if (!email) {
     return NextResponse.json({ error: "Email is required." }, { status: 400 });
   }
@@ -14,7 +20,11 @@ export async function GET(request: NextRequest) {
   if (isSupabaseConfigured() && !actor) {
     return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
   }
-  if (isSupabaseConfigured() && !isProviderActor(actor) && !isSameEmailActor(actor, email)) {
+  if (
+    isSupabaseConfigured() &&
+    !isSameEmailActor(actor, email) &&
+    !isSamePracticeActor(actor, practiceId)
+  ) {
     return NextResponse.json({ error: "You do not have access to this vault." }, { status: 403 });
   }
 
@@ -36,8 +46,14 @@ export async function POST(request: NextRequest) {
   if (isSupabaseConfigured() && !actor) {
     return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
   }
-  if (isSupabaseConfigured() && !isProviderActor(actor) && !isSameEmailActor(actor, body.email)) {
-    return NextResponse.json({ error: "You do not have access to update this vault." }, { status: 403 });
+  if (
+    isSupabaseConfigured() &&
+    (!isPatientActor(actor) || !isSameEmailActor(actor, body.email))
+  ) {
+    return NextResponse.json(
+      { error: "Patients can only update their own medical history vault." },
+      { status: 403 }
+    );
   }
 
   const result = await savePatientVaultRecord(body as PatientVault);

@@ -3,7 +3,12 @@ import {
   createPatientShareLinkRecord,
   getPatientShareLinksRecord
 } from "@/lib/persistence";
-import { getRequestActor, isProviderActor, isSameEmailActor } from "@/lib/request-auth";
+import {
+  getRequestActor,
+  isProviderActor,
+  isSameEmailActor,
+  isSamePracticeActor
+} from "@/lib/request-auth";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
@@ -22,15 +27,23 @@ export async function GET(request: NextRequest) {
   if (isSupabaseConfigured() && !actor) {
     return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
   }
-  if (
-    isSupabaseConfigured() &&
-    !isProviderActor(actor) &&
-    !(patientEmail && isSameEmailActor(actor, patientEmail))
-  ) {
-    return NextResponse.json({ error: "You do not have access to these share links." }, { status: 403 });
+  if (isSupabaseConfigured()) {
+    const patientAccess = patientEmail && isSameEmailActor(actor, patientEmail) && !practiceId && !accessCode;
+    const providerAccess = isProviderActor(actor) && (!practiceId || isSamePracticeActor(actor, practiceId));
+
+    if (!patientAccess && !providerAccess) {
+      return NextResponse.json({ error: "You do not have access to these share links." }, { status: 403 });
+    }
   }
 
   const result = await getPatientShareLinksRecord({ patientEmail, practiceId, accessCode });
+  if (isSupabaseConfigured() && isProviderActor(actor) && actor?.practiceSlug) {
+    return NextResponse.json({
+      ...result,
+      shareLinks: result.shareLinks.filter((link) => link.practiceId === actor.practiceSlug)
+    });
+  }
+
   return NextResponse.json(result);
 }
 
@@ -52,8 +65,14 @@ export async function POST(request: NextRequest) {
   if (isSupabaseConfigured() && !actor) {
     return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
   }
-  if (isSupabaseConfigured() && !isProviderActor(actor) && !isSameEmailActor(actor, body.patientEmail)) {
-    return NextResponse.json({ error: "You do not have access to create this share link." }, { status: 403 });
+  if (isSupabaseConfigured() && !isProviderActor(actor)) {
+    return NextResponse.json({ error: "Provider access is required to create share links." }, { status: 403 });
+  }
+  if (isSupabaseConfigured() && !isSamePracticeActor(actor, body.practiceId)) {
+    return NextResponse.json(
+      { error: "Share links can only be created for your signed-in practice." },
+      { status: 403 }
+    );
   }
 
   const result = await createPatientShareLinkRecord({

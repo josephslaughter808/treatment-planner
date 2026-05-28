@@ -301,6 +301,20 @@ as $$
   select role from public.app_users where auth_user_id = auth.uid() limit 1
 $$;
 
+create or replace function public.current_provider_practice_id()
+returns uuid
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select practice_id
+  from public.app_users
+  where auth_user_id = auth.uid()
+    and role in ('admin', 'front-desk', 'provider')
+  limit 1
+$$;
+
 create or replace function public.current_patient_identity_id()
 returns uuid
 language sql
@@ -334,15 +348,15 @@ alter table public.audit_logs enable row level security;
 
 drop policy if exists practices_same_practice on public.practices;
 create policy practices_same_practice on public.practices
-for select using (id = public.current_practice_id());
+for select using (id = public.current_provider_practice_id());
 
 drop policy if exists providers_same_practice on public.providers;
 create policy providers_same_practice on public.providers
-for select using (practice_id = public.current_practice_id());
+for select using (practice_id = public.current_provider_practice_id());
 
 drop policy if exists app_users_same_practice on public.app_users;
 create policy app_users_same_practice on public.app_users
-for select using (practice_id = public.current_practice_id() or auth_user_id = auth.uid());
+for select using (practice_id = public.current_provider_practice_id() or auth_user_id = auth.uid());
 
 drop policy if exists app_users_self_update on public.app_users;
 create policy app_users_self_update on public.app_users
@@ -355,7 +369,7 @@ for select using (
   or exists (
     select 1 from public.practice_patients pp
     where pp.patient_identity_id = patient_identities.id
-      and pp.practice_id = public.current_practice_id()
+      and pp.practice_id = public.current_provider_practice_id()
   )
 );
 
@@ -366,7 +380,7 @@ for select using (
   or exists (
     select 1 from public.practice_patients pp
     where pp.patient_identity_id = patient_vaults.patient_identity_id
-      and pp.practice_id = public.current_practice_id()
+      and pp.practice_id = public.current_provider_practice_id()
   )
 );
 
@@ -377,19 +391,19 @@ with check (patient_identity_id = public.current_patient_identity_id());
 
 drop policy if exists practice_patients_same_practice on public.practice_patients;
 create policy practice_patients_same_practice on public.practice_patients
-for select using (practice_id = public.current_practice_id());
+for select using (practice_id = public.current_provider_practice_id());
 
 drop policy if exists patients_same_practice on public.patients;
 create policy patients_same_practice on public.patients
-for select using (practice_id = public.current_practice_id());
+for select using (practice_id = public.current_provider_practice_id());
 
 drop policy if exists practice_overrides_same_practice on public.practice_overrides;
 create policy practice_overrides_same_practice on public.practice_overrides
-for select using (practice_id = public.current_practice_id());
+for select using (practice_id = public.current_provider_practice_id());
 
 drop policy if exists cases_same_practice on public.cases;
 create policy cases_same_practice on public.cases
-for select using (practice_id = public.current_practice_id());
+for select using (practice_id = public.current_provider_practice_id());
 
 drop policy if exists case_treatment_options_same_practice on public.case_treatment_options;
 create policy case_treatment_options_same_practice on public.case_treatment_options
@@ -397,7 +411,7 @@ for select using (
   exists (
     select 1 from public.cases c
     where c.id = case_treatment_options.case_id
-      and c.practice_id = public.current_practice_id()
+      and c.practice_id = public.current_provider_practice_id()
   )
 );
 
@@ -405,13 +419,13 @@ drop policy if exists patient_share_links_scoped on public.patient_share_links;
 create policy patient_share_links_scoped on public.patient_share_links
 for select using (
   patient_identity_id = public.current_patient_identity_id()
-  or practice_id = public.current_practice_id()
+  or practice_id = public.current_provider_practice_id()
 );
 
 drop policy if exists office_check_ins_scoped on public.office_check_ins;
 create policy office_check_ins_scoped on public.office_check_ins
 for select using (
-  practice_id = public.current_practice_id()
+  practice_id = public.current_provider_practice_id()
   or patient_identity_id = public.current_patient_identity_id()
 );
 
@@ -421,7 +435,7 @@ for select using (
   exists (
     select 1 from public.cases c
     where c.id = education_packages.case_id
-      and c.practice_id = public.current_practice_id()
+      and c.practice_id = public.current_provider_practice_id()
   )
 );
 
@@ -431,13 +445,13 @@ for select using (
   exists (
     select 1 from public.cases c
     where c.id = case_files.case_id
-      and c.practice_id = public.current_practice_id()
+      and c.practice_id = public.current_provider_practice_id()
   )
 );
 
 drop policy if exists consent_documents_scoped on public.consent_documents;
 create policy consent_documents_scoped on public.consent_documents
-for select using (practice_id is null or practice_id = public.current_practice_id());
+for select using (practice_id is null or practice_id = public.current_provider_practice_id());
 
 drop policy if exists consent_signatures_same_practice on public.consent_signatures;
 create policy consent_signatures_same_practice on public.consent_signatures
@@ -445,13 +459,13 @@ for select using (
   exists (
     select 1 from public.cases c
     where c.id = consent_signatures.case_id
-      and c.practice_id = public.current_practice_id()
+      and c.practice_id = public.current_provider_practice_id()
   )
 );
 
 drop policy if exists audit_logs_same_practice on public.audit_logs;
 create policy audit_logs_same_practice on public.audit_logs
-for select using (practice_id = public.current_practice_id());
+for select using (practice_id = public.current_provider_practice_id());
 
 drop policy if exists case_files_private_read on storage.objects;
 create policy case_files_private_read on storage.objects
@@ -463,6 +477,6 @@ for select using (
     join public.cases c on c.id = cf.case_id
     where cf.storage_bucket = storage.objects.bucket_id
       and cf.storage_path = storage.objects.name
-      and c.practice_id = public.current_practice_id()
+      and c.practice_id = public.current_provider_practice_id()
   )
 );

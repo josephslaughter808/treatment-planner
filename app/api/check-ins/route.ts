@@ -4,7 +4,12 @@ import {
   saveOfficeCheckInRecord
 } from "@/lib/persistence";
 import type { CheckInRecord } from "@/lib/patient-vault";
-import { getRequestActor, isProviderActor, isSameEmailActor } from "@/lib/request-auth";
+import {
+  getRequestActor,
+  isProviderActor,
+  isSameEmailActor,
+  isSamePracticeActor
+} from "@/lib/request-auth";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
@@ -22,12 +27,13 @@ export async function GET(request: NextRequest) {
   if (isSupabaseConfigured() && !actor) {
     return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
   }
-  if (
-    isSupabaseConfigured() &&
-    !isProviderActor(actor) &&
-    !(patientEmail && isSameEmailActor(actor, patientEmail))
-  ) {
-    return NextResponse.json({ error: "You do not have access to these records." }, { status: 403 });
+  if (isSupabaseConfigured()) {
+    const patientAccess = patientEmail && isSameEmailActor(actor, patientEmail) && !practiceId;
+    const providerAccess = practiceId && isSamePracticeActor(actor, practiceId);
+
+    if (!patientAccess && !providerAccess) {
+      return NextResponse.json({ error: "You do not have access to these records." }, { status: 403 });
+    }
   }
 
   const result = await getOfficeCheckInRecords({ patientEmail, practiceId });
@@ -52,6 +58,12 @@ export async function POST(request: NextRequest) {
   }
   if (isSupabaseConfigured() && !isProviderActor(actor)) {
     return NextResponse.json({ error: "Provider access is required." }, { status: 403 });
+  }
+  if (isSupabaseConfigured() && !isSamePracticeActor(actor, body.practiceId)) {
+    return NextResponse.json(
+      { error: "Check-ins can only be saved for your signed-in practice." },
+      { status: 403 }
+    );
   }
 
   const result = await saveOfficeCheckInRecord({

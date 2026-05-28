@@ -4,7 +4,12 @@ import {
   saveAppUserProfileRecord
 } from "@/lib/persistence";
 import type { AccountProfile } from "@/lib/account-directory";
-import { getRequestActor, isSameEmailActor } from "@/lib/request-auth";
+import {
+  getRequestActor,
+  isSameAuthUserActor,
+  isSameEmailActor,
+  isSamePracticeActor
+} from "@/lib/request-auth";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
@@ -24,9 +29,7 @@ export async function GET(request: NextRequest) {
   }
   if (
     isSupabaseConfigured() &&
-    actor &&
-    authUserId &&
-    actor.authUserId !== authUserId &&
+    !isSameAuthUserActor(actor, authUserId) &&
     !isSameEmailActor(actor, email)
   ) {
     return NextResponse.json({ error: "You do not have access to this profile." }, { status: 403 });
@@ -61,8 +64,24 @@ export async function POST(request: NextRequest) {
   if (isSupabaseConfigured() && !actor) {
     return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
   }
-  if (isSupabaseConfigured() && actor && actor.authUserId !== body.authUserId) {
+  if (isSupabaseConfigured() && !isSameAuthUserActor(actor, body.authUserId)) {
     return NextResponse.json({ error: "You do not have access to update this profile." }, { status: 403 });
+  }
+  if (isSupabaseConfigured() && !isSameEmailActor(actor, body.email)) {
+    return NextResponse.json({ error: "Profiles can only be saved for your signed-in email." }, { status: 403 });
+  }
+  if (
+    isSupabaseConfigured() &&
+    actor?.practiceSlug &&
+    !isSamePracticeActor(actor, body.practiceId)
+  ) {
+    return NextResponse.json(
+      { error: "Profiles can only be saved inside your signed-in practice." },
+      { status: 403 }
+    );
+  }
+  if (isSupabaseConfigured() && actor?.role && actor.role !== body.role) {
+    return NextResponse.json({ error: "Profile role changes are not allowed from this endpoint." }, { status: 403 });
   }
 
   const result = await saveAppUserProfileRecord({

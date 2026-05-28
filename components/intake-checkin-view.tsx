@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { practicesById } from "@/lib/clinical-catalog";
+import { getSupabaseAuthHeaders } from "@/lib/supabase-browser";
 import {
   readCheckInsFromStorage,
   readShareLinksFromStorage,
@@ -49,7 +50,9 @@ export function IntakeCheckInView() {
     let active = true;
 
     async function loadShareLink() {
-      const response = await fetch(`/api/share-links?accessCode=${encodeURIComponent(normalizedAccessCode)}`);
+      const response = await fetch(`/api/share-links?accessCode=${encodeURIComponent(normalizedAccessCode)}`, {
+        headers: await getSupabaseAuthHeaders()
+      });
       const data = (await response.json()) as { shareLinks?: ShareLinkRecord[] };
       if (!active || !response.ok) {
         return;
@@ -137,7 +140,8 @@ export function IntakeCheckInView() {
       const response = await fetch("/api/check-ins", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          ...(await getSupabaseAuthHeaders())
         },
         body: JSON.stringify({
           ...nextRecord,

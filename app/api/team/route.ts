@@ -1,13 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getPracticeProfilesRecord } from "@/lib/persistence";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const practiceId = request.nextUrl.searchParams.get("practiceId");
-
-  if (!practiceId) {
-    return NextResponse.json({ error: "practiceId is required." }, { status: 400 });
-  }
-
-  const result = await getPracticeProfilesRecord(practiceId);
-  return NextResponse.json(result);
+export async function GET() {
+  return NextResponse.json(
+    { error: "Team management is outside the phase-one pilot scope." },
+    { status: 404 }
+  );
 }
