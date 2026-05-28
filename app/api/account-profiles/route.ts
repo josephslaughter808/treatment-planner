@@ -10,9 +10,16 @@ import {
   isSameEmailActor,
   isSamePracticeActor
 } from "@/lib/request-auth";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { isSupabaseConfigured, shouldRequireSupabase } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before account profiles are available." },
+      { status: 503 }
+    );
+  }
+
   const authUserId = request.nextUrl.searchParams.get("authUserId") || undefined;
   const email = request.nextUrl.searchParams.get("email") || undefined;
 
@@ -40,6 +47,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before account profiles can be saved." },
+      { status: 503 }
+    );
+  }
+
   const body = (await request.json()) as {
     authUserId?: string;
     practiceId?: string;

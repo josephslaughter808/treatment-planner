@@ -10,9 +10,16 @@ import {
   isSameEmailActor,
   isSamePracticeActor
 } from "@/lib/request-auth";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { isSupabaseConfigured, shouldRequireSupabase } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before check-in history is available." },
+      { status: 503 }
+    );
+  }
+
   const patientEmail = request.nextUrl.searchParams.get("patientEmail") || undefined;
   const practiceId = request.nextUrl.searchParams.get("practiceId") || undefined;
 
@@ -41,6 +48,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before office check-ins can be saved." },
+      { status: 503 }
+    );
+  }
+
   const body = (await request.json()) as Partial<CheckInRecord> & {
     createdByUserId?: string;
   };

@@ -9,9 +9,16 @@ import {
   isSameEmailActor,
   isSamePracticeActor
 } from "@/lib/request-auth";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { isSupabaseConfigured, shouldRequireSupabase } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before patient share links are available." },
+      { status: 503 }
+    );
+  }
+
   const patientEmail = request.nextUrl.searchParams.get("patientEmail") || undefined;
   const practiceId = request.nextUrl.searchParams.get("practiceId") || undefined;
   const accessCode = request.nextUrl.searchParams.get("accessCode") || undefined;
@@ -48,6 +55,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before patient share links can be created." },
+      { status: 503 }
+    );
+  }
+
   const body = (await request.json()) as {
     patientEmail?: string;
     practiceId?: string;

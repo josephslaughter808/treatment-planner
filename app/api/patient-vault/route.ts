@@ -7,9 +7,16 @@ import {
   isSameEmailActor,
   isSamePracticeActor
 } from "@/lib/request-auth";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { isSupabaseConfigured, shouldRequireSupabase } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before patient vault access is available." },
+      { status: 503 }
+    );
+  }
+
   const email = request.nextUrl.searchParams.get("email");
   const practiceId = request.nextUrl.searchParams.get("practiceId");
   if (!email) {
@@ -33,6 +40,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before patient vault updates are available." },
+      { status: 503 }
+    );
+  }
+
   const body = (await request.json()) as Partial<PatientVault>;
 
   if (!body.email || !body.fullName) {

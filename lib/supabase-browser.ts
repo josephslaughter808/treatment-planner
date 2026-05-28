@@ -10,6 +10,10 @@ export function isSupabaseBrowserConfigured() {
   );
 }
 
+export function isSupabaseRequiredInBrowser() {
+  return process.env.NEXT_PUBLIC_CLEARPATH_REQUIRE_SUPABASE === "true" || process.env.NODE_ENV === "production";
+}
+
 export function getSupabaseBrowserClient() {
   if (!isSupabaseBrowserConfigured()) {
     return null;

@@ -1,11 +1,21 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
+const requiredSupabaseEnv = [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  "SUPABASE_SERVICE_ROLE_KEY"
+] as const;
+
 export function isSupabaseConfigured() {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-  );
+  return getMissingSupabaseEnvNames().length === 0;
+}
+
+export function shouldRequireSupabase() {
+  return process.env.CLEARPATH_REQUIRE_SUPABASE === "true" || process.env.VERCEL_ENV === "production";
+}
+
+export function getMissingSupabaseEnvNames() {
+  return requiredSupabaseEnv.filter((name) => !process.env[name]);
 }
 
 export function createAdminSupabaseClient(): SupabaseClient | null {

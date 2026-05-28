@@ -19,7 +19,8 @@ import {
 import {
   getSupabaseBrowserClient,
   getSupabaseAuthHeaders,
-  isSupabaseBrowserConfigured
+  isSupabaseBrowserConfigured,
+  isSupabaseRequiredInBrowser
 } from "@/lib/supabase-browser";
 
 type SignInInput = {
@@ -49,7 +50,7 @@ type AuthContextValue = {
   currentUser: AccountProfile | null;
   accounts: AccountProfile[];
   isReady: boolean;
-  authMode: "supabase" | "local";
+  authMode: "supabase" | "local" | "unconfigured";
   signIn: (input: SignInInput) => AuthResult;
   signUp: (input: SignUpInput) => AuthResult;
   signOut: () => Promise<void>;
@@ -57,14 +58,19 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+type AuthMode = AuthContextValue["authMode"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const authMode = isSupabaseBrowserConfigured() ? "supabase" : "local";
+  const authMode: AuthMode = isSupabaseBrowserConfigured()
+    ? "supabase"
+    : isSupabaseRequiredInBrowser()
+      ? "unconfigured"
+      : "local";
   const [accounts, setAccounts] = useState<AccountProfile[]>(readStoredAccounts);
   const [currentUser, setCurrentUser] = useState<AccountProfile | null>(() =>
     authMode === "local" ? readInitialLocalCurrentUser() : null
   );
-  const [isReady, setIsReady] = useState(authMode === "local");
+  const [isReady, setIsReady] = useState(authMode === "local" || authMode === "unconfigured");
 
   useEffect(() => {
     if (authMode !== "supabase") {
@@ -145,6 +151,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isReady,
       authMode,
       async signIn(input) {
+        if (authMode === "unconfigured") {
+          return {
+            ok: false,
+            message:
+              "Production auth is not configured yet. Add the Supabase environment variables in Vercel before pilot use."
+          };
+        }
+
         if (authMode === "local") {
           const match = accounts.find(
             (account) =>
@@ -206,6 +220,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       },
       async signUp(input) {
+        if (authMode === "unconfigured") {
+          return {
+            ok: false,
+            message:
+              "Production auth is not configured yet. Add the Supabase environment variables in Vercel before creating accounts."
+          };
+        }
+
         if (authMode === "local") {
           const existing = accounts.find(
             (account) => account.email.toLowerCase() === input.email.trim().toLowerCase()
@@ -285,6 +307,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       },
       async signOut() {
+        if (authMode === "unconfigured") {
+          setCurrentUser(null);
+          return;
+        }
+
         if (authMode === "local") {
           setCurrentUser(null);
           return;
@@ -297,6 +324,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCurrentUser(null);
       },
       async updateProfile(input) {
+        if (authMode === "unconfigured") {
+          return {
+            ok: false,
+            message:
+              "Production auth is not configured yet. Profile updates are disabled until Supabase is connected."
+          };
+        }
+
         if (!currentUser) {
           return { ok: false, message: "There is no signed-in profile to update." };
         }
