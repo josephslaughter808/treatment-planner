@@ -86,7 +86,7 @@ export function PatientVaultView() {
       }
 
       setMessage(
-        `${data.message || "Patient vault saved."} Office check-in and emergency card views are updated too.`
+        `${data.message || "Patient vault saved."} Your office check-in view is updated too.`
       );
       setEditingSections({
         profile: false,

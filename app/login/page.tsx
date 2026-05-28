@@ -5,7 +5,7 @@ export default function LoginPage() {
   return (
     <AppShell
       audience="public"
-      description="Sign in as a provider, front desk coordinator, or office admin to manage cases, patient packages, and practice defaults."
+      description="Sign in to update patient medical history and insurance or review the office check-in queue."
       pageLabel="Authentication"
       title="Log in to ClearPath Care"
     >
