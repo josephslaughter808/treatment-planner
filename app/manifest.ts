@@ -5,11 +5,11 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "ClearPath Care",
     short_name: "ClearPath",
     description:
-      "Provider-guided patient education, intake sharing, medical history vault, and emergency disclosure tools.",
+      "Medical history and insurance check-in for a single-office pilot.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f5efe4",
-    theme_color: "#0f766e",
+    background_color: "#f4f5f7",
+    theme_color: "#1d4ed8",
     orientation: "portrait",
     icons: [
       {

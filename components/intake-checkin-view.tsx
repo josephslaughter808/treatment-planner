@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { practicesById } from "@/lib/clinical-catalog";
 import {
   readCheckInsFromStorage,
-  writeIntegrationApprovalSessionToStorage,
   readShareLinksFromStorage,
   readVaultFromStorage,
   writeCheckInsToStorage,
@@ -17,7 +15,6 @@ import {
 
 export function IntakeCheckInView() {
   const { currentUser, authMode } = useAuth();
-  const router = useRouter();
   const [vault] = useState<PatientVault>(() => readVaultFromStorage());
   const [email, setEmail] = useState(() => readVaultFromStorage().email);
   const [memberId, setMemberId] = useState(() => readVaultFromStorage().memberId);
@@ -99,6 +96,15 @@ export function IntakeCheckInView() {
   const reviewCount = checkIns.filter(
     (entry) => !entry.insuranceConfirmed || !entry.historyConfirmed || !entry.medicationConfirmed
   ).length;
+  const matchedCheckIns = useMemo(
+    () =>
+      matched
+        ? checkIns
+            .filter((entry) => entry.patientEmail.toLowerCase() === matched.email.toLowerCase())
+            .slice(0, 5)
+        : checkIns.slice(0, 5),
+    [checkIns, matched]
+  );
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
@@ -158,24 +164,6 @@ export function IntakeCheckInView() {
     } finally {
       setIsSaving(false);
     }
-  }
-
-  function openIntegrationReview() {
-    if (!matched || !currentUser) {
-      setMessage("Match a patient profile first so the chart approval review opens on the correct patient.");
-      return;
-    }
-
-    writeIntegrationApprovalSessionToStorage({
-      id: crypto.randomUUID(),
-      practiceId: currentUser.practiceId,
-      practiceName: practicesById[currentUser.practiceId]?.name ?? "Office",
-      approvingWorker: currentUser.name,
-      matchedAt: new Date().toISOString(),
-      source: accessCode.trim() ? "wallet-scan" : "check-in",
-      vault: matched
-    });
-    router.push("/integrations");
   }
 
   function openPatientFinder() {
@@ -328,9 +316,6 @@ export function IntakeCheckInView() {
         <div className="form-footer">
           <button className="primary-button" disabled={isSaving} onClick={saveCheckIn} type="button">
             {isSaving ? "Saving check-in..." : "Save office check-in"}
-          </button>
-          <button className="secondary-button" disabled={!matched || !currentUser} onClick={openIntegrationReview} type="button">
-            Open chart approval review
           </button>
           <p>This is the “tap once, verify changes, move on” workflow for returning patients.</p>
         </div>
@@ -508,6 +493,21 @@ export function IntakeCheckInView() {
                 )}
               </ul>
             </div>
+            <div className="dialogue-card">
+              <h4>Recent check-ins</h4>
+              {matchedCheckIns.length > 0 ? (
+                <ul>
+                  {matchedCheckIns.map((entry) => (
+                    <li key={entry.id}>
+                      {formatCheckInStatus(entry.status)} • {formatCheckInDate(entry.verifiedAt)}
+                      {entry.notes ? ` • ${entry.notes}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No check-ins saved yet.</p>
+              )}
+            </div>
           </div>
         ) : (
           <p>Enter the patient email and member ID, or use an approved practice access code, to open the patient check-in profile.</p>
@@ -516,6 +516,32 @@ export function IntakeCheckInView() {
       </div>
     </div>
   );
+}
+
+function formatCheckInStatus(status: CheckInRecord["status"]) {
+  if (status === "confirmed-no-changes") {
+    return "Confirmed no changes";
+  }
+
+  if (status === "updated") {
+    return "Updated information";
+  }
+
+  return "New office share";
+}
+
+function formatCheckInDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Date unavailable";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
 }
 
 type PatientFinderResult = {

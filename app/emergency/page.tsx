@@ -1,15 +1,5 @@
-import { AppShell } from "@/components/app-shell";
-import { EmergencyCardView } from "@/components/emergency-card-view";
+import { redirect } from "next/navigation";
 
 export default function EmergencyPage() {
-  return (
-    <AppShell
-      audience="patient"
-      description="Create a patient-approved, emergency-only medical card for allergies, serious conditions, medications, and responder contact details."
-      pageLabel="Emergency card"
-      title="Configure emergency responder disclosure"
-    >
-      <EmergencyCardView />
-    </AppShell>
-  );
+  redirect("/vault");
 }

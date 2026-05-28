@@ -10,9 +10,7 @@ import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
 const providerNavItems = [
-  { href: "/", label: "Check-in" },
-  { href: "/team", label: "Team" },
-  { href: "/settings", label: "Settings" }
+  { href: "/", label: "Check-in" }
 ];
 
 const patientNavItems = [

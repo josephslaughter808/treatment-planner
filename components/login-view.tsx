@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
@@ -66,7 +65,7 @@ export function LoginView() {
         {message ? <p className="info-text">{message}</p> : null}
 
         <p className="catalog-note">
-          Need a new office user? <Link href="/signup">Create an account</Link>.
+          Pilot access is provisioned by ClearPath for the participating office.
         </p>
       </form>
 

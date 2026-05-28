@@ -1,15 +1,5 @@
-import { AppShell } from "@/components/app-shell";
-import { SignupView } from "@/components/signup-view";
+import { redirect } from "next/navigation";
 
 export default function SignupPage() {
-  return (
-    <AppShell
-      audience="public"
-      description="Create a new office account for an admin, provider, or front desk team member and assign it to the right practice."
-      pageLabel="Authentication"
-      title="Create an office login"
-    >
-      <SignupView />
-    </AppShell>
-  );
+  redirect("/login");
 }
