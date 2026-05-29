@@ -465,6 +465,136 @@ export async function getPatientVaultRecord(email: string) {
   return { mode: "supabase" as const, vault };
 }
 
+export async function getPracticePatientVaultRecords(practiceId: string) {
+  const supabase = createAdminSupabaseClient();
+
+  if (!supabase) {
+    return {
+      mode: "mock" as const,
+      patients: [] as PatientVault[]
+    };
+  }
+
+  const practice = practicesById[practiceId];
+  if (!practice) {
+    throw new Error("Selected practice was not found.");
+  }
+
+  const slug = toSlug(practice.name);
+  const { data: practiceRow, error: practiceError } = await supabase
+    .from("practices")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (practiceError) {
+    throw new Error(practiceError.message);
+  }
+
+  if (!practiceRow?.id) {
+    return {
+      mode: "supabase" as const,
+      patients: [] as PatientVault[]
+    };
+  }
+
+  const { data: connections, error: connectionError } = await supabase
+    .from("practice_patients")
+    .select("patient_identity_id, local_chart_label, patient_identities(id, full_name, email, date_of_birth)")
+    .eq("practice_id", practiceRow.id);
+
+  if (connectionError) {
+    throw new Error(connectionError.message);
+  }
+
+  const identities =
+    connections
+      ?.map((connection) => connection.patient_identities as {
+        id?: string;
+        full_name?: string;
+        email?: string;
+        date_of_birth?: string | null;
+      } | null)
+      .filter((identity): identity is {
+        id: string;
+        full_name?: string;
+        email?: string;
+        date_of_birth?: string | null;
+      } => Boolean(identity?.id)) || [];
+
+  if (identities.length === 0) {
+    return {
+      mode: "supabase" as const,
+      patients: [] as PatientVault[]
+    };
+  }
+
+  const identityIds = identities.map((identity) => identity.id);
+  const { data: vaultRows, error: vaultError } = await supabase
+    .from("patient_vaults")
+    .select("*")
+    .in("patient_identity_id", identityIds);
+
+  if (vaultError) {
+    throw new Error(vaultError.message);
+  }
+
+  const vaultsByIdentityId = new Map(
+    (vaultRows || []).map((vaultRow) => [vaultRow.patient_identity_id as string, vaultRow])
+  );
+
+  const patients: PatientVault[] = identities.map((identity) => {
+    const vaultRow = vaultsByIdentityId.get(identity.id);
+
+    return {
+      profileId: identity.id,
+      fullName: identity.full_name || "",
+      email: identity.email || "",
+      phone: (vaultRow?.phone as string) || "",
+      dateOfBirth: identity.date_of_birth || "",
+      memberId: (vaultRow?.member_id as string) || "",
+      walletCode: (vaultRow?.wallet_code as string) || "",
+      lastUpdatedAt: (vaultRow?.updated_at as string) || "",
+      medicalConditions: decryptJsonField<PatientVault["medicalConditions"]>(vaultRow?.conditions_snapshot, []),
+      medications: decryptJsonField<PatientVault["medications"]>(vaultRow?.medications_snapshot, []),
+      allergies: decryptJsonField<PatientVault["allergies"]>(vaultRow?.allergies_snapshot, []),
+      clearanceDocuments:
+        decryptJsonField<PatientVault["clearanceDocuments"]>(vaultRow?.clearances_snapshot, []),
+      insurance: decryptJsonField<PatientVault["insurance"]>(vaultRow?.insurance_snapshot, {
+        providerName: "",
+        memberId: "",
+        groupNumber: "",
+        subscriberName: ""
+      }),
+      emergencyContact:
+        decryptJsonField<PatientVault["emergencyContact"]>(vaultRow?.emergency_contact_snapshot, {
+          name: "",
+          relationship: "",
+          phone: ""
+        }),
+      emergencyDisclosure:
+        decryptJsonField<PatientVault["emergencyDisclosure"]>(vaultRow?.emergency_disclosure_snapshot, {
+          enabled: true,
+          showAllergies: true,
+          showConditions: true,
+          showMedications: true,
+          showEmergencyContact: true,
+          showBloodThinners: true,
+          responderMessage: ""
+        }),
+      officeConnections: decryptJsonField<PatientVault["officeConnections"]>(
+        vaultRow?.office_connections_snapshot,
+        []
+      )
+    };
+  });
+
+  return {
+    mode: "supabase" as const,
+    patients: patients.sort((left, right) => left.fullName.localeCompare(right.fullName))
+  };
+}
+
 export async function saveOfficeCheckInRecord(
   input: CheckInRecord & { createdByUserId?: string | null }
 ): Promise<SaveResult> {

@@ -17,6 +17,8 @@ import {
 export function IntakeCheckInView() {
   const { currentUser, authMode } = useAuth();
   const [vault] = useState<PatientVault>(() => readVaultFromStorage());
+  const [serverPatients, setServerPatients] = useState<PatientVault[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<PatientVault | null>(null);
   const [email, setEmail] = useState(() => readVaultFromStorage().email);
   const [memberId, setMemberId] = useState(() => readVaultFromStorage().memberId);
   const [accessCode, setAccessCode] = useState("");
@@ -39,7 +41,61 @@ export function IntakeCheckInView() {
   const [checkIns, setCheckIns] = useState(() => readCheckInsFromStorage());
   const [message, setMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingPatients, setIsLoadingPatients] = useState(false);
   const [serverShareLink, setServerShareLink] = useState<ShareLinkRecord | null>(null);
+
+  useEffect(() => {
+    const practiceId = currentUser?.practiceId;
+    if (!practiceId) {
+      return;
+    }
+    const activePracticeId = practiceId;
+
+    let active = true;
+
+    async function loadPracticeData() {
+      setIsLoadingPatients(true);
+      try {
+        const headers = await getSupabaseAuthHeaders();
+        const [patientsResponse, checkInsResponse] = await Promise.all([
+          fetch(`/api/patients?practiceId=${encodeURIComponent(activePracticeId)}`, { headers }),
+          fetch(`/api/check-ins?practiceId=${encodeURIComponent(activePracticeId)}`, { headers })
+        ]);
+        const patientsData = (await patientsResponse.json()) as {
+          patients?: PatientVault[];
+          error?: string;
+        };
+        const checkInsData = (await checkInsResponse.json()) as {
+          records?: CheckInRecord[];
+          error?: string;
+        };
+
+        if (!active) {
+          return;
+        }
+
+        if (patientsResponse.ok && patientsData.patients) {
+          setServerPatients(patientsData.patients);
+        }
+        if (checkInsResponse.ok && checkInsData.records) {
+          setCheckIns(checkInsData.records);
+          writeCheckInsToStorage(checkInsData.records);
+        }
+        if (!patientsResponse.ok || !checkInsResponse.ok) {
+          setMessage(patientsData.error || checkInsData.error || "Unable to load practice check-in data.");
+        }
+      } finally {
+        if (active) {
+          setIsLoadingPatients(false);
+        }
+      }
+    }
+
+    void loadPracticeData();
+    return () => {
+      active = false;
+    };
+  }, [currentUser?.practiceId]);
 
   useEffect(() => {
     const normalizedAccessCode = accessCode.trim();
@@ -68,9 +124,20 @@ export function IntakeCheckInView() {
   }, [accessCode]);
 
   const matched = useMemo(() => {
+    if (selectedPatient) {
+      return selectedPatient;
+    }
+
     const emailMatch = vault.email.toLowerCase() === email.trim().toLowerCase();
     const normalizedMemberId = memberId.trim();
     const memberMatch = vault.memberId === normalizedMemberId || vault.walletCode === normalizedMemberId;
+    const serverMatch = serverPatients.find((patient) => {
+      const patientEmailMatch = patient.email.toLowerCase() === email.trim().toLowerCase();
+      const patientMemberMatch =
+        patient.memberId === normalizedMemberId || patient.walletCode === normalizedMemberId;
+
+      return patientEmailMatch && (!normalizedMemberId || patientMemberMatch);
+    });
     const localShareLinkMatch = readShareLinksFromStorage().find(
       (link) =>
         link.accessCode.toLowerCase() === accessCode.trim().toLowerCase() &&
@@ -82,17 +149,22 @@ export function IntakeCheckInView() {
       serverShareLink &&
       serverShareLink.status === "active" &&
       (!currentUser || serverShareLink.practiceId === currentUser.practiceId);
+    const sharedServerPatient = approvedServerLink
+      ? serverPatients.find(
+          (patient) => patient.email.toLowerCase() === serverShareLink.patientEmail.toLowerCase()
+        )
+      : null;
 
-    return emailMatch && memberMatch ? vault : localShareLinkMatch || approvedServerLink ? vault : null;
-  }, [accessCode, currentUser, email, memberId, serverShareLink, vault]);
+    return serverMatch || sharedServerPatient || (emailMatch && memberMatch ? vault : localShareLinkMatch ? vault : null);
+  }, [currentUser, email, memberId, selectedPatient, serverPatients, serverShareLink, vault, accessCode]);
   const lookupMethod = accessCode.trim()
     ? serverShareLink || readShareLinksFromStorage().some((link) => link.accessCode.toLowerCase() === accessCode.trim().toLowerCase())
       ? "share-code"
       : "share-code-pending"
     : "identity";
   const patientFinderResults = useMemo(
-    () => buildPatientFinderResults(vault, patientSearch, currentUser?.practiceId, serverShareLink),
-    [currentUser?.practiceId, patientSearch, serverShareLink, vault]
+    () => buildPatientFinderResults([vault, ...serverPatients], patientSearch, currentUser?.practiceId, serverShareLink),
+    [currentUser?.practiceId, patientSearch, serverPatients, serverShareLink, vault]
   );
   const confirmedCount = checkIns.filter((entry) => entry.status === "confirmed-no-changes").length;
   const updatedCount = checkIns.filter((entry) => entry.status === "updated").length;
@@ -181,6 +253,9 @@ export function IntakeCheckInView() {
   }
 
   function selectPatientFromFinder(result: PatientFinderResult) {
+    const nextPatient = serverPatients.find((patient) => patient.profileId === result.patientProfileId) ?? null;
+    setSelectedPatient(nextPatient);
+
     if (result.matchType === "access-code") {
       setAccessCode(result.accessCode);
     } else {
@@ -550,6 +625,7 @@ function formatCheckInDate(value: string) {
 
 type PatientFinderResult = {
   id: string;
+  patientProfileId: string;
   matchType: "patient" | "access-code";
   fullName: string;
   email: string;
@@ -562,7 +638,7 @@ type PatientFinderResult = {
 };
 
 function buildPatientFinderResults(
-  vault: PatientVault,
+  vaults: PatientVault[],
   search: {
     firstName: string;
     lastName: string;
@@ -576,22 +652,19 @@ function buildPatientFinderResults(
   practiceId: string | undefined,
   serverShareLink: ShareLinkRecord | null
 ) {
-  const candidates: PatientFinderResult[] = hasPatientIdentity(vault)
-    ? [
-        {
-          id: vault.profileId || vault.email || "local-vault",
-          matchType: "patient",
-          fullName: vault.fullName || "Unnamed patient",
-          email: vault.email,
-          dateOfBirth: vault.dateOfBirth,
-          phone: vault.phone,
-          address: "",
-          memberId: vault.memberId,
-          walletCode: vault.walletCode,
-          accessCode: ""
-        }
-      ]
-    : [];
+  const candidates: PatientFinderResult[] = vaults.filter(hasPatientIdentity).map((vault) => ({
+    id: vault.profileId || vault.email || "local-vault",
+    patientProfileId: vault.profileId,
+    matchType: "patient",
+    fullName: vault.fullName || "Unnamed patient",
+    email: vault.email,
+    dateOfBirth: vault.dateOfBirth,
+    phone: vault.phone,
+    address: "",
+    memberId: vault.memberId,
+    walletCode: vault.walletCode,
+    accessCode: ""
+  }));
 
   const accessCode = normalize(search.accessCode);
   const matchingShareLink = accessCode
@@ -603,17 +676,22 @@ function buildPatientFinderResults(
       ) ?? (serverShareLink && normalize(serverShareLink.accessCode) === accessCode ? serverShareLink : null)
     : null;
 
-  if (matchingShareLink && hasPatientIdentity(vault)) {
+  const sharedVault = matchingShareLink
+    ? vaults.find((vault) => vault.email.toLowerCase() === matchingShareLink.patientEmail.toLowerCase())
+    : null;
+
+  if (matchingShareLink && sharedVault && hasPatientIdentity(sharedVault)) {
     candidates.unshift({
       id: `share-${matchingShareLink.id}`,
+      patientProfileId: sharedVault.profileId,
       matchType: "access-code",
-      fullName: vault.fullName || "Shared patient",
-      email: vault.email || matchingShareLink.patientEmail,
-      dateOfBirth: vault.dateOfBirth,
-      phone: vault.phone,
+      fullName: sharedVault.fullName || "Shared patient",
+      email: sharedVault.email || matchingShareLink.patientEmail,
+      dateOfBirth: sharedVault.dateOfBirth,
+      phone: sharedVault.phone,
       address: "",
-      memberId: vault.memberId,
-      walletCode: vault.walletCode,
+      memberId: sharedVault.memberId,
+      walletCode: sharedVault.walletCode,
       accessCode: matchingShareLink.accessCode
     });
   }
