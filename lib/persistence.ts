@@ -323,7 +323,10 @@ export async function deletePracticeOverrideRecord(input: {
   };
 }
 
-export async function savePatientVaultRecord(vault: PatientVault): Promise<SaveResult> {
+export async function savePatientVaultRecord(
+  vault: PatientVault,
+  actor?: RequestActor | null
+): Promise<SaveResult> {
   const supabase = createAdminSupabaseClient();
 
   if (!supabase) {
@@ -381,6 +384,21 @@ export async function savePatientVaultRecord(vault: PatientVault): Promise<SaveR
     throw new Error(vaultError?.message || "Unable to save the patient vault.");
   }
 
+  await logAuditEvent({
+    actor,
+    action: "patient_vault_updated",
+    resourceType: "patient_vault",
+    resourceId: vaultRow.id,
+    patientIdentityId: identityRow.id,
+    metadata: {
+      hasInsurance: Boolean(vault.insurance.providerName || vault.insurance.memberId),
+      conditionCount: vault.medicalConditions.length,
+      medicationCount: vault.medications.length,
+      allergyCount: vault.allergies.length,
+      hasEmergencyContact: Boolean(vault.emergencyContact.name || vault.emergencyContact.phone)
+    }
+  });
+
   return {
     mode: "supabase",
     vaultId: vaultRow.id,
@@ -388,7 +406,7 @@ export async function savePatientVaultRecord(vault: PatientVault): Promise<SaveR
   };
 }
 
-export async function getPatientVaultRecord(email: string) {
+export async function getPatientVaultRecord(email: string, actor?: RequestActor | null) {
   const supabase = createAdminSupabaseClient();
 
   if (!supabase) {
@@ -462,10 +480,18 @@ export async function getPatientVaultRecord(email: string) {
     officeConnections: decryptJsonField<PatientVault["officeConnections"]>(vaultRow.office_connections_snapshot, [])
   };
 
+  await logAuditEvent({
+    actor,
+    action: "patient_vault_read",
+    resourceType: "patient_vault",
+    resourceId: vaultRow.id,
+    patientIdentityId: identityRow.id
+  });
+
   return { mode: "supabase" as const, vault };
 }
 
-export async function getPracticePatientVaultRecords(practiceId: string) {
+export async function getPracticePatientVaultRecords(practiceId: string, actor?: RequestActor | null) {
   const supabase = createAdminSupabaseClient();
 
   if (!supabase) {
@@ -523,6 +549,18 @@ export async function getPracticePatientVaultRecords(practiceId: string) {
       } => Boolean(identity?.id)) || [];
 
   if (identities.length === 0) {
+    await logAuditEvent({
+      actor,
+      action: "practice_patient_list_read",
+      resourceType: "practice_patient_list",
+      resourceId: practiceRow.id,
+      practiceId: practiceRow.id,
+      metadata: {
+        practiceSlug: practiceId,
+        patientCount: 0
+      }
+    });
+
     return {
       mode: "supabase" as const,
       patients: [] as PatientVault[]
@@ -589,6 +627,18 @@ export async function getPracticePatientVaultRecords(practiceId: string) {
     };
   });
 
+  await logAuditEvent({
+    actor,
+    action: "practice_patient_list_read",
+    resourceType: "practice_patient_list",
+    resourceId: practiceRow.id,
+    practiceId: practiceRow.id,
+    metadata: {
+      practiceSlug: practiceId,
+      patientCount: patients.length
+    }
+  });
+
   return {
     mode: "supabase" as const,
     patients: patients.sort((left, right) => left.fullName.localeCompare(right.fullName))
@@ -596,7 +646,8 @@ export async function getPracticePatientVaultRecords(practiceId: string) {
 }
 
 export async function saveOfficeCheckInRecord(
-  input: CheckInRecord & { createdByUserId?: string | null }
+  input: CheckInRecord & { createdByUserId?: string | null },
+  actor?: RequestActor | null
 ): Promise<SaveResult> {
   const supabase = createAdminSupabaseClient();
 
@@ -671,6 +722,22 @@ export async function saveOfficeCheckInRecord(
     );
   }
 
+  await logAuditEvent({
+    actor,
+    action: "office_check_in_created",
+    resourceType: "office_check_in",
+    resourceId: checkInRow.id,
+    practiceId: practiceRow.id,
+      patientIdentityId: identityRow?.id ?? null,
+      metadata: {
+      status: input.status,
+      insuranceConfirmed: input.insuranceConfirmed,
+      historyConfirmed: input.historyConfirmed,
+      medicationConfirmed: input.medicationConfirmed,
+      hasNotes: Boolean(input.notes)
+    }
+  });
+
   return {
     mode: "supabase",
     checkInId: checkInRow.id,
@@ -681,7 +748,7 @@ export async function saveOfficeCheckInRecord(
 export async function getOfficeCheckInRecords(input: {
   patientEmail?: string;
   practiceId?: string;
-}) {
+}, actor?: RequestActor | null) {
   const supabase = createAdminSupabaseClient();
 
   if (!supabase) {
@@ -691,12 +758,20 @@ export async function getOfficeCheckInRecords(input: {
     };
   }
 
+  let practiceUuid: string | null = null;
+  let patientIdentityId: string | null = null;
   let query = supabase
     .from("office_check_ins")
     .select("id, patient_email, member_id, status, insurance_confirmed, history_confirmed, medication_confirmed, notes, created_at, practices(name, slug)");
 
   if (input.patientEmail) {
     query = query.eq("patient_email", input.patientEmail);
+    const { data: identityRow } = await supabase
+      .from("patient_identities")
+      .select("id")
+      .eq("email", input.patientEmail)
+      .maybeSingle();
+    patientIdentityId = identityRow?.id ?? null;
   }
 
   if (input.practiceId) {
@@ -710,6 +785,7 @@ export async function getOfficeCheckInRecords(input: {
         .maybeSingle();
 
       if (practiceRow?.id) {
+        practiceUuid = practiceRow.id;
         query = query.eq("practice_id", practiceRow.id);
       }
     }
@@ -735,6 +811,19 @@ export async function getOfficeCheckInRecords(input: {
       medicationConfirmed: Boolean(row.medication_confirmed),
       notes: decryptTextField(row.notes)
     })) || [];
+
+  await logAuditEvent({
+    actor,
+    action: "office_check_in_history_read",
+    resourceType: "office_check_in_collection",
+    resourceId: practiceUuid ?? patientIdentityId,
+    practiceId: practiceUuid,
+    patientIdentityId,
+    metadata: {
+      practiceSlug: input.practiceId ?? null,
+      recordCount: records.length
+    }
+  });
 
   return {
     mode: "supabase" as const,

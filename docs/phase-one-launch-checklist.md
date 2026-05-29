@@ -68,3 +68,11 @@ Anything outside this list should be hidden, redirected, or postponed unless it 
 - Patient health-profile save/load language is patient-ready and free of prototype wording.
 - Profile settings language is pilot-ready for both patient and provider accounts.
 - Visible production flows do not mention local fallback, server jargon, diagnosis, treatment, or timeline features.
+
+## Day Four Completion Criteria
+
+- Patient health-profile reads and updates write audit events.
+- Provider patient-list reads write audit events.
+- Office check-in saves and history reads write audit events.
+- Audit events include actor, practice, patient, resource, and non-sensitive metadata when available.
+- Pilot verification confirms protected production endpoints still enforce authentication after audit logging.

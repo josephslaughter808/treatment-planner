@@ -24,6 +24,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "You do not have access to this patient list." }, { status: 403 });
   }
 
-  const result = await getPracticePatientVaultRecords(practiceId);
+  const result = await getPracticePatientVaultRecords(practiceId, actor);
   return NextResponse.json(result);
 }

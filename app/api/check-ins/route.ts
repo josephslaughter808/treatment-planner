@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const result = await getOfficeCheckInRecords({ patientEmail, practiceId });
+  const result = await getOfficeCheckInRecords({ patientEmail, practiceId }, actor);
   return NextResponse.json(result);
 }
 
@@ -80,20 +80,23 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const result = await saveOfficeCheckInRecord({
-    id: body.id || crypto.randomUUID(),
-    practiceId: body.practiceId,
-    practiceName: body.practiceName,
-    patientEmail: body.patientEmail,
-    memberId: body.memberId || "",
-    verifiedAt: body.verifiedAt || new Date().toISOString(),
-    status: body.status,
-    insuranceConfirmed: Boolean(body.insuranceConfirmed),
-    historyConfirmed: Boolean(body.historyConfirmed),
-    medicationConfirmed: Boolean(body.medicationConfirmed),
-    notes: body.notes || "",
-    createdByUserId: actor?.appUserId ?? (typeof body.createdByUserId === "string" ? body.createdByUserId : null)
-  });
+  const result = await saveOfficeCheckInRecord(
+    {
+      id: body.id || crypto.randomUUID(),
+      practiceId: body.practiceId,
+      practiceName: body.practiceName,
+      patientEmail: body.patientEmail,
+      memberId: body.memberId || "",
+      verifiedAt: body.verifiedAt || new Date().toISOString(),
+      status: body.status,
+      insuranceConfirmed: Boolean(body.insuranceConfirmed),
+      historyConfirmed: Boolean(body.historyConfirmed),
+      medicationConfirmed: Boolean(body.medicationConfirmed),
+      notes: body.notes || "",
+      createdByUserId: actor?.appUserId ?? (typeof body.createdByUserId === "string" ? body.createdByUserId : null)
+    },
+    actor
+  );
 
   return NextResponse.json(result);
 }

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "You do not have access to this vault." }, { status: 403 });
   }
 
-  const result = await getPatientVaultRecord(email);
+  const result = await getPatientVaultRecord(email, actor);
   return NextResponse.json(result);
 }
 
@@ -70,6 +70,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const result = await savePatientVaultRecord(body as PatientVault);
+  const result = await savePatientVaultRecord(body as PatientVault, actor);
   return NextResponse.json(result);
 }
