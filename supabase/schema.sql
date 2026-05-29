@@ -27,7 +27,7 @@ create table if not exists public.app_users (
   practice_id uuid references public.practices(id) on delete cascade,
   full_name text not null,
   email text not null unique,
-  role text not null default 'front-desk' check (role in ('admin', 'front-desk', 'provider')),
+  role text not null default 'front-desk' check (role in ('admin', 'front-desk', 'provider', 'patient')),
   title text,
   phone text,
   avatar_url text,
