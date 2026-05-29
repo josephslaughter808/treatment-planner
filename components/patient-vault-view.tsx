@@ -8,8 +8,6 @@ import {
   makeBlankAllergy,
   makeBlankCondition,
   makeBlankMedication,
-  readTimelineFromStorage,
-  upsertTimelineEvent,
   readCheckInsFromStorage,
   readShareLinksFromStorage,
   readVaultFromStorage,
@@ -52,22 +50,6 @@ export function PatientVaultView() {
     updateVault(nextVault);
     setCheckIns(readCheckInsFromStorage());
 
-    if (nextVault.email && nextVault.fullName) {
-      const existingInitialEvent = readTimelineFromStorage().find(
-        (event) =>
-          event.type === "initial-history" &&
-          event.patientEmail.toLowerCase() === nextVault.email.toLowerCase()
-      );
-      upsertTimelineEvent({
-        id: `initial-history-${nextVault.email.toLowerCase()}`,
-        type: "initial-history",
-        patientEmail: nextVault.email,
-        patientName: nextVault.fullName,
-        createdAt: existingInitialEvent?.createdAt || nextVault.lastUpdatedAt,
-        summary: "Initial medical history entered in ClearPath."
-      });
-    }
-
     try {
       const response = await fetch("/api/patient-vault", {
         method: "POST",
@@ -80,14 +62,11 @@ export function PatientVaultView() {
         })
       });
 
-      const data = (await response.json()) as { message?: string; error?: string };
       if (!response.ok) {
-        throw new Error(data.error || "Unable to save the patient vault.");
+        throw new Error("Unable to save your health profile right now.");
       }
 
-      setMessage(
-        `${data.message || "Patient vault saved."} Your office check-in view is updated too.`
-      );
+      setMessage("Your health profile has been saved for your next office check-in.");
       setEditingSections({
         profile: false,
         conditions: false,
@@ -99,8 +78,8 @@ export function PatientVaultView() {
     } catch (error) {
       setMessage(
         error instanceof Error
-          ? `${error.message} Local vault save still succeeded in this browser.`
-          : "Local vault save succeeded, but server sync failed."
+          ? `${error.message} Your changes are still on this screen. Please try saving again before you close it.`
+          : "Your changes are still on this screen. Please try saving again before you close it."
       );
     } finally {
       setIsSaving(false);
@@ -109,7 +88,7 @@ export function PatientVaultView() {
 
   async function loadFromServer() {
     if (!vault.email) {
-      setMessage("Enter the patient email first so ClearPath knows which vault to load.");
+      setMessage("Enter your email first so ClearPath can find your saved health profile.");
       return;
     }
 
@@ -121,11 +100,11 @@ export function PatientVaultView() {
       const data = (await response.json()) as { vault?: PatientVault | null; error?: string };
 
       if (!response.ok) {
-        throw new Error(data.error || "Unable to load the patient vault.");
+        throw new Error("Unable to load your health profile right now.");
       }
 
       if (!data.vault) {
-        setMessage("No server-side vault record was found for that email yet.");
+        setMessage("No saved health profile was found for that email yet.");
         return;
       }
 
@@ -133,9 +112,9 @@ export function PatientVaultView() {
       writeVaultToStorage(data.vault);
       await loadCheckInsFromServer(data.vault.email);
       await loadShareLinksFromServer(data.vault.email);
-      setMessage("Loaded the patient vault from the server.");
+      setMessage("Loaded your saved health profile.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to load the patient vault.");
+      setMessage(error instanceof Error ? error.message : "Unable to load your health profile right now.");
     } finally {
       setIsLoadingServer(false);
     }
@@ -180,15 +159,24 @@ export function PatientVaultView() {
       return;
     }
 
-    if (vault.fullName && vault.email) {
+    const isDifferentSignedInPatient =
+      vault.email && vault.email.toLowerCase() !== currentUser.email.toLowerCase();
+
+    if (vault.fullName && vault.email && !isDifferentSignedInPatient) {
       return;
     }
 
-    const next = {
-      ...vault,
-      fullName: vault.fullName || currentUser.name,
-      email: vault.email || currentUser.email
-    };
+    const next = isDifferentSignedInPatient
+      ? {
+          ...emptyVault,
+          fullName: currentUser.name,
+          email: currentUser.email
+        }
+      : {
+          ...vault,
+          fullName: vault.fullName || currentUser.name,
+          email: vault.email || currentUser.email
+        };
 
     if (next.fullName === vault.fullName && next.email === vault.email) {
       return;
@@ -206,27 +194,6 @@ export function PatientVaultView() {
       void loadShareLinksFromServer(vault.email);
     }
   }, [loadCheckInsFromServer, loadShareLinksFromServer, vault.email]);
-
-  useEffect(() => {
-    if (!vault.email || !vault.fullName || !hasMeaningfulHistory(vault)) {
-      return;
-    }
-
-    const existingInitialEvent = readTimelineFromStorage().find(
-      (event) =>
-        event.type === "initial-history" &&
-        event.patientEmail.toLowerCase() === vault.email.toLowerCase()
-    );
-
-    upsertTimelineEvent({
-      id: `initial-history-${vault.email.toLowerCase()}`,
-      type: "initial-history",
-      patientEmail: vault.email,
-      patientName: vault.fullName,
-      createdAt: existingInitialEvent?.createdAt || new Date().toISOString(),
-      summary: "Initial medical history entered in ClearPath."
-    });
-  }, [vault]);
 
   const pendingClearances = vault.clearanceDocuments.filter((document) =>
     ["requested", "expired"].includes(document.status)
@@ -813,7 +780,7 @@ export function PatientVaultView() {
 
         <div className="form-footer">
           <button className="primary-button" disabled={isSaving} onClick={saveVault} type="button">
-            {isSaving ? "Saving vault..." : "Save vault"}
+            {isSaving ? "Saving health profile..." : "Save health profile"}
           </button>
           <button
             className="secondary-button"
@@ -821,9 +788,9 @@ export function PatientVaultView() {
             onClick={loadFromServer}
             type="button"
           >
-            {isLoadingServer ? "Loading..." : "Load from server"}
+            {isLoadingServer ? "Loading..." : "Load saved profile"}
           </button>
-          <p>{vault.lastUpdatedAt ? `Last saved ${new Date(vault.lastUpdatedAt).toLocaleString()}` : "Save your vault to lock in these cards."}</p>
+          <p>{vault.lastUpdatedAt ? `Last saved ${new Date(vault.lastUpdatedAt).toLocaleString()}` : "Save your health profile when these sections look right."}</p>
         </div>
 
         {message ? <p className="info-text">{message}</p> : null}
@@ -1022,21 +989,4 @@ function formatVaultDate(value: string) {
     month: "long",
     day: "numeric"
   });
-}
-
-function hasMeaningfulHistory(vault: PatientVault) {
-  return Boolean(
-    vault.dateOfBirth ||
-      vault.phone ||
-      vault.medicalConditions.length ||
-      vault.medications.length ||
-      vault.allergies.length ||
-      vault.insurance.providerName ||
-      vault.insurance.memberId ||
-      vault.insurance.groupNumber ||
-      vault.insurance.subscriberName ||
-      vault.emergencyContact.name ||
-      vault.emergencyContact.phone ||
-      vault.emergencyContact.relationship
-  );
 }

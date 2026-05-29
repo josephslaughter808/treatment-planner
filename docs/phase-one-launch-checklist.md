@@ -52,3 +52,19 @@ Anything outside this list should be hidden, redirected, or postponed unless it 
 - The provider check-in page includes saved check-in history.
 - The patient side focuses on health profile and account only.
 - This checklist exists and becomes the source of truth for the week.
+
+## Day Two Completion Criteria
+
+- Supabase Auth is required for production patient and provider access.
+- Patient/provider roles are separated before protected data is read or written.
+- Patient vaults, office check-ins, and share links are persisted in Supabase.
+- Sensitive vault snapshots and check-in notes are encrypted before database storage.
+- Phase-two APIs stay locked behind server-side access checks.
+
+## Day Three Completion Criteria
+
+- Provider patient selection loads connected patients from the signed-in practice.
+- Provider check-in history loads from the practice record, not only browser storage.
+- Patient health-profile save/load language is patient-ready and free of prototype wording.
+- Profile settings language is pilot-ready for both patient and provider accounts.
+- Visible production flows do not mention local fallback, server jargon, diagnosis, treatment, or timeline features.

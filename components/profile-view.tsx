@@ -23,7 +23,7 @@ export function ProfileView() {
       <section className="panel empty-state">
         <p className="mini-label">Profile access</p>
         <h3>Log in to edit a profile</h3>
-        <p>This page is for office users. Sign in first so you can manage the profile and photo that appear across the workspace.</p>
+        <p>Sign in first so ClearPath can show the right profile, contact details, and account settings.</p>
         <Link className="primary-link" href="/login">
           Go to login
         </Link>
@@ -123,7 +123,7 @@ export function ProfileView() {
             onChange={(event) => handleAvatarChange(event.target.files?.[0] ?? null)}
             type="file"
           />
-          <span>This photo will be used in the app header, team directory, and office profile views.</span>
+          <span>This photo appears in your app header and profile views.</span>
         </label>
 
         <label>
@@ -135,7 +135,7 @@ export function ProfileView() {
           <button className="primary-button" disabled={isSaving} type="submit">
             {isSaving ? "Saving profile..." : "Save profile"}
           </button>
-          <p>These profile edits are local prototype data for now and are ready to move to Supabase later.</p>
+          <p>Changes save to the signed-in ClearPath profile used by this pilot.</p>
         </div>
 
         {message ? <p className="info-text">{message}</p> : null}

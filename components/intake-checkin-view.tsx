@@ -183,7 +183,7 @@ export function IntakeCheckInView() {
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
-      setMessage("Match a patient vault and sign in to record an office check-in.");
+      setMessage("Select a patient health profile and sign in to record an office check-in.");
       return;
     }
 
@@ -234,8 +234,8 @@ export function IntakeCheckInView() {
     } catch (error) {
       setMessage(
         error instanceof Error
-          ? `${error.message} Local check-in save still succeeded in this browser.`
-          : "Local check-in save succeeded, but server sync failed."
+          ? `${error.message} Please try saving again before moving on.`
+          : "Check-in could not be saved. Please try again before moving on."
       );
     } finally {
       setIsSaving(false);
@@ -319,6 +319,8 @@ export function IntakeCheckInView() {
             <p>
               {matched
                 ? `${matched.email} ${matched.dateOfBirth ? `• DOB ${matched.dateOfBirth}` : ""}`
+                : isLoadingPatients
+                  ? "Loading connected patients for this practice."
                 : "Open patient selection to search by name, birthday, phone, address, email, or ID."}
             </p>
           </div>
@@ -490,7 +492,11 @@ export function IntakeCheckInView() {
             <div className="patient-finder-results">
               <div className="patient-finder-results-header">
                 <strong>Patients</strong>
-                <span>{patientFinderResults.length} result{patientFinderResults.length === 1 ? "" : "s"}</span>
+                <span>
+                  {isLoadingPatients
+                    ? "Loading patients..."
+                    : `${patientFinderResults.length} result${patientFinderResults.length === 1 ? "" : "s"}`}
+                </span>
               </div>
               {patientFinderResults.length > 0 ? (
                 patientFinderResults.map((result) => (
@@ -514,7 +520,13 @@ export function IntakeCheckInView() {
                   </article>
                 ))
               ) : (
-                <p className="info-text">No matching patients found. Add more details or use a practice access code.</p>
+                <p className="info-text">
+                  {isLoadingPatients
+                    ? "Loading the practice patient list..."
+                    : serverPatients.length === 0
+                      ? "No patients are connected to this practice yet. Ask the patient to save their health profile first."
+                      : "No matching patients found. Add more details or use a practice access code."}
+                </p>
               )}
             </div>
           </section>
@@ -530,6 +542,7 @@ export function IntakeCheckInView() {
               <p>{matched.email}</p>
               <p>DOB: {matched.dateOfBirth || "Not entered yet"}</p>
               <p>Insurance: {matched.insurance.providerName || "Not entered yet"}</p>
+              <p>Last updated: {matched.lastUpdatedAt ? formatCheckInDate(matched.lastUpdatedAt) : "Not available"}</p>
               <p>{accessCode.trim() ? "Matched from practice access code" : "Matched from reusable office intake profile"}</p>
             </div>
             <div className="dialogue-card">
