@@ -76,3 +76,11 @@ Anything outside this list should be hidden, redirected, or postponed unless it 
 - Office check-in saves and history reads write audit events.
 - Audit events include actor, practice, patient, resource, and non-sensitive metadata when available.
 - Pilot verification confirms protected production endpoints still enforce authentication after audit logging.
+
+## Day Five Completion Criteria
+
+- Provider dashboard includes a pilot patient invite workflow.
+- Creating an invite prepares the patient identity, practice connection, access code, and patient placeholder record.
+- Office users can copy a ready-to-send invite message for text or email.
+- Empty patient-finder states explain how to invite the first patient.
+- Invite creation is protected by provider/practice access checks and writes an audit event.

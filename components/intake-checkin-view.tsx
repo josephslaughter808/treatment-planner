@@ -43,6 +43,10 @@ export function IntakeCheckInView() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingPatients, setIsLoadingPatients] = useState(false);
   const [serverShareLink, setServerShareLink] = useState<ShareLinkRecord | null>(null);
+  const [inviteName, setInviteName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [isCreatingInvite, setIsCreatingInvite] = useState(false);
 
   useEffect(() => {
     const practiceId = currentUser?.practiceId;
@@ -242,6 +246,83 @@ export function IntakeCheckInView() {
     }
   }
 
+  async function refreshPracticePatients() {
+    if (!currentUser?.practiceId) {
+      return;
+    }
+
+    const response = await fetch(`/api/patients?practiceId=${encodeURIComponent(currentUser.practiceId)}`, {
+      headers: await getSupabaseAuthHeaders()
+    });
+    const data = (await response.json()) as { patients?: PatientVault[]; error?: string };
+    if (!response.ok || !data.patients) {
+      throw new Error(data.error || "Unable to refresh the patient list.");
+    }
+
+    setServerPatients(data.patients);
+  }
+
+  async function createPatientInvite() {
+    if (!currentUser?.practiceId) {
+      setMessage("Sign in as the office before creating a patient invite.");
+      return;
+    }
+
+    const emailForInvite = inviteEmail.trim();
+    if (!emailForInvite) {
+      setMessage("Enter the patient's email before creating an invite.");
+      return;
+    }
+
+    setIsCreatingInvite(true);
+    setInviteMessage("");
+    try {
+      const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+      const response = await fetch("/api/share-links", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getSupabaseAuthHeaders())
+        },
+        body: JSON.stringify({
+          patientEmail: emailForInvite,
+          patientName: inviteName.trim(),
+          practiceId: currentUser.practiceId,
+          expiresAt
+        })
+      });
+      const data = (await response.json()) as { shareLink?: ShareLinkRecord; error?: string };
+      if (!response.ok || !data.shareLink) {
+        throw new Error(data.error || "Unable to create the patient invite.");
+      }
+
+      const nextInviteMessage = buildPilotInviteMessage(data.shareLink, inviteName.trim(), window.location.origin);
+      setInviteMessage(nextInviteMessage);
+      setEmail(emailForInvite);
+      setAccessCode(data.shareLink.accessCode);
+      setPatientSearch((current) => ({
+        ...current,
+        email: emailForInvite,
+        accessCode: data.shareLink?.accessCode ?? ""
+      }));
+      setMessage("Patient invite created. The patient is connected to this practice and ready to complete their health profile.");
+      await refreshPracticePatients();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to create the patient invite.");
+    } finally {
+      setIsCreatingInvite(false);
+    }
+  }
+
+  async function copyInviteMessage() {
+    if (!inviteMessage) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(inviteMessage);
+    setMessage("Invite message copied. Send it by text or email from the office.");
+  }
+
   function openPatientFinder() {
     setPatientSearch((current) => ({
       ...current,
@@ -310,6 +391,55 @@ export function IntakeCheckInView() {
             <p className="eyebrow">Office intake</p>
             <h2>Find the correct patient</h2>
           </div>
+        </div>
+
+        <div className="pilot-invite-card">
+          <div>
+            <p className="eyebrow">Pilot invite</p>
+            <h3>Invite or reconnect a patient</h3>
+            <p>
+              Use this when a patient is not in the finder yet. ClearPath creates the practice connection,
+              generates an access code, and gives you a message to send from the office.
+            </p>
+          </div>
+          <div className="grid two-up">
+            <label>
+              Patient name
+              <input
+                onChange={(event) => setInviteName(event.target.value)}
+                placeholder="Optional"
+                value={inviteName}
+              />
+            </label>
+            <label>
+              Patient email
+              <input
+                autoComplete="email"
+                onChange={(event) => setInviteEmail(event.target.value)}
+                type="email"
+                value={inviteEmail}
+              />
+            </label>
+          </div>
+          <div className="invite-action-row">
+            <button className="secondary-button" disabled={isCreatingInvite} onClick={createPatientInvite} type="button">
+              {isCreatingInvite ? "Creating invite..." : "Create patient invite"}
+            </button>
+            {inviteMessage ? (
+              <button className="secondary-button" onClick={copyInviteMessage} type="button">
+                Copy invite message
+              </button>
+            ) : null}
+          </div>
+          {inviteMessage ? (
+            <textarea
+              aria-label="Patient invite message"
+              className="pilot-invite-message"
+              onChange={(event) => setInviteMessage(event.target.value)}
+              rows={5}
+              value={inviteMessage}
+            />
+          ) : null}
         </div>
 
         <div className="patient-select-launcher">
@@ -524,7 +654,7 @@ export function IntakeCheckInView() {
                   {isLoadingPatients
                     ? "Loading the practice patient list..."
                     : serverPatients.length === 0
-                      ? "No patients are connected to this practice yet. Ask the patient to save their health profile first."
+                      ? "No patients are connected yet. Create a patient invite, send the message, then have the patient complete their health profile."
                       : "No matching patients found. Add more details or use a practice access code."}
                 </p>
               )}
@@ -608,6 +738,17 @@ export function IntakeCheckInView() {
       </div>
     </div>
   );
+}
+
+function buildPilotInviteMessage(shareLink: ShareLinkRecord, patientName: string, origin: string) {
+  const greeting = patientName ? `Hi ${patientName},` : "Hi,";
+  return [
+    greeting,
+    `${shareLink.practiceName} is using ClearPath Care for medical history, medication, allergy, emergency contact, and insurance updates before your visit.`,
+    `Please open ${origin}/signup, create your patient account with this email address, then complete your health profile.`,
+    `If the office asks for your access code, use ${shareLink.accessCode}.`,
+    `This code expires on ${new Date(shareLink.expiresAt).toLocaleDateString()}.`
+  ].join("\n\n");
 }
 
 function formatCheckInStatus(status: CheckInRecord["status"]) {

@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
 
   const body = (await request.json()) as {
     patientEmail?: string;
+    patientName?: string;
     practiceId?: string;
     expiresAt?: string;
   };
@@ -91,9 +92,10 @@ export async function POST(request: NextRequest) {
 
   const result = await createPatientShareLinkRecord({
     patientEmail: body.patientEmail,
+    patientName: body.patientName,
     practiceId: body.practiceId,
     expiresAt: body.expiresAt
-  });
+  }, actor);
 
   return NextResponse.json(result);
 }

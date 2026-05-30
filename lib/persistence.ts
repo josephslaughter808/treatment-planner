@@ -8,7 +8,7 @@ import {
 import type { AccountProfile } from "@/lib/account-directory";
 import type { AnalysisResponse, IntakePayload } from "@/lib/mock-analysis";
 import type { RequestActor } from "@/lib/request-auth";
-import type { CheckInRecord, PatientVault, ShareLinkRecord } from "@/lib/patient-vault";
+import { createMemberId, type CheckInRecord, type PatientVault, type ShareLinkRecord } from "@/lib/patient-vault";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { decryptJsonField, decryptTextField, encryptJsonField, encryptTextField } from "@/lib/field-encryption";
 
@@ -1026,9 +1026,10 @@ export async function getPracticeProfilesRecord(practiceId: string) {
 
 export async function createPatientShareLinkRecord(input: {
   patientEmail: string;
+  patientName?: string;
   practiceId: string;
   expiresAt: string;
-}): Promise<SaveResult & { shareLink?: ShareLinkRecord }> {
+}, actor?: RequestActor | null): Promise<SaveResult & { shareLink?: ShareLinkRecord }> {
   const supabase = createAdminSupabaseClient();
   const practice = practicesById[input.practiceId];
   const accessCode = `CP-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
@@ -1055,14 +1056,37 @@ export async function createPatientShareLinkRecord(input: {
     };
   }
 
-  const { data: identityRow, error: identityError } = await supabase
+  const { data: existingIdentityRow, error: existingIdentityError } = await supabase
     .from("patient_identities")
     .select("id")
     .eq("email", input.patientEmail)
     .maybeSingle();
 
-  if (identityError || !identityRow) {
-    throw new Error(identityError?.message || "Patient identity was not found for this email.");
+  if (existingIdentityError) {
+    throw new Error(existingIdentityError.message);
+  }
+
+  let identityRow = existingIdentityRow;
+  if (!identityRow) {
+    const { data: newIdentityRow, error: newIdentityError } = await supabase
+      .from("patient_identities")
+      .insert({
+        email: input.patientEmail,
+        full_name: input.patientName?.trim() || input.patientEmail,
+        date_of_birth: null
+      })
+      .select("id")
+      .single();
+
+    if (newIdentityError) {
+      throw new Error(newIdentityError.message);
+    }
+
+    identityRow = newIdentityRow;
+  }
+
+  if (!identityRow) {
+    throw new Error("Unable to prepare the patient invite.");
   }
 
   const slug = toSlug(practice.name);
@@ -1074,6 +1098,34 @@ export async function createPatientShareLinkRecord(input: {
 
   if (practiceError || !practiceRow) {
     throw new Error(practiceError?.message || "Practice record was not found.");
+  }
+
+  const memberId = createMemberId("CP");
+  const walletCode = createMemberId("WAL");
+  const { error: vaultError } = await supabase.from("patient_vaults").upsert(
+    {
+      patient_identity_id: identityRow.id,
+      member_id: memberId,
+      wallet_code: walletCode
+    },
+    { onConflict: "patient_identity_id", ignoreDuplicates: true }
+  );
+
+  if (vaultError) {
+    throw new Error(vaultError.message);
+  }
+
+  const { error: practicePatientError } = await supabase.from("practice_patients").upsert(
+    {
+      practice_id: practiceRow.id,
+      patient_identity_id: identityRow.id,
+      local_chart_label: input.patientName?.trim() || input.patientEmail
+    },
+    { onConflict: "practice_id,patient_identity_id" }
+  );
+
+  if (practicePatientError) {
+    throw new Error(practicePatientError.message);
   }
 
   const { data: linkRow, error: linkError } = await supabase
@@ -1091,6 +1143,18 @@ export async function createPatientShareLinkRecord(input: {
   if (linkError || !linkRow) {
     throw new Error(linkError?.message || "Unable to create the patient share link.");
   }
+
+  await logAuditEvent({
+    actor,
+    action: "patient_invite_created",
+    resourceType: "patient_share_link",
+    resourceId: linkRow.id,
+    practiceId: practiceRow.id,
+    patientIdentityId: identityRow.id,
+    metadata: {
+      expiresAt: input.expiresAt
+    }
+  });
 
   return {
     mode: "supabase",
