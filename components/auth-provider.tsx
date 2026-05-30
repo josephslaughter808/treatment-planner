@@ -198,16 +198,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
         }
 
-        const profile = await fetchServerProfile({
+        let profile = await fetchServerProfile({
           authUserId: data.user.id,
           email: data.user.email || input.email.trim()
         });
 
         if (!profile) {
+          const patientProfileResult = await saveServerProfile({
+            authUserId: data.user.id,
+            practiceId: "clearpath-default",
+            name:
+              typeof data.user.user_metadata?.name === "string"
+                ? data.user.user_metadata.name
+                : data.user.email?.split("@")[0] || "Patient",
+            email: data.user.email || input.email.trim(),
+            role: "patient",
+            title: "Patient",
+            phone: "",
+            bio: "",
+            avatarColor: pickAvatarColor(data.user.email || input.email),
+            avatarDataUrl: undefined
+          });
+          profile = patientProfileResult.profile;
+        }
+
+        if (!profile) {
           return {
             ok: false,
             message:
-              "Supabase sign-in worked, but no office profile exists for this user yet."
+              "Sign-in worked, but ClearPath could not prepare this profile yet."
           };
         }
 
@@ -276,6 +295,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return {
             ok: false,
             message: error?.message || "Unable to create the Supabase account."
+          };
+        }
+
+        if (!data.session) {
+          return {
+            ok: false,
+            message:
+              "Your account was created. Check your email to confirm it, then return here and log in."
           };
         }
 

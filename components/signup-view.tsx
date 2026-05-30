@@ -105,7 +105,7 @@ export function SignupView() {
         <div className="dialogue-list">
           <div className="dialogue-card">
             <h4>1. Create your account</h4>
-            <p>Use the same email address your office used for your invite.</p>
+            <p>Use the same email address your office used for your invite. If asked, confirm your email before logging in.</p>
           </div>
           <div className="dialogue-card">
             <h4>2. Update your health profile</h4>

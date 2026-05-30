@@ -89,6 +89,7 @@ Anything outside this list should be hidden, redirected, or postponed unless it 
 
 - `/signup` opens a patient account setup flow instead of redirecting to login.
 - Patient signup language matches the invite workflow and sends patients to the health profile.
+- Email-confirmation signup states are handled without breaking later patient login.
 - Patient health profile includes a mobile-friendly pre-visit checklist.
 - Out-of-scope patient panels are removed from the phase-one health profile.
 - Patient/provider route guards and production auth still protect the correct surfaces.
