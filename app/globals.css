@@ -456,6 +456,14 @@ select:focus {
   color: var(--accent);
 }
 
+.field-help {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .error-text {
   color: var(--danger);
 }
@@ -1135,6 +1143,74 @@ select:focus {
   font-size: 1.25rem;
 }
 
+.patient-checkin-guide {
+  display: grid;
+  gap: 16px;
+}
+
+.patient-progress-meter {
+  display: grid;
+  gap: 8px;
+}
+
+.patient-progress-meter span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.patient-progress-meter div {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--panel-soft);
+}
+
+.patient-progress-meter i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #60a5fa);
+}
+
+.patient-checkin-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.patient-checkin-item {
+  align-items: flex-start;
+  min-height: 86px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--panel-soft);
+  text-align: left;
+}
+
+.patient-checkin-item span {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.patient-checkin-item strong {
+  display: block;
+  margin-top: 6px;
+}
+
+.patient-checkin-item.complete {
+  border-color: rgba(22, 163, 74, 0.24);
+  background: #f0fdf4;
+}
+
+.patient-checkin-item.complete span {
+  color: #15803d;
+}
+
 .patient-care-space,
 .patient-diagnosis-detail-space {
   display: grid;
@@ -1626,6 +1702,14 @@ select:focus {
 
   .v0-patient-quick-status div {
     min-width: 84px;
+  }
+
+  .patient-checkin-list {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-checkin-item {
+    min-height: 70px;
   }
 
   .saved-section-card,

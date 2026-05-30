@@ -3,8 +3,6 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
-import { practiceCatalog } from "@/lib/clinical-catalog";
-import { officeRoles, type UserRole } from "@/lib/account-directory";
 
 export function SignupView() {
   const router = useRouter();
@@ -12,24 +10,10 @@ export function SignupView() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [practiceId, setPracticeId] = useState(practiceCatalog[0]?.id ?? "");
-  const [role, setRole] = useState<UserRole>("front-desk");
-  const [title, setTitle] = useState("");
   const [phone, setPhone] = useState("");
-  const [bio, setBio] = useState("");
-  const [avatarDataUrl, setAvatarDataUrl] = useState<string | undefined>(undefined);
+  const [accessCode, setAccessCode] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  async function handleAvatarChange(file: File | null) {
-    if (!file) {
-      setAvatarDataUrl(undefined);
-      return;
-    }
-
-    const dataUrl = await readFileAsDataUrl(file);
-    setAvatarDataUrl(dataUrl);
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,31 +23,30 @@ export function SignupView() {
       name,
       email,
       password,
-      practiceId,
-      role,
-      title,
+      practiceId: "clearpath-default",
+      role: "patient",
+      title: "Patient",
       phone,
-      bio,
-      avatarDataUrl
+      bio: accessCode.trim() ? `Pilot access code: ${accessCode.trim()}` : ""
     });
 
     setMessage(result.message);
     if (result.ok) {
-      router.push("/profile");
+      router.push(result.redirectTo || "/vault");
     }
     setIsSubmitting(false);
   }
 
   return (
-    <section className="panel">
+    <section className="grid login-layout patient-signup-layout">
+      <form className="panel" onSubmit={handleSubmit}>
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">Create office account</p>
-          <h2>Set up a provider, front desk, or admin login</h2>
+          <p className="eyebrow">Patient account</p>
+          <h2>Set up your health profile</h2>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit}>
         <div className="grid two-up">
           <label>
             Full name
@@ -85,93 +68,55 @@ export function SignupView() {
             />
           </label>
           <label>
-            Practice
-            <select onChange={(event) => setPracticeId(event.target.value)} value={practiceId}>
-              {practiceCatalog.map((practice) => (
-                <option key={practice.id} value={practice.id}>
-                  {practice.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <div className="grid two-up">
-              <label>
-            Role
-            <select onChange={(event) => setRole(event.target.value as UserRole)} value={role}>
-              {officeRoles.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Title
-            <input
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Treatment coordinator"
-              value={title}
-            />
-          </label>
-        </div>
-
-        <div className="grid two-up">
-          <label>
             Phone
             <input
+              autoComplete="tel"
               onChange={(event) => setPhone(event.target.value)}
               placeholder="(555) 000-0000"
               value={phone}
             />
           </label>
-          <label className="upload-field">
-            Profile picture
-            <input
-              accept="image/*"
-              onChange={(event) => handleAvatarChange(event.target.files?.[0] ?? null)}
-              type="file"
-            />
-            <span>Upload a headshot or team photo for the office directory and profile card.</span>
-          </label>
         </div>
 
         <label>
-          Bio
-          <textarea
-            onChange={(event) => setBio(event.target.value)}
-            placeholder="Short role description for the office directory."
-            rows={4}
-            value={bio}
-          />
+            Access code from your office
+            <input
+              autoCapitalize="characters"
+              onChange={(event) => setAccessCode(event.target.value)}
+              placeholder="Optional"
+              value={accessCode}
+            />
+            <span className="field-help">If your office gave you a code, keep it here so they can match your profile quickly.</span>
         </label>
 
         <div className="form-footer">
           <button className="primary-button" disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Creating account..." : "Create account"}
+            {isSubmitting ? "Creating account..." : "Create patient account"}
           </button>
-          <p>Patient accounts are separate. This screen is only for office-side users.</p>
+          <p>After this, you will update medical history, medications, allergies, emergency contact, and insurance.</p>
         </div>
 
         {message ? <p className="info-text">{message}</p> : null}
       </form>
+
+      <section className="panel patient-signup-guide">
+        <p className="eyebrow">What happens next</p>
+        <h2>A few minutes now saves time at check-in.</h2>
+        <div className="dialogue-list">
+          <div className="dialogue-card">
+            <h4>1. Create your account</h4>
+            <p>Use the same email address your office used for your invite.</p>
+          </div>
+          <div className="dialogue-card">
+            <h4>2. Update your health profile</h4>
+            <p>Add medical conditions, medications, allergies, emergency contact, and insurance.</p>
+          </div>
+          <div className="dialogue-card">
+            <h4>3. Save before your visit</h4>
+            <p>Your office can review the saved profile before or during check-in.</p>
+          </div>
+        </div>
+      </section>
     </section>
   );
-}
-
-function readFileAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result);
-        return;
-      }
-
-      reject(new Error("Unable to read the selected image."));
-    };
-    reader.onerror = () => reject(reader.error ?? new Error("Unable to read the selected image."));
-    reader.readAsDataURL(file);
-  });
 }

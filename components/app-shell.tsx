@@ -122,7 +122,9 @@ export function AppShell({
             <h1 className="page-title">{title}</h1>
             <p className="lede">{description}</p>
             <p className="catalog-note">
-              Office accounts are approved and provisioned by ClearPath. Patient access stays limited to patient pages only.
+              {pathname === "/signup"
+                ? "Use the same email address your office used for your invite so your profile can be matched correctly."
+                : "Office accounts are approved and provisioned by ClearPath. Patient access stays limited to patient pages only."}
             </p>
           </div>
         </section>

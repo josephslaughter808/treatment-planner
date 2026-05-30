@@ -26,14 +26,7 @@ export function PatientVaultView() {
   const [shareLinks, setShareLinks] = useState<ShareLinkRecord[]>(() => readShareLinksFromStorage());
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingServer, setIsLoadingServer] = useState(false);
-  const [editingSections, setEditingSections] = useState({
-    profile: false,
-    conditions: false,
-    medications: false,
-    allergies: false,
-    insurance: false,
-    emergency: false
-  });
+  const [editingSections, setEditingSections] = useState(initialEditingSections);
 
   function updateVault(next: PatientVault) {
     const updated = { ...next, lastUpdatedAt: new Date().toISOString() };
@@ -195,11 +188,9 @@ export function PatientVaultView() {
     }
   }, [loadCheckInsFromServer, loadShareLinksFromServer, vault.email]);
 
-  const pendingClearances = vault.clearanceDocuments.filter((document) =>
-    ["requested", "expired"].includes(document.status)
-  );
-
   const activeOffices = getActiveOffices(vault, checkIns, shareLinks);
+  const completionItems = getPatientCompletionItems(vault);
+  const completedItemCount = completionItems.filter((item) => item.complete).length;
 
   function removeActiveOffice(practiceId: string) {
     const nextCheckIns = checkIns.filter((entry) => entry.practiceId !== practiceId);
@@ -251,6 +242,35 @@ export function PatientVaultView() {
             <span>Insurance</span>
             <strong>{vault.insurance.providerName ? "Added" : "Open"}</strong>
           </div>
+        </div>
+      </section>
+
+      <section className="panel patient-checkin-guide">
+        <div>
+          <p className="eyebrow">Before your visit</p>
+          <h2>Complete these sections for your office.</h2>
+          <p>
+            You can leave a section blank if it does not apply. Save your health profile when the list looks right.
+          </p>
+        </div>
+        <div className="patient-progress-meter" aria-label="Health profile completion">
+          <span>{completedItemCount} of {completionItems.length} complete</span>
+          <div>
+            <i style={{ width: `${Math.round((completedItemCount / completionItems.length) * 100)}%` }} />
+          </div>
+        </div>
+        <div className="patient-checkin-list">
+          {completionItems.map((item) => (
+            <button
+              className={`patient-checkin-item ${item.complete ? "complete" : ""}`}
+              key={item.section}
+              onClick={() => setEditingSections((current) => ({ ...current, [item.section]: true }))}
+              type="button"
+            >
+              <span>{item.complete ? "Done" : "Open"}</span>
+              <strong>{item.label}</strong>
+            </button>
+          ))}
         </div>
       </section>
 
@@ -797,33 +817,6 @@ export function PatientVaultView() {
       </section>
 
       <section className="panel">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">Pending clearances</p>
-            <h2>Pending clearance requests</h2>
-          </div>
-        </div>
-        {pendingClearances.length > 0 ? (
-          <div className="saved-entry-list">
-            {pendingClearances.map((document) => (
-              <div className="saved-entry-card saved-entry-alert" key={document.id}>
-                <p className="saved-entry-title">{document.title || "Pending clearance"}</p>
-                <p className="saved-entry-subtitle">
-                  From {document.requestedFromOffice || "outside office"}
-                  {document.requestedByPracticeName ? ` for ${document.requestedByPracticeName}` : ""}
-                </p>
-                {document.dueDate ? (
-                  <p className="saved-entry-subtitle">Due {formatVaultDate(document.dueDate)}</p>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EmptySavedState text="No pending clearances." />
-        )}
-      </section>
-
-      <section className="panel">
         <p className="eyebrow">Active offices</p>
         <h2>Active offices</h2>
         {activeOffices.length > 0 ? (
@@ -854,14 +847,20 @@ export function PatientVaultView() {
         )}
       </section>
 
-      <section className="panel">
-        <p className="eyebrow">Requested forms</p>
-        <h2>Requested forms</h2>
-        <EmptySavedState text="No requested forms right now." />
-      </section>
     </div>
   );
 }
+
+type EditablePatientSection = keyof typeof initialEditingSections;
+
+const initialEditingSections = {
+  profile: false,
+  conditions: false,
+  medications: false,
+  allergies: false,
+  insurance: false,
+  emergency: false
+};
 
 function SavedValue({ label, value }: { label: string; value: string }) {
   return (
@@ -891,6 +890,45 @@ function SavedEntry({
 
 function EmptySavedState({ text }: { text: string }) {
   return <p className="saved-empty-state">{text}</p>;
+}
+
+function getPatientCompletionItems(vault: PatientVault): {
+  section: EditablePatientSection;
+  label: string;
+  complete: boolean;
+}[] {
+  return [
+    {
+      section: "profile",
+      label: "Patient details",
+      complete: Boolean(vault.fullName && vault.email && vault.phone && vault.dateOfBirth)
+    },
+    {
+      section: "conditions",
+      label: "Medical conditions",
+      complete: true
+    },
+    {
+      section: "medications",
+      label: "Current medications",
+      complete: true
+    },
+    {
+      section: "allergies",
+      label: "Allergies",
+      complete: true
+    },
+    {
+      section: "insurance",
+      label: "Insurance",
+      complete: Boolean(vault.insurance.providerName || vault.insurance.memberId)
+    },
+    {
+      section: "emergency",
+      label: "Emergency contact",
+      complete: Boolean(vault.emergencyContact.name && vault.emergencyContact.phone)
+    }
+  ];
 }
 
 function sanitizeVault(vault: PatientVault): PatientVault {

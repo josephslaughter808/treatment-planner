@@ -234,7 +234,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           );
 
           if (existing) {
-            return { ok: false, message: "That email is already being used by an office account." };
+            return { ok: false, message: "That email is already being used by a ClearPath account." };
           }
 
           const newAccount: AccountProfile = {
@@ -244,7 +244,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: input.email.trim(),
             password: input.password,
             role: input.role,
-            title: input.title.trim() || "Office team member",
+            title: input.title.trim() || (isPatientRole(input.role) ? "Patient" : "Office team member"),
             phone: input.phone.trim(),
             bio: input.bio.trim(),
             avatarColor: pickAvatarColor(input.name),
@@ -255,8 +255,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setCurrentUser(newAccount);
           return {
             ok: true,
-            message: "Your office account has been created.",
-            redirectTo: "/profile"
+            message: isPatientRole(input.role)
+              ? "Your patient account has been created."
+              : "Your office account has been created.",
+            redirectTo: isPatientRole(input.role) ? "/vault" : "/profile"
           };
         }
 
@@ -283,7 +285,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: input.name.trim(),
           email: input.email.trim(),
           role: input.role,
-          title: input.title.trim() || "Office team member",
+          title: input.title.trim() || (isPatientRole(input.role) ? "Patient" : "Office team member"),
           phone: input.phone.trim(),
           bio: input.bio.trim(),
           avatarColor: pickAvatarColor(input.name),
@@ -302,8 +304,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAccounts((current) => mergeProfiles(current, profileResult.profile!));
         return {
           ok: true,
-          message: "Your office account has been created in Supabase.",
-          redirectTo: "/profile"
+          message: isPatientRole(profileResult.profile.role)
+            ? "Your patient account has been created."
+            : "Your office account has been created in Supabase.",
+          redirectTo: isPatientRole(profileResult.profile.role) ? "/vault" : "/profile"
         };
       },
       async signOut() {
