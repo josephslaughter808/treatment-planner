@@ -6,6 +6,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ClearPath Care",
   description: "A pilot medical history and insurance check-in app for dental offices.",
+  robots: {
+    index: false,
+    follow: false
+  },
   icons: {
     icon: "/icon.png",
     apple: "/apple-icon.png"

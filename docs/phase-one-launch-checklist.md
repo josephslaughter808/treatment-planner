@@ -93,3 +93,12 @@ Anything outside this list should be hidden, redirected, or postponed unless it 
 - Patient health profile includes a mobile-friendly pre-visit checklist.
 - Out-of-scope patient panels are removed from the phase-one health profile.
 - Patient/provider route guards and production auth still protect the correct surfaces.
+
+## Day Seven Completion Criteria
+
+- Production build, lint, and smoke checks pass immediately before pilot use.
+- Public pilot pages are marked no-index while the single-office pilot is private.
+- `/api/health` reports the phase-one pilot status without exposing secrets or patient data.
+- Out-of-scope pages and APIs remain redirected or locked.
+- The pilot runbook documents the exact office workflow, patient workflow, verification checks, and support escalation path.
+- No new feature work is added unless it directly supports the phase-one check-in launch.
