@@ -153,7 +153,7 @@ export function AppShell({
       <header className="topbar">
         <div className="topbar-brand">
           <Link className="brand-lockup brand-link" href={resolvedAudience === "patient" ? "/patient" : "/"}>
-            <Image alt="ClearPath Care logo" className="brand-logo topbar-logo" height={56} priority src="/clearpath-silhouette-logo.svg" width={56} />
+            <Image alt="ClearPath Care logo" className="brand-logo topbar-logo" priority src={clearPathLogo} />
             <div>
               <p className="eyebrow">{eyebrow}</p>
               <p className="brand-name">ClearPath Care</p>

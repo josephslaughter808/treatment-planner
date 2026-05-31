@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import clearPathLogo from "@/ClearPath-Care-logo.png";
 
 export function StartupSplash() {
   const [visible, setVisible] = useState(true);
@@ -26,7 +27,7 @@ export function StartupSplash() {
       <div className="startup-diagonal startup-diagonal-upper" />
       <div className="startup-diagonal startup-diagonal-lower" />
       <div className="startup-logo-stage">
-        <Image alt="ClearPath Care" className="startup-logo" height={520} priority src="/clearpath-silhouette-logo.svg" width={420} />
+        <Image alt="ClearPath Care" className="startup-logo" priority src={clearPathLogo} />
       </div>
     </div>
   );
