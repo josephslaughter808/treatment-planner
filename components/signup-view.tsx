@@ -1,17 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 
 export function SignupView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signUp } = useAuth();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [accessCode, setAccessCode] = useState("");
+  const [accessCode, setAccessCode] = useState(() => searchParams.get("accessCode") || "");
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -93,6 +95,9 @@ export function SignupView() {
           <button className="primary-button" disabled={isSubmitting} type="submit">
             {isSubmitting ? "Creating account..." : "Create patient account"}
           </button>
+          <Link className="secondary-button" href={email ? `/login?email=${encodeURIComponent(email)}` : "/login"}>
+            I already have an account
+          </Link>
           <p>After this, you will update medical history, medications, allergies, emergency contact, and insurance.</p>
         </div>
 
@@ -105,7 +110,7 @@ export function SignupView() {
         <div className="dialogue-list">
           <div className="dialogue-card">
             <h4>1. Create your account</h4>
-            <p>Use the same email address your office used for your invite. If asked, confirm your email before logging in.</p>
+            <p>Create an account anytime. If your office sent an invite, use that same email so ClearPath can connect your profile to the office.</p>
           </div>
           <div className="dialogue-card">
             <h4>2. Update your health profile</h4>

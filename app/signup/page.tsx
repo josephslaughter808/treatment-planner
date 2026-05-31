@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
 import { SignupView } from "@/components/signup-view";
 
@@ -9,7 +10,9 @@ export default function SignupPage() {
       pageLabel="Patient setup"
       title="Create your ClearPath patient account"
     >
-      <SignupView />
+      <Suspense fallback={<section className="panel">Loading account setup...</section>}>
+        <SignupView />
+      </Suspense>
     </AppShell>
   );
 }

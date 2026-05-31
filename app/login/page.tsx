@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
 import { LoginView } from "@/components/login-view";
 
@@ -9,7 +10,9 @@ export default function LoginPage() {
       pageLabel="Authentication"
       title="Log in to ClearPath Care"
     >
-      <LoginView />
+      <Suspense fallback={<section className="panel">Loading login...</section>}>
+        <LoginView />
+      </Suspense>
     </AppShell>
   );
 }

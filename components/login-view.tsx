@@ -1,15 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { demoAccounts, isPatientRole } from "@/lib/account-directory";
 
 export function LoginView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { authMode, signIn } = useAuth();
   const isAuthConfigured = authMode !== "unconfigured";
-  const [email, setEmail] = useState(authMode === "local" ? (demoAccounts[0]?.email ?? "") : "");
+  const [email, setEmail] = useState(searchParams.get("email") || (authMode === "local" ? (demoAccounts[0]?.email ?? "") : ""));
   const [password, setPassword] = useState(authMode === "local" ? "clearpath123" : "");
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,6 +73,9 @@ export function LoginView() {
           <button className="primary-button" disabled={isSubmitting || !isAuthConfigured} type="submit">
             {isSubmitting ? "Logging in..." : "Log in"}
           </button>
+          <Link className="secondary-button" href="/signup">
+            Create patient account
+          </Link>
           <p>
             {isAuthConfigured
               ? "Provider and patient logins land in different app experiences automatically."
@@ -81,7 +86,7 @@ export function LoginView() {
         {message ? <p className="info-text">{message}</p> : null}
 
         <p className="catalog-note">
-          Pilot access is provisioned by ClearPath for the participating office.
+          Patients can create a ClearPath account before any visit. Office accounts are provisioned by ClearPath.
         </p>
       </form>
 

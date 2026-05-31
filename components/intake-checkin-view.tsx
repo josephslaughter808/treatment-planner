@@ -742,11 +742,15 @@ export function IntakeCheckInView() {
 
 function buildPilotInviteMessage(shareLink: ShareLinkRecord, patientName: string, origin: string) {
   const greeting = patientName ? `Hi ${patientName},` : "Hi,";
+  const signupUrl = new URL("/signup", origin);
+  signupUrl.searchParams.set("email", shareLink.patientEmail);
+  signupUrl.searchParams.set("accessCode", shareLink.accessCode);
+
   return [
     greeting,
     `${shareLink.practiceName} is using ClearPath Care for medical history, medication, allergy, emergency contact, and insurance updates before your visit.`,
-    `Please open ${origin}/signup, create your patient account with this email address, then complete your health profile.`,
-    `If the office asks for your access code, use ${shareLink.accessCode}.`,
+    `Please open ${signupUrl.toString()} to create your patient account or connect your existing account, then complete your health profile.`,
+    `Your office access code is ${shareLink.accessCode}.`,
     `This code expires on ${new Date(shareLink.expiresAt).toLocaleDateString()}.`
   ].join("\n\n");
 }
