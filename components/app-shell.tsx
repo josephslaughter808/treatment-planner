@@ -10,7 +10,7 @@ import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
 const providerNavItems = [
-  { href: "/", label: "Check-in" }
+  { href: "/", label: "Patients" }
 ];
 
 const patientNavItems = [
@@ -202,6 +202,16 @@ export function AppShell({
           )}
         </div>
       </header>
+
+      <section className="app-utility-bar" aria-label="Workspace tools">
+        <input aria-label="Search ClearPath" placeholder="Search..." />
+        <div className="utility-actions">
+          <span className="sync-status">Sync: Live</span>
+          <Link className="primary-button" href={resolvedAudience === "patient" ? "/vault" : "/"}>
+            {resolvedAudience === "patient" ? "Update profile" : "New Record"}
+          </Link>
+        </div>
+      </section>
 
       {!hidePageBanner ? (
         <section className="page-banner">
