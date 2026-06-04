@@ -18,7 +18,9 @@ export function SignupView() {
   const [accessCode, setAccessCode] = useState(() => searchParams.get("accessCode") || "");
   const [conditionsText, setConditionsText] = useState("");
   const [selectedHistoryFlags, setSelectedHistoryFlags] = useState<string[]>([]);
-  const [surgeryHistory, setSurgeryHistory] = useState("");
+  const [surgeryEntries, setSurgeryEntries] = useState<SignupSurgeryEntry[]>([
+    { description: "", year: "" }
+  ]);
   const [anesthesiaConcerns, setAnesthesiaConcerns] = useState("");
   const [bleedingConcerns, setBleedingConcerns] = useState("");
   const [recentChanges, setRecentChanges] = useState("");
@@ -48,7 +50,7 @@ export function SignupView() {
       dateOfBirth,
       conditionsText,
       selectedHistoryFlags,
-      surgeryHistory,
+      surgeryHistory: serializeSignupSurgeryEntries(surgeryEntries),
       anesthesiaConcerns,
       bleedingConcerns,
       recentChanges,
@@ -84,6 +86,23 @@ export function SignupView() {
       router.push(result.redirectTo || "/vault");
     }
     setIsSubmitting(false);
+  }
+
+  function updateSurgeryEntry(index: number, field: keyof SignupSurgeryEntry, value: string) {
+    setSurgeryEntries((current) =>
+      current.map((entry, entryIndex) => (entryIndex === index ? { ...entry, [field]: value } : entry))
+    );
+  }
+
+  function addSurgeryEntry() {
+    setSurgeryEntries((current) => [...current, { description: "", year: "" }]);
+  }
+
+  function removeSurgeryEntry(index: number) {
+    setSurgeryEntries((current) => {
+      const next = current.filter((_, entryIndex) => entryIndex !== index);
+      return next.length > 0 ? next : [{ description: "", year: "" }];
+    });
   }
 
   return (
@@ -197,14 +216,39 @@ export function SignupView() {
           </label>
 
           <div className="grid two-up">
-            <label>
-              Surgeries, hospitalizations, or major illnesses
-              <textarea
-                onChange={(event) => setSurgeryHistory(event.target.value)}
-                placeholder="List surgery/illness, approximate date, and whether there were complications."
-                value={surgeryHistory}
-              />
-            </label>
+            <div className="questionnaire-field-block">
+              <p className="questionnaire-field-label">Surgeries, hospitalizations, or major illnesses</p>
+              <div className="repeatable-history-list">
+                {surgeryEntries.map((entry, index) => (
+                  <div className="repeatable-history-row" key={`signup-surgery-${index}`}>
+                    <label>
+                      Surgery, hospitalization, or major illness
+                      <input
+                        onChange={(event) => updateSurgeryEntry(index, "description", event.target.value)}
+                        placeholder="Example: Open heart surgery"
+                        value={entry.description}
+                      />
+                    </label>
+                    <label>
+                      Year
+                      <input
+                        inputMode="numeric"
+                        maxLength={4}
+                        onChange={(event) => updateSurgeryEntry(index, "year", event.target.value)}
+                        placeholder="2013"
+                        value={entry.year}
+                      />
+                    </label>
+                    <button className="secondary-button" onClick={() => removeSurgeryEntry(index)} type="button">
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button className="secondary-button" onClick={addSurgeryEntry} type="button">
+                Add another surgery or hospitalization
+              </button>
+            </div>
             <label>
               Anesthesia, sedation, or procedure concerns
               <textarea
@@ -257,12 +301,10 @@ export function SignupView() {
             <label>
               Pregnancy or nursing
               <select onChange={(event) => setPregnancyStatus(event.target.value)} value={pregnancyStatus}>
-                <option value="">Select if applicable</option>
+                <option value="">Select one</option>
                 <option value="Not applicable">Not applicable</option>
                 <option value="Pregnant">Pregnant</option>
-                <option value="Possibly pregnant">Possibly pregnant</option>
                 <option value="Nursing">Nursing</option>
-                <option value="Prefer to discuss privately">Prefer to discuss privately</option>
               </select>
             </label>
           </div>
@@ -371,6 +413,22 @@ type SignupVaultDraftInput = {
   emergencyRelationship: string;
   emergencyPhone: string;
 };
+
+type SignupSurgeryEntry = {
+  description: string;
+  year: string;
+};
+
+function serializeSignupSurgeryEntries(entries: SignupSurgeryEntry[]) {
+  return entries
+    .map((entry) => ({
+      description: entry.description.trim(),
+      year: entry.year.trim()
+    }))
+    .filter((entry) => entry.description || entry.year)
+    .map((entry) => (entry.year ? `${entry.year} | ${entry.description}` : entry.description))
+    .join("\n");
+}
 
 function buildSignupVaultDraft(input: SignupVaultDraftInput) {
   return {
@@ -507,7 +565,6 @@ const historyFlagOptions = [
   "Arthritis or mobility limitation",
   "Anxiety, depression, PTSD, or other mental health condition",
   "Eating disorder or nutritional concern",
-  "Pregnant, possibly pregnant, or nursing",
   "Latex sensitivity",
   "Medication allergy history",
   "Food, environmental, or adhesive allergy history",

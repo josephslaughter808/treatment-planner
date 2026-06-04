@@ -237,7 +237,7 @@ export function PatientVaultView() {
               {
                 id: crypto.randomUUID(),
                 name,
-                notes: "Selected in medical questionnaire."
+                notes: ""
               }
             ]
       };
@@ -281,6 +281,32 @@ export function PatientVaultView() {
         ]
       };
     });
+  }
+
+  function getSurgeryHistoryEntries() {
+    const entries = parseSurgeryHistoryEntries(getQuestionnaireNote(surgeryHistoryTitle));
+    return entries.length > 0 ? entries : [{ description: "", year: "" }];
+  }
+
+  function updateSurgeryHistoryEntry(index: number, field: keyof SurgeryHistoryEntry, value: string) {
+    const entries = getSurgeryHistoryEntries();
+    const nextEntries = entries.map((entry, entryIndex) =>
+      entryIndex === index ? { ...entry, [field]: value } : entry
+    );
+
+    updateQuestionnaireNote(surgeryHistoryTitle, serializeSurgeryHistoryEntries(nextEntries));
+  }
+
+  function addSurgeryHistoryEntry() {
+    updateQuestionnaireNote(surgeryHistoryTitle, serializeSurgeryHistoryEntries([
+      ...getSurgeryHistoryEntries(),
+      { description: "", year: "" }
+    ]));
+  }
+
+  function removeSurgeryHistoryEntry(index: number) {
+    const nextEntries = getSurgeryHistoryEntries().filter((_, entryIndex) => entryIndex !== index);
+    updateQuestionnaireNote(surgeryHistoryTitle, serializeSurgeryHistoryEntries(nextEntries));
   }
 
   return (
@@ -392,16 +418,81 @@ export function PatientVaultView() {
             </div>
 
             <div className="grid two-up">
-              {questionnaireNarrativePrompts.map((prompt) => (
-                <label key={prompt.title}>
-                  {prompt.label}
-                  <textarea
-                    onChange={(event) => updateQuestionnaireNote(prompt.title, event.target.value)}
-                    placeholder={prompt.placeholder}
-                    value={getQuestionnaireNote(prompt.title)}
-                  />
-                </label>
-              ))}
+              {questionnaireNarrativePrompts.map((prompt) => {
+                if (prompt.title === surgeryHistoryTitle) {
+                  const entries = getSurgeryHistoryEntries();
+
+                  return (
+                    <div className="questionnaire-field-block" key={prompt.title}>
+                      <p className="questionnaire-field-label">{prompt.label}</p>
+                      <div className="repeatable-history-list">
+                        {entries.map((entry, index) => (
+                          <div className="repeatable-history-row" key={`${prompt.title}-${index}`}>
+                            <label>
+                              Surgery, hospitalization, or major illness
+                              <input
+                                onChange={(event) =>
+                                  updateSurgeryHistoryEntry(index, "description", event.target.value)
+                                }
+                                placeholder="Example: Open heart surgery"
+                                value={entry.description}
+                              />
+                            </label>
+                            <label>
+                              Year
+                              <input
+                                inputMode="numeric"
+                                maxLength={4}
+                                onChange={(event) => updateSurgeryHistoryEntry(index, "year", event.target.value)}
+                                placeholder="2013"
+                                value={entry.year}
+                              />
+                            </label>
+                            <button
+                              className="secondary-button"
+                              onClick={() => removeSurgeryHistoryEntry(index)}
+                              type="button"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <button className="secondary-button" onClick={addSurgeryHistoryEntry} type="button">
+                        Add another surgery or hospitalization
+                      </button>
+                    </div>
+                  );
+                }
+
+                if (prompt.title === pregnancyStatusTitle) {
+                  return (
+                    <label key={prompt.title}>
+                      {prompt.label}
+                      <select
+                        onChange={(event) => updateQuestionnaireNote(prompt.title, event.target.value)}
+                        value={getQuestionnaireNote(prompt.title)}
+                      >
+                        <option value="">Select one</option>
+                        <option value="Not applicable">Not applicable</option>
+                        <option value="Pregnant">Pregnant</option>
+                        <option value="Nursing">Nursing</option>
+                      </select>
+                    </label>
+                  );
+                }
+
+                return (
+                  <label key={prompt.title}>
+                    {prompt.label}
+                    <textarea
+                      onChange={(event) => updateQuestionnaireNote(prompt.title, event.target.value)}
+                      placeholder={prompt.placeholder}
+                      value={getQuestionnaireNote(prompt.title)}
+                    />
+                  </label>
+                );
+              })}
             </div>
           </div>
         ) : (
@@ -563,7 +654,7 @@ export function PatientVaultView() {
                     <SavedEntry
                       key={condition.id}
                       title={condition.name}
-                      subtitle={condition.notes || "Condition on file"}
+                      subtitle={getConditionDisplayNote(condition.notes)}
                     />
                   ))
                 ) : (
@@ -1020,19 +1111,23 @@ function SavedEntry({
   tone = "default"
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   tone?: "default" | "alert";
 }) {
   return (
     <div className={`saved-entry-card ${tone === "alert" ? "saved-entry-alert" : ""}`}>
       <p className="saved-entry-title">{title || "Not added"}</p>
-      <p className="saved-entry-subtitle">{subtitle}</p>
+      {subtitle ? <p className="saved-entry-subtitle">{subtitle}</p> : null}
     </div>
   );
 }
 
 function EmptySavedState({ text }: { text: string }) {
   return <p className="saved-empty-state">{text}</p>;
+}
+
+function getConditionDisplayNote(notes: string) {
+  return notes.trim().toLowerCase() === "selected in medical questionnaire." ? "" : notes;
 }
 
 function getPatientCompletionItems(vault: PatientVault): {
@@ -1124,7 +1219,6 @@ const questionnaireConditionOptions = [
   "Arthritis or mobility limitation",
   "Anxiety, depression, PTSD, or other mental health condition",
   "Eating disorder or nutritional concern",
-  "Pregnant, possibly pregnant, or nursing",
   "Latex sensitivity",
   "Medication allergy history",
   "Food, environmental, or adhesive allergy history",
@@ -1136,11 +1230,14 @@ const questionnaireConditionOptions = [
   "Specialist care or ongoing medical monitoring"
 ];
 
+const surgeryHistoryTitle = "Surgery / hospitalization history";
+const pregnancyStatusTitle = "Pregnancy or nursing status";
+
 const questionnaireNarrativePrompts = [
   {
-    title: "Surgery / hospitalization history",
+    title: surgeryHistoryTitle,
     label: "Surgeries, hospitalizations, or major illnesses",
-    placeholder: "List surgery/illness, approximate date, and whether there were complications."
+    placeholder: "Add each surgery, hospitalization, or major illness separately."
   },
   {
     title: "Anesthesia or sedation history",
@@ -1168,9 +1265,9 @@ const questionnaireNarrativePrompts = [
     placeholder: "Wheelchair/walker use, hearing or vision needs, interpreter needs, anxiety accommodations, caregiver support, or transportation concerns."
   },
   {
-    title: "Pregnancy or nursing status",
+    title: pregnancyStatusTitle,
     label: "Pregnancy or nursing",
-    placeholder: "Pregnant, possibly pregnant, nursing, not applicable, or prefer to discuss privately."
+    placeholder: "Pregnant, nursing, or not applicable."
   },
   {
     title: "Additional pre-visit notes",
@@ -1178,6 +1275,51 @@ const questionnaireNarrativePrompts = [
     placeholder: "Anything not covered above, including goals, concerns, privacy preferences, or information you want reviewed before the visit."
   }
 ];
+
+type SurgeryHistoryEntry = {
+  description: string;
+  year: string;
+};
+
+function parseSurgeryHistoryEntries(notes: string): SurgeryHistoryEntry[] {
+  return notes
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [first, second] = line.split(" | ");
+      if (second !== undefined) {
+        return {
+          year: first.trim(),
+          description: second.trim()
+        };
+      }
+
+      const yearMatch = line.match(/^(.*?)(?:\s+in|\s+-|\s*,)?\s*((?:19|20)\d{2})$/i);
+      if (yearMatch) {
+        return {
+          description: yearMatch[1]?.trim() ?? "",
+          year: yearMatch[2]?.trim() ?? ""
+        };
+      }
+
+      return {
+        description: line,
+        year: ""
+      };
+    });
+}
+
+function serializeSurgeryHistoryEntries(entries: SurgeryHistoryEntry[]) {
+  return entries
+    .map((entry) => ({
+      description: entry.description.trim(),
+      year: entry.year.trim()
+    }))
+    .filter((entry) => entry.description || entry.year)
+    .map((entry) => (entry.year ? `${entry.year} | ${entry.description}` : entry.description))
+    .join("\n");
+}
 
 function sanitizeVault(vault: PatientVault): PatientVault {
   return {

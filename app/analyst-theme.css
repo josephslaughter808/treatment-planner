@@ -358,6 +358,42 @@ h4,
   margin: 20px 22px !important;
 }
 
+.insurance-display-card,
+.emergency-display-card {
+  padding-bottom: 18px !important;
+}
+
+.questionnaire-field-block {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.questionnaire-field-label {
+  margin: 0 !important;
+  color: var(--analyst-text) !important;
+  font-weight: 900 !important;
+}
+
+.repeatable-history-list {
+  display: grid !important;
+  gap: 12px !important;
+}
+
+.repeatable-history-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(96px, 140px) auto !important;
+  gap: 10px !important;
+  align-items: end !important;
+  padding: 12px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 14px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.repeatable-history-row .secondary-button {
+  min-height: 44px !important;
+}
+
 .saved-value-grid {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -664,6 +700,7 @@ select:focus {
   .login-layout,
   .patient-checkin-list,
   .questionnaire-summary-grid,
+  .repeatable-history-row,
   .saved-value-grid,
   .guided-option-grid {
     grid-template-columns: 1fr !important;
