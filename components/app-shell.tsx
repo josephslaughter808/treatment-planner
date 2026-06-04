@@ -9,13 +9,21 @@ import { AvatarBadge } from "@/components/avatar-badge";
 import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
-const providerNavItems = [
-  { href: "/", label: "Patients" }
+type NavIconName = "patients" | "health" | "account";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: NavIconName;
+};
+
+const providerNavItems: NavItem[] = [
+  { href: "/", label: "Patients", icon: "patients" }
 ];
 
-const patientNavItems = [
-  { href: "/vault", label: "Health Profile" },
-  { href: "/profile", label: "Account" }
+const patientNavItems: NavItem[] = [
+  { href: "/vault", label: "Health Profile", icon: "health" },
+  { href: "/profile", label: "Account", icon: "account" }
 ];
 
 type AppShellProps = {
@@ -168,7 +176,8 @@ export function AppShell({
                   href={item.href}
                   key={item.href}
                 >
-                  {item.label}
+                  <NavIcon name={item.icon} />
+                  <span className="nav-label">{item.label}</span>
                 </Link>
               );
             })}
@@ -229,6 +238,7 @@ export function AppShell({
             const active = pathname === item.href;
             return (
               <Link className={`mobile-tab ${active ? "active" : ""}`} href={item.href} key={item.href}>
+                <NavIcon name={item.icon} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -236,6 +246,35 @@ export function AppShell({
         </nav>
       ) : null}
     </main>
+  );
+}
+
+function NavIcon({ name }: { name: NavIconName }) {
+  if (name === "patients") {
+    return (
+      <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
+        <path d="M8 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+        <path d="M2.5 21a5.5 5.5 0 0 1 11 0" />
+        <path d="M17 10a3 3 0 1 0 0-6" />
+        <path d="M15.5 15.5A4.5 4.5 0 0 1 21.5 21" />
+      </svg>
+    );
+  }
+
+  if (name === "health") {
+    return (
+      <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
+        <path d="M12 21s-8-4.7-8-11a4.8 4.8 0 0 1 8-3.6A4.8 4.8 0 0 1 20 10c0 6.3-8 11-8 11Z" />
+        <path d="M8 12h2.5l1.2-3 2.1 6 1.2-3H17" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
+      <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </svg>
   );
 }
 

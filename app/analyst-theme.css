@@ -50,7 +50,10 @@ h4,
   gap: 0 !important;
 }
 
-.patient-app-shell.shell-with-nav,
+.patient-app-shell.shell-with-nav {
+  grid-template-columns: 88px minmax(0, 1fr) !important;
+}
+
 .public-app-shell.shell-with-nav {
   grid-template-columns: minmax(0, 1fr) !important;
 }
@@ -131,6 +134,9 @@ h4,
 .provider-app-shell .topnav-link {
   min-height: 46px !important;
   width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
   justify-content: flex-start !important;
   padding: 12px 14px !important;
   border: 0 !important;
@@ -140,6 +146,63 @@ h4,
   box-shadow: none !important;
   font-weight: 850 !important;
   text-align: left !important;
+}
+
+.nav-icon {
+  width: 20px !important;
+  height: 20px !important;
+  flex: 0 0 20px !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.patient-app-shell .topbar {
+  width: 88px !important;
+  z-index: 20 !important;
+  overflow: hidden !important;
+  transition: width 180ms ease, box-shadow 180ms ease !important;
+}
+
+.patient-app-shell .topbar:hover,
+.patient-app-shell .topbar:focus-within {
+  width: 270px !important;
+  box-shadow: 18px 0 42px rgba(15, 23, 42, 0.08) !important;
+}
+
+.patient-app-shell .brand-lockup,
+.patient-app-shell .topnav-link {
+  width: 234px !important;
+}
+
+.patient-app-shell .brand-lockup > div,
+.patient-app-shell .topnav::before,
+.patient-app-shell .nav-label,
+.patient-app-shell .user-copy {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 140ms ease !important;
+}
+
+.patient-app-shell .topbar:hover .brand-lockup > div,
+.patient-app-shell .topbar:hover .topnav::before,
+.patient-app-shell .topbar:hover .nav-label,
+.patient-app-shell .topbar:hover .user-copy,
+.patient-app-shell .topbar:focus-within .brand-lockup > div,
+.patient-app-shell .topbar:focus-within .topnav::before,
+.patient-app-shell .topbar:focus-within .nav-label,
+.patient-app-shell .topbar:focus-within .user-copy {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.patient-app-shell .topnav-link {
+  padding-left: 13px !important;
+}
+
+.patient-app-shell .topbar-user {
+  width: 234px !important;
 }
 
 .topnav-link.active,
@@ -641,21 +704,34 @@ select:focus {
   }
 
   .topbar,
-  .provider-app-shell .topbar {
+  .provider-app-shell .topbar,
+  .patient-app-shell .topbar {
     position: static !important;
+    width: auto !important;
     min-height: auto !important;
     grid-row: 1 !important;
+    overflow: visible !important;
     padding: 14px 18px !important;
     border-right: 0 !important;
     border-bottom: 1px solid var(--analyst-line) !important;
     flex-direction: row !important;
+    box-shadow: none !important;
   }
 
   .topbar-brand,
-  .provider-app-shell .topbar-brand {
+  .provider-app-shell .topbar-brand,
+  .patient-app-shell .brand-lockup {
+    width: auto !important;
     display: flex !important;
     align-items: center !important;
     gap: 14px !important;
+  }
+
+  .patient-app-shell .brand-lockup > div,
+  .patient-app-shell .nav-label,
+  .patient-app-shell .user-copy {
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
 
   .topnav,
@@ -663,7 +739,8 @@ select:focus {
     display: none !important;
   }
 
-  .topbar-user {
+  .topbar-user,
+  .patient-app-shell .topbar-user {
     width: auto !important;
     padding: 0 !important;
     border: 0 !important;
