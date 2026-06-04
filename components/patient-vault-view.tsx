@@ -80,6 +80,15 @@ export function PatientVaultView() {
     }
   }
 
+  function toggleEditSection(section: EditablePatientSection) {
+    if (editingSections[section]) {
+      void saveVault();
+      return;
+    }
+
+    setEditingSections((current) => ({ ...current, [section]: true }));
+  }
+
   async function loadFromServer() {
     if (!vault.email) {
       setMessage("Enter your email first so ClearPath can find your saved health profile.");
@@ -352,12 +361,15 @@ export function PatientVaultView() {
           </div>
           <button
             className="primary-button"
-            onClick={() =>
-              setEditingSections((current) => ({ ...current, questionnaire: !current.questionnaire }))
-            }
+            disabled={isSaving}
+            onClick={() => toggleEditSection("questionnaire")}
             type="button"
           >
-            {editingSections.questionnaire ? "Done" : "Update questionnaire"}
+            {editingSections.questionnaire
+              ? isSaving
+                ? "Saving..."
+                : "Save questionnaire"
+              : "Update questionnaire"}
           </button>
         </div>
 
@@ -426,12 +438,11 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                onClick={() =>
-                  setEditingSections((current) => ({ ...current, profile: !current.profile }))
-                }
+                disabled={isSaving}
+                onClick={() => toggleEditSection("profile")}
                 type="button"
               >
-                {editingSections.profile ? "Done" : "✎ Edit"}
+                {editingSections.profile ? (isSaving ? "Saving..." : "Save") : "Edit"}
               </button>
             </div>
             {editingSections.profile ? (
@@ -487,12 +498,11 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                onClick={() =>
-                  setEditingSections((current) => ({ ...current, conditions: !current.conditions }))
-                }
+                disabled={isSaving}
+                onClick={() => toggleEditSection("conditions")}
                 type="button"
               >
-                {editingSections.conditions ? "Done" : "✎ Edit"}
+                {editingSections.conditions ? (isSaving ? "Saving..." : "Save") : "Edit"}
               </button>
             </div>
             {editingSections.conditions ? (
@@ -571,12 +581,11 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                onClick={() =>
-                  setEditingSections((current) => ({ ...current, medications: !current.medications }))
-                }
+                disabled={isSaving}
+                onClick={() => toggleEditSection("medications")}
                 type="button"
               >
-                {editingSections.medications ? "Done" : "✎ Edit"}
+                {editingSections.medications ? (isSaving ? "Saving..." : "Save") : "Edit"}
               </button>
             </div>
             {editingSections.medications ? (
@@ -671,12 +680,11 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                onClick={() =>
-                  setEditingSections((current) => ({ ...current, allergies: !current.allergies }))
-                }
+                disabled={isSaving}
+                onClick={() => toggleEditSection("allergies")}
                 type="button"
               >
-                {editingSections.allergies ? "Done" : "✎ Edit"}
+                {editingSections.allergies ? (isSaving ? "Saving..." : "Save") : "Edit"}
               </button>
             </div>
             {editingSections.allergies ? (
@@ -779,12 +787,11 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                onClick={() =>
-                  setEditingSections((current) => ({ ...current, insurance: !current.insurance }))
-                }
+                disabled={isSaving}
+                onClick={() => toggleEditSection("insurance")}
                 type="button"
               >
-                {editingSections.insurance ? "Done" : "✎ Edit"}
+                {editingSections.insurance ? (isSaving ? "Saving..." : "Save") : "Edit"}
               </button>
             </div>
             {editingSections.insurance ? (
@@ -871,12 +878,11 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                onClick={() =>
-                  setEditingSections((current) => ({ ...current, emergency: !current.emergency }))
-                }
+                disabled={isSaving}
+                onClick={() => toggleEditSection("emergency")}
                 type="button"
               >
-                {editingSections.emergency ? "Done" : "✎ Edit"}
+                {editingSections.emergency ? (isSaving ? "Saving..." : "Save") : "Edit"}
               </button>
             </div>
             {editingSections.emergency ? (
