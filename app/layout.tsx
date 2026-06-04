@@ -6,7 +6,7 @@ import "./analyst-theme.css";
 
 export const metadata: Metadata = {
   title: "ClearPath Care",
-  description: "A pilot medical history and insurance check-in app for dental offices.",
+  description: "A secure medical history and insurance check-in app for patients and care teams.",
   robots: {
     index: false,
     follow: false

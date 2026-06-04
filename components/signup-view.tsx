@@ -21,6 +21,9 @@ export function SignupView() {
   const [surgeryHistory, setSurgeryHistory] = useState("");
   const [anesthesiaConcerns, setAnesthesiaConcerns] = useState("");
   const [bleedingConcerns, setBleedingConcerns] = useState("");
+  const [recentChanges, setRecentChanges] = useState("");
+  const [careTeam, setCareTeam] = useState("");
+  const [accessibilityNeeds, setAccessibilityNeeds] = useState("");
   const [pregnancyStatus, setPregnancyStatus] = useState("");
   const [medicalNotes, setMedicalNotes] = useState("");
   const [medicationsText, setMedicationsText] = useState("");
@@ -48,6 +51,9 @@ export function SignupView() {
       surgeryHistory,
       anesthesiaConcerns,
       bleedingConcerns,
+      recentChanges,
+      careTeam,
+      accessibilityNeeds,
       pregnancyStatus,
       medicalNotes,
       medicationsText,
@@ -200,10 +206,10 @@ export function SignupView() {
               />
             </label>
             <label>
-              Anesthesia, sedation, or dental concerns
+              Anesthesia, sedation, or procedure concerns
               <textarea
                 onChange={(event) => setAnesthesiaConcerns(event.target.value)}
-                placeholder="Problems getting numb, sedation reactions, nausea, panic, fainting, jaw issues, or dental anxiety."
+                placeholder="Reactions to anesthesia, nausea, breathing problems, difficult IV access, panic, fainting, or other procedure concerns."
                 value={anesthesiaConcerns}
               />
             </label>
@@ -219,6 +225,36 @@ export function SignupView() {
               />
             </label>
             <label>
+              Current symptoms or recent health changes
+              <textarea
+                onChange={(event) => setRecentChanges(event.target.value)}
+                placeholder="Chest pain, shortness of breath, fever, infection, new pain, dizziness, swelling, recent diagnosis, or medication changes."
+                value={recentChanges}
+              />
+            </label>
+          </div>
+
+          <div className="grid two-up">
+            <label>
+              Doctors, specialists, or care team members
+              <textarea
+                onChange={(event) => setCareTeam(event.target.value)}
+                placeholder="Primary care provider, cardiologist, endocrinologist, oncologist, psychiatrist, surgeon, or anyone managing a condition."
+                value={careTeam}
+              />
+            </label>
+            <label>
+              Mobility, communication, or accessibility needs
+              <textarea
+                onChange={(event) => setAccessibilityNeeds(event.target.value)}
+                placeholder="Wheelchair/walker use, hearing or vision needs, interpreter needs, anxiety accommodations, caregiver support, or transportation concerns."
+                value={accessibilityNeeds}
+              />
+            </label>
+          </div>
+
+          <div className="grid two-up">
+            <label>
               Pregnancy or nursing
               <select onChange={(event) => setPregnancyStatus(event.target.value)} value={pregnancyStatus}>
                 <option value="">Select if applicable</option>
@@ -232,10 +268,10 @@ export function SignupView() {
           </div>
 
           <label>
-            Anything else the office should know before your visit?
+            Anything else your care team should know before your visit?
             <textarea
               onChange={(event) => setMedicalNotes(event.target.value)}
-              placeholder="Recent ER visits, new symptoms, specialist care, medical clearance needs, mobility needs, communication preferences, or anything you want the office to know."
+              placeholder="Anything not covered above, including goals, concerns, privacy preferences, or information you want reviewed before the visit."
               value={medicalNotes}
             />
           </label>
@@ -320,6 +356,9 @@ type SignupVaultDraftInput = {
   surgeryHistory: string;
   anesthesiaConcerns: string;
   bleedingConcerns: string;
+  recentChanges: string;
+  careTeam: string;
+  accessibilityNeeds: string;
   pregnancyStatus: string;
   medicalNotes: string;
   medicationsText: string;
@@ -396,8 +435,11 @@ function splitLines(value: string) {
 function makeNarrativeConditionEntries(input: SignupVaultDraftInput) {
   return [
     ["Surgery / hospitalization history", input.surgeryHistory],
-    ["Anesthesia or dental concerns", input.anesthesiaConcerns],
+    ["Anesthesia or sedation history", input.anesthesiaConcerns],
     ["Bleeding or healing concerns", input.bleedingConcerns],
+    ["Current symptoms or recent changes", input.recentChanges],
+    ["Specialists and care team", input.careTeam],
+    ["Functional or accessibility needs", input.accessibilityNeeds],
     ["Pregnancy or nursing status", input.pregnancyStatus],
     ["Additional pre-visit notes", input.medicalNotes]
   ]
@@ -421,24 +463,58 @@ function toggleHistoryFlag(
 }
 
 const historyFlagOptions = [
+  "No known major medical conditions",
   "High blood pressure",
-  "Heart disease or heart attack",
-  "Heart murmur, valve problem, or pacemaker",
-  "Need antibiotics before dental treatment",
+  "High cholesterol",
+  "Heart disease, chest pain, or heart attack",
+  "Heart murmur or valve problem",
+  "Pacemaker, defibrillator, or implanted heart device",
+  "Congestive heart failure",
+  "Irregular heartbeat or atrial fibrillation",
   "Stroke or TIA",
-  "Diabetes",
-  "Asthma or COPD",
+  "Blood clot, DVT, or pulmonary embolism",
+  "Bleeding disorder or easy bruising",
+  "Blood thinner or antiplatelet medication use",
+  "Anemia or blood disorder",
+  "Diabetes or prediabetes",
+  "Thyroid disease",
+  "Adrenal or hormone disorder",
+  "Asthma",
+  "COPD, emphysema, or chronic bronchitis",
   "Sleep apnea",
+  "Tuberculosis or chronic lung infection",
   "Seizures or epilepsy",
+  "Migraine or chronic headaches",
+  "Parkinson's disease, multiple sclerosis, or movement disorder",
+  "Memory loss, dementia, or cognitive concerns",
+  "Fainting, dizziness, or falls",
   "Kidney disease",
+  "Dialysis or kidney transplant history",
   "Liver disease or hepatitis",
-  "Cancer, chemotherapy, or radiation",
+  "Stomach ulcers, reflux, or digestive disease",
+  "Inflammatory bowel disease",
+  "Cancer history",
+  "Chemotherapy, radiation, or immunotherapy",
   "Immune suppression or transplant history",
-  "Bleeding disorder",
-  "Blood thinner use",
-  "Osteoporosis medication or bisphosphonate use",
+  "Autoimmune disease",
+  "HIV/AIDS",
+  "Chronic infection or antibiotic-resistant infection history",
+  "Osteoporosis or bone density concerns",
+  "Bisphosphonate, Prolia, or other bone medication use",
   "Joint replacement",
+  "Implanted device, port, shunt, or hardware",
+  "Chronic pain condition",
+  "Arthritis or mobility limitation",
+  "Anxiety, depression, PTSD, or other mental health condition",
+  "Eating disorder or nutritional concern",
+  "Pregnant, possibly pregnant, or nursing",
   "Latex sensitivity",
+  "Medication allergy history",
+  "Food, environmental, or adhesive allergy history",
   "Tobacco or nicotine use",
-  "Alcohol or substance use concern"
+  "Alcohol use concern",
+  "Substance use or recovery history",
+  "History of anesthesia reaction",
+  "Hospitalization or ER visit in the last year",
+  "Specialist care or ongoing medical monitoring"
 ];

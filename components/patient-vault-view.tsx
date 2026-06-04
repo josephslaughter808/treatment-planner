@@ -355,8 +355,8 @@ export function PatientVaultView() {
             <p className="eyebrow">Medical questionnaire</p>
             <h2>Guided health history</h2>
             <p>
-              Keep this current before every visit. Your office reviews these answers with your medications,
-              allergies, insurance, and emergency contact.
+              Keep this current before any healthcare visit. Your care team can review these answers with your
+              medications, allergies, insurance, and emergency contact.
             </p>
           </div>
           <button
@@ -1080,26 +1080,60 @@ function getPatientCompletionItems(vault: PatientVault): {
 }
 
 const questionnaireConditionOptions = [
+  "No known major medical conditions",
   "High blood pressure",
-  "Heart disease or heart attack",
-  "Heart murmur, valve problem, or pacemaker",
-  "Need antibiotics before dental treatment",
+  "High cholesterol",
+  "Heart disease, chest pain, or heart attack",
+  "Heart murmur or valve problem",
+  "Pacemaker, defibrillator, or implanted heart device",
+  "Congestive heart failure",
+  "Irregular heartbeat or atrial fibrillation",
   "Stroke or TIA",
-  "Diabetes",
-  "Asthma or COPD",
+  "Blood clot, DVT, or pulmonary embolism",
+  "Bleeding disorder or easy bruising",
+  "Blood thinner or antiplatelet medication use",
+  "Anemia or blood disorder",
+  "Diabetes or prediabetes",
+  "Thyroid disease",
+  "Adrenal or hormone disorder",
+  "Asthma",
+  "COPD, emphysema, or chronic bronchitis",
   "Sleep apnea",
+  "Tuberculosis or chronic lung infection",
   "Seizures or epilepsy",
+  "Migraine or chronic headaches",
+  "Parkinson's disease, multiple sclerosis, or movement disorder",
+  "Memory loss, dementia, or cognitive concerns",
+  "Fainting, dizziness, or falls",
   "Kidney disease",
+  "Dialysis or kidney transplant history",
   "Liver disease or hepatitis",
-  "Cancer, chemotherapy, or radiation",
+  "Stomach ulcers, reflux, or digestive disease",
+  "Inflammatory bowel disease",
+  "Cancer history",
+  "Chemotherapy, radiation, or immunotherapy",
   "Immune suppression or transplant history",
-  "Bleeding disorder",
-  "Blood thinner use",
-  "Osteoporosis medication or bisphosphonate use",
+  "Autoimmune disease",
+  "HIV/AIDS",
+  "Chronic infection or antibiotic-resistant infection history",
+  "Osteoporosis or bone density concerns",
+  "Bisphosphonate, Prolia, or other bone medication use",
   "Joint replacement",
+  "Implanted device, port, shunt, or hardware",
+  "Chronic pain condition",
+  "Arthritis or mobility limitation",
+  "Anxiety, depression, PTSD, or other mental health condition",
+  "Eating disorder or nutritional concern",
+  "Pregnant, possibly pregnant, or nursing",
   "Latex sensitivity",
+  "Medication allergy history",
+  "Food, environmental, or adhesive allergy history",
   "Tobacco or nicotine use",
-  "Alcohol or substance use concern"
+  "Alcohol use concern",
+  "Substance use or recovery history",
+  "History of anesthesia reaction",
+  "Hospitalization or ER visit in the last year",
+  "Specialist care or ongoing medical monitoring"
 ];
 
 const questionnaireNarrativePrompts = [
@@ -1109,14 +1143,29 @@ const questionnaireNarrativePrompts = [
     placeholder: "List surgery/illness, approximate date, and whether there were complications."
   },
   {
-    title: "Anesthesia or dental concerns",
-    label: "Anesthesia, sedation, or dental concerns",
-    placeholder: "Problems getting numb, sedation reactions, nausea, panic, fainting, jaw issues, or dental anxiety."
+    title: "Anesthesia or sedation history",
+    label: "Anesthesia, sedation, or procedure concerns",
+    placeholder: "Reactions to anesthesia, nausea, breathing problems, difficult IV access, panic, fainting, or other procedure concerns."
   },
   {
     title: "Bleeding or healing concerns",
     label: "Bleeding or healing concerns",
     placeholder: "Blood thinners, easy bruising, bleeding disorders, delayed healing, immune suppression, or recent infections."
+  },
+  {
+    title: "Current symptoms or recent changes",
+    label: "Current symptoms or recent health changes",
+    placeholder: "Chest pain, shortness of breath, fever, infection, new pain, dizziness, swelling, recent diagnosis, or medication changes."
+  },
+  {
+    title: "Specialists and care team",
+    label: "Doctors, specialists, or care team members",
+    placeholder: "Primary care provider, cardiologist, endocrinologist, oncologist, psychiatrist, surgeon, or anyone managing a condition."
+  },
+  {
+    title: "Functional or accessibility needs",
+    label: "Mobility, communication, or accessibility needs",
+    placeholder: "Wheelchair/walker use, hearing or vision needs, interpreter needs, anxiety accommodations, caregiver support, or transportation concerns."
   },
   {
     title: "Pregnancy or nursing status",
@@ -1125,8 +1174,8 @@ const questionnaireNarrativePrompts = [
   },
   {
     title: "Additional pre-visit notes",
-    label: "Anything else the office should know?",
-    placeholder: "Recent ER visits, new symptoms, specialist care, mobility needs, communication preferences, or anything else."
+    label: "Anything else your care team should know?",
+    placeholder: "Anything not covered above, including goals, concerns, privacy preferences, or information you want reviewed before the visit."
   }
 ];
 
