@@ -300,6 +300,169 @@ h4,
   padding: 26px !important;
 }
 
+.panel > *:last-child,
+.dialogue-card > *:last-child,
+.saved-section-card > *:last-child,
+.public-auth-copy > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+.panel-heading {
+  align-items: flex-start !important;
+  gap: 22px !important;
+  margin-bottom: 24px !important;
+}
+
+.panel-heading h2,
+.saved-section-header h3,
+.dialogue-card h4 {
+  margin-bottom: 8px !important;
+}
+
+.panel-heading p,
+.dialogue-card p,
+.saved-entry-subtitle,
+.saved-empty-state {
+  margin-bottom: 0 !important;
+}
+
+.saved-section-list,
+.dialogue-list,
+.v0-patient-vault,
+.questionnaire-workspace,
+.vault-layout {
+  gap: 18px !important;
+}
+
+.vault-layout,
+.questionnaire-workspace {
+  display: grid !important;
+}
+
+.saved-section-card {
+  overflow: hidden !important;
+}
+
+.saved-section-header {
+  padding: 20px 22px !important;
+  border-bottom: 1px solid var(--analyst-line) !important;
+  background: #ffffff !important;
+}
+
+.saved-value-grid,
+.saved-entry-list,
+.saved-section-card > .dialogue-list,
+.saved-section-card > .secondary-button,
+.insurance-display-card,
+.emergency-display-card {
+  margin: 20px 22px !important;
+}
+
+.saved-value-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.saved-value-card,
+.saved-entry-card {
+  padding: 14px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--analyst-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.saved-value-card:last-child,
+.saved-entry-card:last-child {
+  border-bottom: 0 !important;
+}
+
+.medical-questionnaire-panel {
+  border-color: rgba(37, 99, 235, 0.22) !important;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.045), transparent 180px),
+    #ffffff !important;
+}
+
+.questionnaire-summary-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.questionnaire-summary-grid div {
+  padding: 16px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 14px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.questionnaire-summary-grid span {
+  display: block !important;
+  margin-bottom: 8px !important;
+  color: var(--analyst-slate) !important;
+  font-size: 0.8rem !important;
+  font-weight: 850 !important;
+}
+
+.questionnaire-summary-grid strong {
+  color: var(--analyst-text) !important;
+  font-size: 1.15rem !important;
+}
+
+.patient-checkin-guide {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+.patient-checkin-list {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.patient-checkin-item {
+  min-height: 70px !important;
+  display: grid !important;
+  gap: 6px !important;
+  justify-items: start !important;
+  padding: 14px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 14px !important;
+  color: var(--analyst-text) !important;
+  background: #ffffff !important;
+}
+
+.patient-checkin-item.complete {
+  background: #f0fdf4 !important;
+  border-color: rgba(22, 163, 74, 0.22) !important;
+}
+
+.patient-progress-meter {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.patient-progress-meter span {
+  color: var(--analyst-slate) !important;
+  font-weight: 850 !important;
+}
+
+.patient-progress-meter div {
+  height: 10px !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  background: #e2e8f0 !important;
+}
+
+.patient-progress-meter i {
+  display: block !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  background: var(--analyst-blue) !important;
+}
+
 .page-title {
   color: var(--analyst-text) !important;
   font-size: clamp(2.35rem, 4.8vw, 4.2rem) !important;
@@ -414,7 +577,9 @@ select:focus {
   padding: 11px 12px !important;
   border: 1px solid var(--analyst-line) !important;
   border-radius: 12px !important;
+  color: var(--analyst-text) !important;
   background: #ffffff !important;
+  font-weight: 800 !important;
 }
 
 .guided-option input {
@@ -496,7 +661,11 @@ select:focus {
 
   .v0-checkin-layout,
   .patient-signup-layout,
-  .login-layout {
+  .login-layout,
+  .patient-checkin-list,
+  .questionnaire-summary-grid,
+  .saved-value-grid,
+  .guided-option-grid {
     grid-template-columns: 1fr !important;
   }
 

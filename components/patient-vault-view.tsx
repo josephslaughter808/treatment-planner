@@ -61,6 +61,7 @@ export function PatientVaultView() {
 
       setMessage("Your health profile has been saved for your next office check-in.");
       setEditingSections({
+        questionnaire: false,
         profile: false,
         conditions: false,
         medications: false,
@@ -208,6 +209,71 @@ export function PatientVaultView() {
     setMessage("Office removed from your active list.");
   }
 
+  function hasConditionNamed(name: string) {
+    return vault.medicalConditions.some((condition) => condition.name.toLowerCase() === name.toLowerCase());
+  }
+
+  function toggleQuestionnaireCondition(name: string) {
+    setVault((current) => {
+      const exists = current.medicalConditions.some(
+        (condition) => condition.name.toLowerCase() === name.toLowerCase()
+      );
+
+      return {
+        ...current,
+        medicalConditions: exists
+          ? current.medicalConditions.filter((condition) => condition.name.toLowerCase() !== name.toLowerCase())
+          : [
+              ...current.medicalConditions,
+              {
+                id: crypto.randomUUID(),
+                name,
+                notes: "Selected in medical questionnaire."
+              }
+            ]
+      };
+    });
+  }
+
+  function getQuestionnaireNote(title: string) {
+    return vault.medicalConditions.find((condition) => condition.name === title)?.notes ?? "";
+  }
+
+  function updateQuestionnaireNote(title: string, notes: string) {
+    setVault((current) => {
+      const trimmedNotes = notes;
+      const existing = current.medicalConditions.find((condition) => condition.name === title);
+
+      if (!trimmedNotes.trim()) {
+        return {
+          ...current,
+          medicalConditions: current.medicalConditions.filter((condition) => condition.name !== title)
+        };
+      }
+
+      if (existing) {
+        return {
+          ...current,
+          medicalConditions: current.medicalConditions.map((condition) =>
+            condition.name === title ? { ...condition, notes: trimmedNotes } : condition
+          )
+        };
+      }
+
+      return {
+        ...current,
+        medicalConditions: [
+          ...current.medicalConditions,
+          {
+            id: crypto.randomUUID(),
+            name: title,
+            notes: trimmedNotes
+          }
+        ]
+      };
+    });
+  }
+
   return (
     <div className="vault-layout v0-patient-vault">
       <section className="panel wallet-card-panel v0-patient-health-hero">
@@ -272,6 +338,76 @@ export function PatientVaultView() {
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="panel medical-questionnaire-panel">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Medical questionnaire</p>
+            <h2>Guided health history</h2>
+            <p>
+              Keep this current before every visit. Your office reviews these answers with your medications,
+              allergies, insurance, and emergency contact.
+            </p>
+          </div>
+          <button
+            className="primary-button"
+            onClick={() =>
+              setEditingSections((current) => ({ ...current, questionnaire: !current.questionnaire }))
+            }
+            type="button"
+          >
+            {editingSections.questionnaire ? "Done" : "Update questionnaire"}
+          </button>
+        </div>
+
+        {editingSections.questionnaire ? (
+          <div className="questionnaire-workspace">
+            <div>
+              <p className="mini-label">Check any that apply</p>
+              <div className="guided-option-grid">
+                {questionnaireConditionOptions.map((option) => (
+                  <label className="guided-option" key={option}>
+                    <input
+                      checked={hasConditionNamed(option)}
+                      onChange={() => toggleQuestionnaireCondition(option)}
+                      type="checkbox"
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid two-up">
+              {questionnaireNarrativePrompts.map((prompt) => (
+                <label key={prompt.title}>
+                  {prompt.label}
+                  <textarea
+                    onChange={(event) => updateQuestionnaireNote(prompt.title, event.target.value)}
+                    placeholder={prompt.placeholder}
+                    value={getQuestionnaireNote(prompt.title)}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="questionnaire-summary-grid">
+            <div>
+              <span>Conditions selected</span>
+              <strong>{vault.medicalConditions.filter((condition) => questionnaireConditionOptions.includes(condition.name)).length}</strong>
+            </div>
+            <div>
+              <span>History notes</span>
+              <strong>{vault.medicalConditions.filter((condition) => questionnaireNarrativePrompts.some((prompt) => prompt.title === condition.name)).length}</strong>
+            </div>
+            <div>
+              <span>Last updated</span>
+              <strong>{vault.lastUpdatedAt ? formatVaultDate(vault.lastUpdatedAt) : "Not saved"}</strong>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="panel v0-health-profile-panel">
@@ -854,6 +990,7 @@ export function PatientVaultView() {
 type EditablePatientSection = keyof typeof initialEditingSections;
 
 const initialEditingSections = {
+  questionnaire: false,
   profile: false,
   conditions: false,
   medications: false,
@@ -899,6 +1036,11 @@ function getPatientCompletionItems(vault: PatientVault): {
 }[] {
   return [
     {
+      section: "questionnaire",
+      label: "Medical questionnaire",
+      complete: true
+    },
+    {
       section: "profile",
       label: "Patient details",
       complete: Boolean(vault.fullName && vault.email && vault.phone && vault.dateOfBirth)
@@ -930,6 +1072,57 @@ function getPatientCompletionItems(vault: PatientVault): {
     }
   ];
 }
+
+const questionnaireConditionOptions = [
+  "High blood pressure",
+  "Heart disease or heart attack",
+  "Heart murmur, valve problem, or pacemaker",
+  "Need antibiotics before dental treatment",
+  "Stroke or TIA",
+  "Diabetes",
+  "Asthma or COPD",
+  "Sleep apnea",
+  "Seizures or epilepsy",
+  "Kidney disease",
+  "Liver disease or hepatitis",
+  "Cancer, chemotherapy, or radiation",
+  "Immune suppression or transplant history",
+  "Bleeding disorder",
+  "Blood thinner use",
+  "Osteoporosis medication or bisphosphonate use",
+  "Joint replacement",
+  "Latex sensitivity",
+  "Tobacco or nicotine use",
+  "Alcohol or substance use concern"
+];
+
+const questionnaireNarrativePrompts = [
+  {
+    title: "Surgery / hospitalization history",
+    label: "Surgeries, hospitalizations, or major illnesses",
+    placeholder: "List surgery/illness, approximate date, and whether there were complications."
+  },
+  {
+    title: "Anesthesia or dental concerns",
+    label: "Anesthesia, sedation, or dental concerns",
+    placeholder: "Problems getting numb, sedation reactions, nausea, panic, fainting, jaw issues, or dental anxiety."
+  },
+  {
+    title: "Bleeding or healing concerns",
+    label: "Bleeding or healing concerns",
+    placeholder: "Blood thinners, easy bruising, bleeding disorders, delayed healing, immune suppression, or recent infections."
+  },
+  {
+    title: "Pregnancy or nursing status",
+    label: "Pregnancy or nursing",
+    placeholder: "Pregnant, possibly pregnant, nursing, not applicable, or prefer to discuss privately."
+  },
+  {
+    title: "Additional pre-visit notes",
+    label: "Anything else the office should know?",
+    placeholder: "Recent ER visits, new symptoms, specialist care, mobility needs, communication preferences, or anything else."
+  }
+];
 
 function sanitizeVault(vault: PatientVault): PatientVault {
   return {
