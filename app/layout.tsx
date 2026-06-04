@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AuthProvider } from "@/components/auth-provider";
 import { StartupSplash } from "@/components/startup-splash";
 import "./globals.css";
+import "./analyst-theme.css";
 
 export const metadata: Metadata = {
   title: "ClearPath Care",

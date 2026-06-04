@@ -1,0 +1,534 @@
+/* Analyst Cool: final visual system for the phase-one pilot. */
+:root {
+  --analyst-bg: #f1f5f9;
+  --analyst-surface: #ffffff;
+  --analyst-blue: #2563eb;
+  --analyst-blue-dark: #1d4ed8;
+  --analyst-slate: #64748b;
+  --analyst-text: #0f172a;
+  --analyst-line: #dbe3ec;
+  --analyst-soft: #f8fafc;
+  --analyst-green: #16a34a;
+  --analyst-red: #dc3345;
+}
+
+html,
+body {
+  background: var(--analyst-bg) !important;
+  color: var(--analyst-text) !important;
+  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+.page-title,
+.brand-name,
+.panel h2 {
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif !important;
+  letter-spacing: -0.055em !important;
+}
+
+.startup-splash {
+  display: none !important;
+}
+
+.shell {
+  width: 100% !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--analyst-bg) !important;
+}
+
+.shell-with-nav,
+.provider-app-shell.shell-with-nav {
+  display: grid !important;
+  grid-template-columns: 270px minmax(0, 1fr) !important;
+  grid-template-rows: 76px auto 1fr !important;
+  gap: 0 !important;
+}
+
+.patient-app-shell.shell-with-nav,
+.public-app-shell.shell-with-nav {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.topbar,
+.provider-app-shell .topbar {
+  position: sticky !important;
+  top: 0 !important;
+  grid-column: 1 !important;
+  grid-row: 1 / -1 !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 26px 18px !important;
+  border: 0 !important;
+  border-right: 1px solid var(--analyst-line) !important;
+  border-radius: 0 !important;
+  background: var(--analyst-surface) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.topbar-brand,
+.provider-app-shell .topbar-brand {
+  width: 100% !important;
+  display: grid !important;
+  gap: 44px !important;
+  justify-items: stretch !important;
+}
+
+.brand-lockup,
+.provider-app-shell .brand-lockup {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  text-decoration: none !important;
+}
+
+.brand-logo,
+.provider-app-shell .topbar-logo {
+  width: 42px !important;
+  height: 42px !important;
+  padding: 4px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.brand-name {
+  margin: 0 !important;
+  color: var(--analyst-text) !important;
+  font-size: 1.1rem !important;
+  font-weight: 900 !important;
+}
+
+.topnav,
+.provider-app-shell .topnav {
+  width: 100% !important;
+  display: grid !important;
+  gap: 9px !important;
+}
+
+.topnav::before {
+  content: "Database";
+  margin: 0 10px 4px;
+  color: var(--analyst-slate);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.topnav-link,
+.provider-app-shell .topnav-link {
+  min-height: 46px !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  padding: 12px 14px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  color: var(--analyst-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-weight: 850 !important;
+  text-align: left !important;
+}
+
+.topnav-link.active,
+.topnav-link:hover,
+.provider-app-shell .topnav-link.active,
+.provider-app-shell .topnav-link:hover {
+  color: var(--analyst-text) !important;
+  background: #e9eef5 !important;
+}
+
+.topbar-user,
+.provider-app-shell .topbar-user {
+  width: 100% !important;
+  justify-content: flex-start !important;
+  padding-top: 18px !important;
+  border-top: 1px solid var(--analyst-line) !important;
+}
+
+.user-copy {
+  text-align: left !important;
+}
+
+.user-copy span,
+.lede,
+.catalog-note,
+.panel p,
+.dialogue-card p,
+.option-card p,
+.patient-finder-row p {
+  color: var(--analyst-slate) !important;
+}
+
+.app-utility-bar {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 24px !important;
+  padding: 18px 36px !important;
+  border-bottom: 1px solid var(--analyst-line) !important;
+  background: var(--analyst-surface) !important;
+}
+
+.app-utility-bar input {
+  max-width: 460px !important;
+  height: 42px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 11px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.utility-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+}
+
+.sync-status {
+  color: var(--analyst-slate) !important;
+  font-weight: 850 !important;
+}
+
+.sync-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: var(--analyst-green);
+  vertical-align: middle;
+}
+
+.page-banner,
+.shell-content,
+.provider-app-shell .shell-content {
+  grid-column: 2 !important;
+}
+
+.page-banner {
+  padding: 52px 56px 18px !important;
+}
+
+.shell-content {
+  padding: 0 56px 70px !important;
+}
+
+.public-app-shell {
+  min-height: 100vh !important;
+  display: grid !important;
+  grid-template-columns: minmax(360px, 0.7fr) minmax(0, 1fr) !important;
+  grid-template-rows: 1fr !important;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(37, 99, 235, 0.12), transparent 30%),
+    var(--analyst-bg) !important;
+}
+
+.public-auth-header {
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 48px !important;
+  padding: 42px !important;
+  border-right: 1px solid var(--analyst-line) !important;
+  border-bottom: 0 !important;
+  background: var(--analyst-surface) !important;
+}
+
+.public-auth-copy {
+  max-width: 520px !important;
+}
+
+.public-auth-copy::before {
+  content: "Analyst Cool";
+  display: inline-flex;
+  margin-bottom: 18px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--analyst-blue);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-app-shell > .grid,
+.public-app-shell > .patient-signup-layout,
+.public-app-shell > .login-layout {
+  align-self: center !important;
+  width: min(1120px, calc(100% - 48px)) !important;
+  max-width: none !important;
+  margin: 34px auto !important;
+  padding: 0 !important;
+}
+
+.panel,
+.saved-section-card,
+.dialogue-card,
+.patient-select-launcher,
+.patient-match-status,
+.pilot-invite-card,
+.option-card,
+.patient-finder-row,
+.provider-app-shell .panel,
+.provider-app-shell .dialogue-card,
+.provider-app-shell .option-card {
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 18px !important;
+  color: var(--analyst-text) !important;
+  background: var(--analyst-surface) !important;
+  box-shadow: none !important;
+}
+
+.panel {
+  padding: 26px !important;
+}
+
+.page-title {
+  color: var(--analyst-text) !important;
+  font-size: clamp(2.35rem, 4.8vw, 4.2rem) !important;
+  line-height: 0.98 !important;
+}
+
+.panel h2 {
+  color: var(--analyst-text) !important;
+  font-size: clamp(1.45rem, 2.2vw, 2.3rem) !important;
+}
+
+.eyebrow,
+.mini-label,
+.wallet-label,
+.saved-value-label,
+.provider-app-shell .eyebrow,
+.provider-app-shell .mini-label {
+  color: var(--analyst-slate) !important;
+  font-size: 0.73rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.15em !important;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 11px !important;
+  color: var(--analyst-text) !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(37, 99, 235, 0.45) !important;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+.primary-button {
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  background: var(--analyst-blue) !important;
+  box-shadow: none !important;
+}
+
+.secondary-button,
+.secondary-link,
+.edit-chip,
+.tab-button {
+  border-radius: 10px !important;
+  color: var(--analyst-text) !important;
+  border-color: var(--analyst-line) !important;
+  background: var(--analyst-soft) !important;
+  box-shadow: none !important;
+}
+
+.v0-command-hero {
+  border: 0 !important;
+  color: var(--analyst-text) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.v0-command-hero h2 {
+  max-width: none !important;
+  color: var(--analyst-text) !important;
+}
+
+.v0-command-metrics div,
+.v0-flow-bars {
+  border: 1px solid var(--analyst-line) !important;
+  background: var(--analyst-surface) !important;
+}
+
+.v0-command-metrics strong {
+  color: var(--analyst-text) !important;
+}
+
+.v0-flow-bars span {
+  background: var(--analyst-blue) !important;
+  box-shadow: none !important;
+}
+
+.signup-questionnaire {
+  display: grid !important;
+  gap: 18px !important;
+  margin-top: 24px !important;
+  padding-top: 24px !important;
+  border-top: 1px solid var(--analyst-line) !important;
+}
+
+.signup-questionnaire h3 {
+  margin: 0 0 6px !important;
+  color: var(--analyst-text) !important;
+  font-size: 1.4rem !important;
+}
+
+.guided-option-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.guided-option {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 46px !important;
+  margin: 0 !important;
+  padding: 11px 12px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+}
+
+.guided-option input {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.patient-signup-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr) !important;
+}
+
+.patient-signup-guide {
+  position: sticky !important;
+  top: 34px !important;
+}
+
+@media (max-width: 1080px) {
+  .shell-with-nav,
+  .provider-app-shell.shell-with-nav,
+  .public-app-shell {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+  }
+
+  .topbar,
+  .provider-app-shell .topbar {
+    position: static !important;
+    min-height: auto !important;
+    grid-row: 1 !important;
+    padding: 14px 18px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--analyst-line) !important;
+    flex-direction: row !important;
+  }
+
+  .topbar-brand,
+  .provider-app-shell .topbar-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  .topnav,
+  .provider-app-shell .topnav {
+    display: none !important;
+  }
+
+  .topbar-user {
+    width: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .app-utility-bar,
+  .page-banner,
+  .shell-content,
+  .provider-app-shell .shell-content {
+    grid-column: 1 !important;
+  }
+
+  .app-utility-bar {
+    grid-row: 2 !important;
+    padding: 12px 18px !important;
+  }
+
+  .public-auth-header {
+    min-height: auto !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--analyst-line) !important;
+  }
+
+  .page-banner {
+    padding: 30px 20px 14px !important;
+  }
+
+  .shell-content {
+    padding: 0 20px 88px !important;
+  }
+
+  .v0-checkin-layout,
+  .patient-signup-layout,
+  .login-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .patient-signup-guide {
+    position: static !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-utility-bar {
+    display: none !important;
+  }
+
+  .public-auth-header {
+    padding: 26px 20px !important;
+  }
+
+  .public-app-shell > .grid,
+  .public-app-shell > .patient-signup-layout,
+  .public-app-shell > .login-layout {
+    width: calc(100% - 28px) !important;
+    margin: 18px auto !important;
+  }
+
+  .panel {
+    padding: 18px !important;
+  }
+
+  .guided-option-grid,
+  .two-up,
+  .three-up,
+  .v0-command-metrics {
+    grid-template-columns: 1fr !important;
+  }
+}
