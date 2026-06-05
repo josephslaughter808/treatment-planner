@@ -60,11 +60,15 @@ h4,
 
 .topbar,
 .provider-app-shell .topbar {
-  position: sticky !important;
-  top: 0 !important;
+  position: fixed !important;
+  inset: 0 auto 0 0 !important;
+  width: 270px !important;
   grid-column: 1 !important;
   grid-row: 1 / -1 !important;
+  z-index: 30 !important;
+  overflow-y: auto !important;
   min-height: 100vh !important;
+  height: 100vh !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
@@ -1653,6 +1657,10 @@ select:focus {
 @media (max-width: 1280px) and (min-width: 1081px) {
   .provider-app-shell.shell-with-nav {
     grid-template-columns: 236px minmax(0, 1fr) !important;
+  }
+
+  .provider-app-shell .topbar {
+    width: 236px !important;
   }
 
   .provider-app-shell .shell-content {
