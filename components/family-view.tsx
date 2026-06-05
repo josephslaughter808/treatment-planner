@@ -115,10 +115,11 @@ export function FamilyView() {
     }
 
     let active = true;
+    const patientUser = currentUser;
 
     async function hydrateFamilyAccess() {
       try {
-        const response = await fetch(`/api/patient-vault?email=${encodeURIComponent(currentUser.email)}`, {
+        const response = await fetch(`/api/patient-vault?email=${encodeURIComponent(patientUser.email)}`, {
           headers: await getSupabaseAuthHeaders()
         });
         const data = (await response.json()) as { vault?: PatientVault | null };

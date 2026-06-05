@@ -180,10 +180,11 @@ export function PatientVaultView() {
     }
 
     let active = true;
+    const patientUser = currentUser;
 
     async function hydrateSignedInVault() {
       try {
-        const response = await fetch(`/api/patient-vault?email=${encodeURIComponent(currentUser.email)}`, {
+        const response = await fetch(`/api/patient-vault?email=${encodeURIComponent(patientUser.email)}`, {
           headers: await getSupabaseAuthHeaders()
         });
         const data = (await response.json()) as { vault?: PatientVault | null; error?: string };
@@ -193,8 +194,8 @@ export function PatientVaultView() {
 
         const localVault = sanitizeVault({
           ...vaultRef.current,
-          fullName: vaultRef.current.fullName || currentUser.name,
-          email: currentUser.email
+          fullName: vaultRef.current.fullName || patientUser.name,
+          email: patientUser.email
         });
         const serverVault = data.vault ? sanitizeVault(data.vault) : null;
         const nextVault = chooseNewestVault(localVault, serverVault);
