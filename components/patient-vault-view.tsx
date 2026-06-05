@@ -22,8 +22,10 @@ export function PatientVaultView() {
   const [editingSections, setEditingSections] = useState(initialEditingSections);
   const [surgeryDraftRowCount, setSurgeryDraftRowCount] = useState(1);
   const hasAutosaveMountedRef = useRef(false);
+  const hasServerHydratedRef = useRef(false);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedSignatureRef = useRef("");
+  const vaultRef = useRef(vault);
 
   function updateVault(next: PatientVault) {
     const updated = { ...next, lastUpdatedAt: new Date().toISOString() };
@@ -70,6 +72,10 @@ export function PatientVaultView() {
       setIsSaving(false);
     }
   }, []);
+
+  useEffect(() => {
+    vaultRef.current = vault;
+  }, [vault]);
 
   function syncVaultNow() {
     const nextVault = sanitizeVault({
@@ -138,6 +144,10 @@ export function PatientVaultView() {
     const nextSignature = JSON.stringify(nextVault);
     writeVaultToStorage(nextVault);
 
+    if (currentUser?.role === "patient" && !hasServerHydratedRef.current) {
+      return;
+    }
+
     if (!hasAutosaveMountedRef.current) {
       hasAutosaveMountedRef.current = true;
       lastSavedSignatureRef.current = nextSignature;
@@ -161,7 +171,56 @@ export function PatientVaultView() {
         clearTimeout(autosaveTimerRef.current);
       }
     };
-  }, [syncVaultToServer, vault]);
+  }, [currentUser?.role, syncVaultToServer, vault]);
+
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== "patient") {
+      hasServerHydratedRef.current = true;
+      return;
+    }
+
+    let active = true;
+
+    async function hydrateSignedInVault() {
+      try {
+        const response = await fetch(`/api/patient-vault?email=${encodeURIComponent(currentUser.email)}`, {
+          headers: await getSupabaseAuthHeaders()
+        });
+        const data = (await response.json()) as { vault?: PatientVault | null; error?: string };
+        if (!active) {
+          return;
+        }
+
+        const localVault = sanitizeVault({
+          ...vaultRef.current,
+          fullName: vaultRef.current.fullName || currentUser.name,
+          email: currentUser.email
+        });
+        const serverVault = data.vault ? sanitizeVault(data.vault) : null;
+        const nextVault = chooseNewestVault(localVault, serverVault);
+
+        hasServerHydratedRef.current = true;
+        hasAutosaveMountedRef.current = true;
+        lastSavedSignatureRef.current = JSON.stringify(nextVault);
+
+        writeVaultToStorage(nextVault);
+        startTransition(() => {
+          setVault(nextVault);
+        });
+
+        if (response.ok && (!serverVault || isVaultNewer(localVault, serverVault))) {
+          void syncVaultToServer(nextVault);
+        }
+      } catch {
+        hasServerHydratedRef.current = true;
+      }
+    }
+
+    void hydrateSignedInVault();
+    return () => {
+      active = false;
+    };
+  }, [currentUser, syncVaultToServer]);
 
   useEffect(() => {
     if (!currentUser || currentUser.role !== "patient") {
@@ -1318,6 +1377,89 @@ function sanitizeVault(vault: PatientVault): PatientVault {
       phone: vault.emergencyContact.phone.trim()
     }
   };
+}
+
+function chooseNewestVault(localVault: PatientVault, serverVault: PatientVault | null) {
+  if (!serverVault) {
+    return localVault;
+  }
+
+  if (!hasMeaningfulVaultContent(localVault)) {
+    return serverVault;
+  }
+
+  return isVaultNewer(localVault, serverVault)
+    ? mergeVaults(serverVault, localVault)
+    : mergeVaults(localVault, serverVault);
+}
+
+function mergeVaults(baseVault: PatientVault, preferredVault: PatientVault): PatientVault {
+  return {
+    ...baseVault,
+    ...preferredVault,
+    medicalConditions: mergeByKey(baseVault.medicalConditions, preferredVault.medicalConditions, (condition) =>
+      `${condition.name.trim().toLowerCase()}::${condition.notes.trim().toLowerCase()}`
+    ),
+    medications: mergeByKey(baseVault.medications, preferredVault.medications, (medication) =>
+      `${medication.name.trim().toLowerCase()}::${medication.dose.trim().toLowerCase()}::${medication.frequency.trim().toLowerCase()}`
+    ),
+    allergies: mergeByKey(baseVault.allergies, preferredVault.allergies, (allergy) =>
+      `${allergy.allergen.trim().toLowerCase()}::${allergy.reaction.trim().toLowerCase()}::${allergy.severity}`
+    ),
+    clearanceDocuments: mergeByKey(baseVault.clearanceDocuments, preferredVault.clearanceDocuments, (document) =>
+      document.id
+    ),
+    officeConnections: mergeByKey(baseVault.officeConnections, preferredVault.officeConnections, (connection) =>
+      connection.practiceId
+    ),
+    familyAccess: {
+      dependents: mergeByKey(
+        baseVault.familyAccess?.dependents ?? [],
+        preferredVault.familyAccess?.dependents ?? [],
+        (dependent) => dependent.id
+      ),
+      adultLinks: mergeByKey(
+        baseVault.familyAccess?.adultLinks ?? [],
+        preferredVault.familyAccess?.adultLinks ?? [],
+        (link) => link.id
+      )
+    }
+  };
+}
+
+function mergeByKey<T>(baseItems: T[], preferredItems: T[], getKey: (item: T) => string) {
+  const merged = new Map<string, T>();
+  for (const item of baseItems) {
+    merged.set(getKey(item), item);
+  }
+  for (const item of preferredItems) {
+    merged.set(getKey(item), item);
+  }
+  return Array.from(merged.values());
+}
+
+function isVaultNewer(left: PatientVault, right: PatientVault) {
+  return getVaultTimestamp(left) > getVaultTimestamp(right);
+}
+
+function getVaultTimestamp(vault: PatientVault) {
+  const timestamp = new Date(vault.lastUpdatedAt || "").getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function hasMeaningfulVaultContent(vault: PatientVault) {
+  return Boolean(
+    vault.medicalConditions.length ||
+      vault.medications.length ||
+      vault.allergies.length ||
+      vault.insurance.providerName ||
+      vault.insurance.memberId ||
+      vault.emergencyContact.name ||
+      vault.phone ||
+      vault.dateOfBirth ||
+      (vault.familyAccess?.dependents.length ?? 0) ||
+      (vault.familyAccess?.adultLinks.length ?? 0)
+  );
 }
 
 function formatVaultDate(value: string) {

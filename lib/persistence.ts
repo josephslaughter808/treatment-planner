@@ -379,7 +379,10 @@ export async function savePatientVaultRecord(
         clearances_snapshot: encryptJsonField(vault.clearanceDocuments),
         emergency_contact_snapshot: encryptJsonField(vault.emergencyContact),
         emergency_disclosure_snapshot: encryptJsonField(vault.emergencyDisclosure),
-        office_connections_snapshot: encryptJsonField(vault.officeConnections)
+        office_connections_snapshot: encryptJsonField({
+          officeConnections: vault.officeConnections,
+          familyAccess: vault.familyAccess ?? { dependents: [], adultLinks: [] }
+        })
       },
       { onConflict: "patient_identity_id" }
     )
@@ -483,7 +486,7 @@ export async function getPatientVaultRecord(email: string, actor?: RequestActor 
         showBloodThinners: true,
         responderMessage: ""
       }),
-    officeConnections: decryptJsonField<PatientVault["officeConnections"]>(vaultRow.office_connections_snapshot, [])
+    ...parseVaultExtras(vaultRow.office_connections_snapshot)
   };
 
   await logAuditEvent({
@@ -626,10 +629,7 @@ export async function getPracticePatientVaultRecords(practiceId: string, actor?:
           showBloodThinners: true,
           responderMessage: ""
         }),
-      officeConnections: decryptJsonField<PatientVault["officeConnections"]>(
-        vaultRow?.office_connections_snapshot,
-        []
-      )
+      ...parseVaultExtras(vaultRow?.office_connections_snapshot)
     };
   });
 
@@ -1528,10 +1528,33 @@ function buildPatientVaultFromRows(
         showBloodThinners: true,
         responderMessage: ""
       }),
-    officeConnections: decryptJsonField<PatientVault["officeConnections"]>(
-      vaultRow?.office_connections_snapshot,
-      []
-    )
+    ...parseVaultExtras(vaultRow?.office_connections_snapshot)
+  };
+}
+
+function parseVaultExtras(value: unknown): Pick<PatientVault, "officeConnections" | "familyAccess"> {
+  const parsed = decryptJsonField<unknown>(value, []);
+  if (Array.isArray(parsed)) {
+    return {
+      officeConnections: parsed as PatientVault["officeConnections"],
+      familyAccess: { dependents: [], adultLinks: [] }
+    };
+  }
+
+  if (parsed && typeof parsed === "object") {
+    const candidate = parsed as Partial<Pick<PatientVault, "officeConnections" | "familyAccess">>;
+    return {
+      officeConnections: Array.isArray(candidate.officeConnections) ? candidate.officeConnections : [],
+      familyAccess: {
+        dependents: Array.isArray(candidate.familyAccess?.dependents) ? candidate.familyAccess.dependents : [],
+        adultLinks: Array.isArray(candidate.familyAccess?.adultLinks) ? candidate.familyAccess.adultLinks : []
+      }
+    };
+  }
+
+  return {
+    officeConnections: [],
+    familyAccess: { dependents: [], adultLinks: [] }
   };
 }
 

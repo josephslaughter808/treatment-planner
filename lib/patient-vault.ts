@@ -102,6 +102,29 @@ export type PatientVault = {
     lastVerifiedAt: string;
     notes: string;
   }[];
+  familyAccess?: FamilyAccessState;
+};
+
+export type DependentProfile = {
+  id: string;
+  relationship: string;
+  legalAuthority: string;
+  vault: PatientVault;
+};
+
+export type AdultCareLink = {
+  id: string;
+  name: string;
+  email: string;
+  relationship: string;
+  status: "pending-sent" | "pending-received" | "approved" | "rejected";
+  requestedAt: string;
+  respondedAt?: string;
+};
+
+export type FamilyAccessState = {
+  dependents: DependentProfile[];
+  adultLinks: AdultCareLink[];
 };
 
 export type CheckInRecord = {
@@ -233,7 +256,11 @@ export const emptyVault: PatientVault = {
       "This emergency view contains only the information I have approved for first responders in an emergency."
   },
   clearanceDocuments: [],
-  officeConnections: []
+  officeConnections: [],
+  familyAccess: {
+    dependents: [],
+    adultLinks: []
+  }
 };
 
 export function createMemberId(prefix: string) {

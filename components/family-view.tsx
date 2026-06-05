@@ -1,39 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useAuth } from "@/components/auth-provider";
 import {
   createMemberId,
   emptyVault,
   makeBlankAllergy,
   makeBlankCondition,
   makeBlankMedication,
+  readVaultFromStorage,
+  writeVaultToStorage,
   type AllergyEntry,
+  type AdultCareLink,
   type ConditionEntry,
+  type DependentProfile,
+  type FamilyAccessState,
   type MedicationEntry,
   type PatientVault
 } from "@/lib/patient-vault";
-
-type DependentProfile = {
-  id: string;
-  relationship: string;
-  legalAuthority: string;
-  vault: PatientVault;
-};
-
-type AdultCareLink = {
-  id: string;
-  name: string;
-  email: string;
-  relationship: string;
-  status: "pending-sent" | "pending-received" | "approved" | "rejected";
-  requestedAt: string;
-  respondedAt?: string;
-};
-
-type FamilyAccessState = {
-  dependents: DependentProfile[];
-  adultLinks: AdultCareLink[];
-};
+import { getSupabaseAuthHeaders } from "@/lib/supabase-browser";
 
 type SurgeryHistoryEntry = {
   description: string;
@@ -45,7 +30,9 @@ const surgeryHistoryTitle = "Surgery / hospitalization history";
 const pregnancyStatusTitle = "Pregnancy or nursing status";
 
 export function FamilyView() {
+  const { currentUser } = useAuth();
   const [family, setFamily] = useState<FamilyAccessState>(() => readFamilyAccess());
+  const [ownerVault, setOwnerVault] = useState<PatientVault>(() => readVaultFromStorage());
   const [selectedDependentId, setSelectedDependentId] = useState<string | null>(null);
   const [dependentDraft, setDependentDraft] = useState({
     name: "",
@@ -54,16 +41,122 @@ export function FamilyView() {
     legalAuthority: "Parent or legal guardian"
   });
   const [adultDraft, setAdultDraft] = useState({ name: "", email: "", relationship: "Spouse" });
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ownerVaultRef = useRef(ownerVault);
 
   const selectedDependent = family.dependents.find((dependent) => dependent.id === selectedDependentId) ?? null;
   const incomingRequests = family.adultLinks.filter((link) => link.status === "pending-received");
   const sentRequests = family.adultLinks.filter((link) => link.status === "pending-sent");
   const approvedAdults = family.adultLinks.filter((link) => link.status === "approved");
 
+  useEffect(() => {
+    ownerVaultRef.current = ownerVault;
+  }, [ownerVault]);
+
+  const saveFamilyToServer = useCallback(
+    async (nextFamily: FamilyAccessState, baseVault?: PatientVault) => {
+      if (!currentUser || currentUser.role !== "patient") {
+        return;
+      }
+
+      const sourceVault = baseVault ?? ownerVaultRef.current;
+      const nextVault: PatientVault = {
+        ...emptyVault,
+        ...sourceVault,
+        fullName: sourceVault.fullName || currentUser.name,
+        email: currentUser.email,
+        familyAccess: nextFamily,
+        lastUpdatedAt: new Date().toISOString()
+      };
+
+      setOwnerVault(nextVault);
+      writeVaultToStorage(nextVault);
+
+      try {
+        await fetch("/api/patient-vault", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(await getSupabaseAuthHeaders())
+          },
+          body: JSON.stringify(nextVault)
+        });
+      } catch {
+        // Local storage remains the offline fallback; the next family edit will retry.
+      }
+    },
+    [currentUser]
+  );
+
   function updateFamily(nextFamily: FamilyAccessState) {
     setFamily(nextFamily);
     writeFamilyAccess(nextFamily);
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    saveTimerRef.current = setTimeout(() => {
+      void saveFamilyToServer(nextFamily);
+    }, 700);
   }
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== "patient") {
+      return;
+    }
+
+    let active = true;
+
+    async function hydrateFamilyAccess() {
+      try {
+        const response = await fetch(`/api/patient-vault?email=${encodeURIComponent(currentUser.email)}`, {
+          headers: await getSupabaseAuthHeaders()
+        });
+        const data = (await response.json()) as { vault?: PatientVault | null };
+
+        if (!active || !response.ok) {
+          return;
+        }
+
+        const localFamily = readFamilyAccess();
+        const serverVault = data.vault;
+        const serverFamily = normalizeFamilyAccess(serverVault?.familyAccess);
+
+        if (serverVault) {
+          setOwnerVault(serverVault);
+          writeVaultToStorage(serverVault);
+        }
+
+        if (hasFamilyContent(serverFamily)) {
+          setFamily(serverFamily);
+          writeFamilyAccess(serverFamily);
+          return;
+        }
+
+        if (hasFamilyContent(localFamily)) {
+          setFamily(localFamily);
+          writeFamilyAccess(localFamily);
+          await saveFamilyToServer(localFamily, serverVault ?? ownerVaultRef.current);
+        }
+      } catch {
+        // The local family profile still works offline.
+      }
+    }
+
+    void hydrateFamilyAccess();
+    return () => {
+      active = false;
+    };
+  }, [currentUser, saveFamilyToServer]);
 
   function addDependent() {
     const name = dependentDraft.name.trim();
@@ -929,10 +1022,10 @@ function readFamilyAccess(): FamilyAccessState {
       children?: unknown[];
       authorizedAdults?: unknown[];
     };
-    const nextFamily = {
-      dependents: (parsed.dependents ?? parsed.children ?? []).map(normalizeDependentProfile),
-      adultLinks: (parsed.adultLinks ?? parsed.authorizedAdults ?? []).map(normalizeAdultCareLink)
-    };
+    const nextFamily = normalizeFamilyAccess({
+      dependents: parsed.dependents ?? parsed.children ?? [],
+      adultLinks: parsed.adultLinks ?? parsed.authorizedAdults ?? []
+    });
 
     writeFamilyAccess(nextFamily);
     return nextFamily;
@@ -947,6 +1040,18 @@ function writeFamilyAccess(family: FamilyAccessState) {
   }
 
   window.localStorage.setItem(familyStorageKey, JSON.stringify(family));
+}
+
+function normalizeFamilyAccess(rawFamily: unknown): FamilyAccessState {
+  const family = isRecord(rawFamily) ? rawFamily : {};
+  return {
+    dependents: Array.isArray(family.dependents) ? family.dependents.map(normalizeDependentProfile) : [],
+    adultLinks: Array.isArray(family.adultLinks) ? family.adultLinks.map(normalizeAdultCareLink) : []
+  };
+}
+
+function hasFamilyContent(family: FamilyAccessState) {
+  return family.dependents.length > 0 || family.adultLinks.length > 0;
 }
 
 function normalizeDependentProfile(rawProfile: unknown): DependentProfile {
@@ -977,7 +1082,8 @@ function normalizeDependentProfile(rawProfile: unknown): DependentProfile {
           ...(isRecord(rawVault.emergencyDisclosure) ? rawVault.emergencyDisclosure : {})
         },
         clearanceDocuments: Array.isArray(rawVault.clearanceDocuments) ? rawVault.clearanceDocuments : [],
-        officeConnections: Array.isArray(rawVault.officeConnections) ? rawVault.officeConnections : []
+        officeConnections: Array.isArray(rawVault.officeConnections) ? rawVault.officeConnections : [],
+        familyAccess: { dependents: [], adultLinks: [] }
       }
     : makeDependentVault(fullName, dateOfBirth);
 
