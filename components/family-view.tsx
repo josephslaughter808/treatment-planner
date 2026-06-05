@@ -978,13 +978,16 @@ function readFamilyAccess(): FamilyAccessState {
     }
 
     const parsed = JSON.parse(stored) as Partial<FamilyAccessState> & {
-      children?: DependentProfile[];
-      authorizedAdults?: AdultCareLink[];
+      children?: unknown[];
+      authorizedAdults?: unknown[];
     };
-    return {
-      dependents: parsed.dependents ?? parsed.children ?? [],
-      adultLinks: parsed.adultLinks ?? parsed.authorizedAdults ?? []
+    const nextFamily = {
+      dependents: (parsed.dependents ?? parsed.children ?? []).map(normalizeDependentProfile),
+      adultLinks: (parsed.adultLinks ?? parsed.authorizedAdults ?? []).map(normalizeAdultCareLink)
     };
+
+    writeFamilyAccess(nextFamily);
+    return nextFamily;
   } catch {
     return { dependents: [], adultLinks: [] };
   }
@@ -996,6 +999,73 @@ function writeFamilyAccess(family: FamilyAccessState) {
   }
 
   window.localStorage.setItem(familyStorageKey, JSON.stringify(family));
+}
+
+function normalizeDependentProfile(rawProfile: unknown): DependentProfile {
+  const profile = isRecord(rawProfile) ? rawProfile : {};
+  const rawVault = isRecord(profile.vault) ? (profile.vault as Partial<PatientVault>) : null;
+  const fullName = getString(rawVault?.fullName) || getString(profile.name) || "Dependent profile";
+  const dateOfBirth = getString(rawVault?.dateOfBirth) || getString(profile.dateOfBirth);
+  const vault: PatientVault = rawVault
+    ? {
+        ...emptyVault,
+        ...rawVault,
+        profileId: getString(rawVault.profileId) || crypto.randomUUID(),
+        fullName,
+        dateOfBirth,
+        memberId: getString(rawVault.memberId) || createMemberId("CPK"),
+        walletCode: getString(rawVault.walletCode) || createMemberId("KID"),
+        lastUpdatedAt: getString(rawVault.lastUpdatedAt) || new Date().toISOString(),
+        medicalConditions: Array.isArray(rawVault.medicalConditions) ? rawVault.medicalConditions : [],
+        medications: Array.isArray(rawVault.medications) ? rawVault.medications : [],
+        allergies: Array.isArray(rawVault.allergies) ? rawVault.allergies : [],
+        insurance: { ...emptyVault.insurance, ...(isRecord(rawVault.insurance) ? rawVault.insurance : {}) },
+        emergencyContact: {
+          ...emptyVault.emergencyContact,
+          ...(isRecord(rawVault.emergencyContact) ? rawVault.emergencyContact : {})
+        },
+        emergencyDisclosure: {
+          ...emptyVault.emergencyDisclosure,
+          ...(isRecord(rawVault.emergencyDisclosure) ? rawVault.emergencyDisclosure : {})
+        },
+        clearanceDocuments: Array.isArray(rawVault.clearanceDocuments) ? rawVault.clearanceDocuments : [],
+        officeConnections: Array.isArray(rawVault.officeConnections) ? rawVault.officeConnections : []
+      }
+    : makeDependentVault(fullName, dateOfBirth);
+
+  return {
+    id: getString(profile.id) || crypto.randomUUID(),
+    relationship: getString(profile.relationship) || "Dependent",
+    legalAuthority: getString(profile.legalAuthority) || "Legal authority on file",
+    vault
+  };
+}
+
+function normalizeAdultCareLink(rawLink: unknown): AdultCareLink {
+  const link = isRecord(rawLink) ? rawLink : {};
+  const status = getString(link.status);
+  const normalizedStatus: AdultCareLink["status"] =
+    status === "pending-sent" || status === "pending-received" || status === "approved" || status === "rejected"
+      ? status
+      : "approved";
+
+  return {
+    id: getString(link.id) || crypto.randomUUID(),
+    name: getString(link.name) || getString(link.email) || "Adult family member",
+    email: getString(link.email),
+    relationship: getString(link.relationship) || "Adult family member",
+    status: normalizedStatus,
+    requestedAt: getString(link.requestedAt) || new Date().toISOString(),
+    respondedAt: getString(link.respondedAt) || undefined
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function getString(value: unknown) {
+  return typeof value === "string" ? value : "";
 }
 
 function parseSurgeryHistoryEntries(notes: string): SurgeryHistoryEntry[] {
