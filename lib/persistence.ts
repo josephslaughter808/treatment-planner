@@ -645,6 +645,147 @@ export async function getPracticePatientVaultRecords(practiceId: string, actor?:
   };
 }
 
+export async function connectPracticePatientByCodeRecord(input: {
+  practiceId: string;
+  accessCode: string;
+}, actor?: RequestActor | null): Promise<SaveResult & { patient?: PatientVault }> {
+  const supabase = createAdminSupabaseClient();
+
+  if (!supabase) {
+    return {
+      mode: "mock",
+      message:
+        "Supabase environment variables are not set yet. Patient database connections require server persistence."
+    };
+  }
+
+  const practice = practicesById[input.practiceId];
+  if (!practice) {
+    throw new Error("Selected practice was not found.");
+  }
+
+  const normalizedCode = input.accessCode.trim().toUpperCase();
+  if (!normalizedCode) {
+    throw new Error("Patient access code is required.");
+  }
+
+  const slug = toSlug(practice.name);
+  const { data: practiceRow, error: practiceError } = await supabase
+    .from("practices")
+    .upsert(
+      {
+        slug,
+        name: practice.name,
+        description: practice.description,
+        default_package_source: practice.defaultPackageSource,
+        brand_note: practice.brandNote
+      },
+      { onConflict: "slug" }
+    )
+    .select("id")
+    .single();
+
+  if (practiceError || !practiceRow) {
+    throw new Error(practiceError?.message || "Unable to prepare the practice database.");
+  }
+
+  let patientIdentityId: string | null = null;
+
+  const { data: vaultByCode, error: vaultLookupError } = await supabase
+    .from("patient_vaults")
+    .select("patient_identity_id")
+    .or(`member_id.eq.${normalizedCode},wallet_code.eq.${normalizedCode}`)
+    .maybeSingle();
+
+  if (vaultLookupError) {
+    throw new Error(vaultLookupError.message);
+  }
+
+  patientIdentityId = (vaultByCode?.patient_identity_id as string | undefined) ?? null;
+
+  if (!patientIdentityId) {
+    const { data: shareLinkRow, error: shareLinkError } = await supabase
+      .from("patient_share_links")
+      .select("patient_identity_id, status, expires_at")
+      .eq("access_code", normalizedCode)
+      .maybeSingle();
+
+    if (shareLinkError) {
+      throw new Error(shareLinkError.message);
+    }
+
+    if (shareLinkRow) {
+      const status = shareLinkRow.status as ShareLinkRecord["status"];
+      const expiresAt = new Date((shareLinkRow.expires_at as string) || "");
+      if (status !== "active") {
+        throw new Error("This patient access code is no longer active.");
+      }
+      if (!Number.isNaN(expiresAt.getTime()) && expiresAt.getTime() < Date.now()) {
+        throw new Error("This patient access code has expired.");
+      }
+      patientIdentityId = (shareLinkRow.patient_identity_id as string | undefined) ?? null;
+    }
+  }
+
+  if (!patientIdentityId) {
+    throw new Error("No patient was found for that ClearPath code.");
+  }
+
+  const { data: identityRow, error: identityError } = await supabase
+    .from("patient_identities")
+    .select("id, full_name, email, date_of_birth")
+    .eq("id", patientIdentityId)
+    .maybeSingle();
+
+  if (identityError || !identityRow) {
+    throw new Error(identityError?.message || "Unable to load the patient identity.");
+  }
+
+  const { error: practicePatientError } = await supabase.from("practice_patients").upsert(
+    {
+      practice_id: practiceRow.id,
+      patient_identity_id: identityRow.id,
+      local_chart_label: identityRow.full_name || identityRow.email
+    },
+    { onConflict: "practice_id,patient_identity_id" }
+  );
+
+  if (practicePatientError) {
+    throw new Error(practicePatientError.message);
+  }
+
+  const { data: vaultRow, error: vaultError } = await supabase
+    .from("patient_vaults")
+    .select("*")
+    .eq("patient_identity_id", identityRow.id)
+    .maybeSingle();
+
+  if (vaultError) {
+    throw new Error(vaultError.message);
+  }
+
+  const patient = buildPatientVaultFromRows(identityRow, vaultRow);
+
+  await logAuditEvent({
+    actor,
+    action: "practice_patient_connected",
+    resourceType: "practice_patient",
+    resourceId: practiceRow.id,
+    practiceId: practiceRow.id,
+    patientIdentityId: identityRow.id,
+    metadata: {
+      practiceSlug: input.practiceId,
+      codeType: vaultByCode ? "patient-wallet-code" : "share-link-code"
+    }
+  });
+
+  return {
+    mode: "supabase",
+    patient,
+    message: `${patient.fullName || patient.email} was added to the practice patient database.`
+  };
+}
+
 export async function saveOfficeCheckInRecord(
   input: CheckInRecord & { createdByUserId?: string | null },
   actor?: RequestActor | null
@@ -1334,6 +1475,58 @@ export async function logAuditEvent(input: {
     resource_id: input.resourceId ?? null,
     metadata: input.metadata ?? {}
   });
+}
+
+function buildPatientVaultFromRows(
+  identityRow: {
+    id: string;
+    full_name?: string | null;
+    email?: string | null;
+    date_of_birth?: string | null;
+  },
+  vaultRow: Record<string, unknown> | null
+): PatientVault {
+  return {
+    profileId: identityRow.id,
+    fullName: identityRow.full_name || "",
+    email: identityRow.email || "",
+    phone: (vaultRow?.phone as string) || "",
+    dateOfBirth: identityRow.date_of_birth || "",
+    memberId: (vaultRow?.member_id as string) || "",
+    walletCode: (vaultRow?.wallet_code as string) || "",
+    lastUpdatedAt: (vaultRow?.updated_at as string) || "",
+    medicalConditions: decryptJsonField<PatientVault["medicalConditions"]>(vaultRow?.conditions_snapshot, []),
+    medications: decryptJsonField<PatientVault["medications"]>(vaultRow?.medications_snapshot, []),
+    allergies: decryptJsonField<PatientVault["allergies"]>(vaultRow?.allergies_snapshot, []),
+    clearanceDocuments:
+      decryptJsonField<PatientVault["clearanceDocuments"]>(vaultRow?.clearances_snapshot, []),
+    insurance: decryptJsonField<PatientVault["insurance"]>(vaultRow?.insurance_snapshot, {
+      providerName: "",
+      memberId: "",
+      groupNumber: "",
+      subscriberName: ""
+    }),
+    emergencyContact:
+      decryptJsonField<PatientVault["emergencyContact"]>(vaultRow?.emergency_contact_snapshot, {
+        name: "",
+        relationship: "",
+        phone: ""
+      }),
+    emergencyDisclosure:
+      decryptJsonField<PatientVault["emergencyDisclosure"]>(vaultRow?.emergency_disclosure_snapshot, {
+        enabled: true,
+        showAllergies: true,
+        showConditions: true,
+        showMedications: true,
+        showEmergencyContact: true,
+        showBloodThinners: true,
+        responderMessage: ""
+      }),
+    officeConnections: decryptJsonField<PatientVault["officeConnections"]>(
+      vaultRow?.office_connections_snapshot,
+      []
+    )
+  };
 }
 
 function toSlug(value: string) {
