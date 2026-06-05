@@ -932,6 +932,29 @@ select:focus {
   display: none !important;
 }
 
+.auth-required-shell {
+  min-height: 100svh !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 24px !important;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 32rem),
+    var(--analyst-soft) !important;
+}
+
+.auth-required-card {
+  width: min(620px, 100%) !important;
+  display: grid !important;
+  gap: 16px !important;
+}
+
+.auth-required-card h1 {
+  margin: 0 !important;
+  color: var(--analyst-text) !important;
+  font-size: clamp(2rem, 5vw, 3.6rem) !important;
+  line-height: 0.98 !important;
+}
+
 @media (max-width: 1080px) {
   .shell-with-nav,
   .provider-app-shell.shell-with-nav,

@@ -93,7 +93,21 @@ export function AppShell({
   }
 
   if (audience !== "public" && !currentUser) {
-    return null;
+    return (
+      <main className="shell auth-required-shell">
+        <section className="panel auth-required-card">
+          <p className="eyebrow">Sign in required</p>
+          <h1>Open your ClearPath account first.</h1>
+          <p>
+            This page needs an active patient or provider session. Sign in again and ClearPath will take you
+            back into the correct workspace.
+          </p>
+          <Link className="primary-button" href="/login">
+            Go to sign in
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   if (
@@ -101,7 +115,21 @@ export function AppShell({
     ((audience === "provider" && !isProviderWorkspaceRole(currentUser.role)) ||
       (audience === "patient" && !isPatientRole(currentUser.role)))
   ) {
-    return null;
+    return (
+      <main className="shell auth-required-shell">
+        <section className="panel auth-required-card">
+          <p className="eyebrow">Wrong workspace</p>
+          <h1>This account does not have access here.</h1>
+          <p>
+            You are signed in, but this page belongs to a different workspace. Use the button below to return
+            to the correct side of ClearPath.
+          </p>
+          <Link className="primary-button" href={isPatientRole(currentUser.role) ? "/patient" : "/"}>
+            Go to my workspace
+          </Link>
+        </section>
+      </main>
+    );
   }
 
   const resolvedAudience = resolveAudience(audience, currentUser?.role);
