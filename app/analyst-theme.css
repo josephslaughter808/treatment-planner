@@ -1026,6 +1026,168 @@ select:focus {
   margin: 0 0 3px !important;
 }
 
+.provider-new-patient-stage {
+  width: min(1420px, 100%) !important;
+  display: grid !important;
+  gap: 28px !important;
+}
+
+.provider-new-patient-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+}
+
+.provider-new-patient-hero h2 {
+  margin: 0 0 10px !important;
+  color: var(--analyst-text) !important;
+  font-size: clamp(2.5rem, 4.8vw, 5rem) !important;
+  line-height: 0.92 !important;
+}
+
+.provider-new-patient-hero p {
+  max-width: 760px !important;
+  margin: 0 !important;
+}
+
+.provider-scan-status-card {
+  display: grid !important;
+  align-content: center !important;
+  gap: 10px !important;
+  padding: 22px !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(255, 255, 255, 0) 68%),
+    #ffffff !important;
+}
+
+.provider-scan-status-card span {
+  color: var(--analyst-slate) !important;
+  font-size: 0.75rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.provider-scan-status-card strong {
+  color: var(--analyst-text) !important;
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif !important;
+  font-size: 2rem !important;
+  letter-spacing: -0.055em !important;
+}
+
+.provider-new-patient-layout {
+  display: grid !important;
+  grid-template-columns: minmax(520px, 1fr) minmax(360px, 0.62fr) !important;
+  gap: 24px !important;
+  align-items: start !important;
+}
+
+.provider-scan-panel,
+.provider-manual-code-panel {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+.provider-camera-frame {
+  position: relative !important;
+  min-height: 430px !important;
+  overflow: hidden !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.08), rgba(37, 99, 235, 0.06)),
+    #0f172a !important;
+}
+
+.provider-camera-frame video {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 430px !important;
+  object-fit: cover !important;
+}
+
+.provider-camera-frame > i {
+  position: absolute !important;
+  inset: 52px !important;
+  border: 2px solid rgba(255, 255, 255, 0.78) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 0 0 999px rgba(15, 23, 42, 0.2), 0 0 22px rgba(37, 99, 235, 0.34) !important;
+  pointer-events: none !important;
+}
+
+.provider-camera-placeholder {
+  position: absolute !important;
+  inset: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  align-content: center !important;
+  gap: 12px !important;
+  padding: 28px !important;
+  text-align: center !important;
+}
+
+.provider-camera-placeholder span {
+  width: 72px !important;
+  height: 72px !important;
+  border: 2px solid rgba(255, 255, 255, 0.72) !important;
+  border-radius: 18px !important;
+  box-shadow: inset 0 0 0 14px rgba(255, 255, 255, 0.08) !important;
+}
+
+.provider-camera-placeholder strong {
+  color: #ffffff !important;
+  font-size: 1.3rem !important;
+}
+
+.provider-camera-placeholder p {
+  max-width: 360px !important;
+  margin: 0 !important;
+  color: rgba(255, 255, 255, 0.76) !important;
+}
+
+.provider-scan-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  align-items: center !important;
+}
+
+.provider-access-code-field input {
+  min-height: 68px !important;
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif !important;
+  font-size: 1.9rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+}
+
+.provider-open-checkin-button {
+  min-height: 52px !important;
+}
+
+.provider-code-help {
+  display: grid !important;
+  gap: 10px !important;
+  padding: 18px !important;
+  border: 1px solid rgba(37, 99, 235, 0.2) !important;
+  border-radius: 16px !important;
+  background: rgba(37, 99, 235, 0.055) !important;
+}
+
+.provider-code-help h3 {
+  margin: 0 !important;
+  color: var(--analyst-text) !important;
+}
+
+.provider-code-help p {
+  margin: 0 !important;
+}
+
 .signup-questionnaire {
   display: grid !important;
   gap: 18px !important;
@@ -1498,7 +1660,9 @@ select:focus {
   }
 
   .v0-command-hero,
-  .v0-checkin-layout {
+  .v0-checkin-layout,
+  .provider-new-patient-hero,
+  .provider-new-patient-layout {
     grid-template-columns: 1fr !important;
   }
 
@@ -1512,6 +1676,11 @@ select:focus {
 
   .provider-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .provider-camera-frame,
+  .provider-camera-frame video {
+    min-height: 360px !important;
   }
 }
 

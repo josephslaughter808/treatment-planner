@@ -9,17 +9,19 @@ import { AvatarBadge } from "@/components/avatar-badge";
 import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
-type NavIconName = "patients" | "health" | "family" | "documents" | "share" | "account";
+type NavIconName = "patients" | "health" | "family" | "documents" | "share" | "scan" | "account";
 
 type NavItem = {
   href: string;
   label: string;
   mobileLabel?: string;
   icon: NavIconName;
+  activePaths?: string[];
 };
 
 const providerNavItems: NavItem[] = [
-  { href: "/", label: "Check-in", icon: "patients" }
+  { href: "/", label: "Check-in", icon: "patients", activePaths: ["/", "/check-in"] },
+  { href: "/new-patient", label: "New Patient", icon: "scan" }
 ];
 
 const patientNavItems: NavItem[] = [
@@ -201,7 +203,7 @@ export function AppShell({
           </Link>
           <nav className="topnav" aria-label="Primary navigation">
             {navItems.map((item) => {
-              const active = pathname === item.href;
+              const active = isNavItemActive(pathname, item);
               return (
                 <Link
                   className={`topnav-link ${active ? "active" : ""}`}
@@ -272,7 +274,7 @@ export function AppShell({
       {resolvedAudience === "patient" ? (
         <nav className="mobile-tabbar" aria-label="Mobile navigation">
           {navItems.map((item) => {
-            const active = pathname === item.href;
+            const active = isNavItemActive(pathname, item);
             return (
               <Link className={`mobile-tab ${active ? "active" : ""}`} href={item.href} key={item.href}>
                 <NavIcon name={item.icon} />
@@ -284,6 +286,11 @@ export function AppShell({
       ) : null}
     </main>
   );
+}
+
+function isNavItemActive(pathname: string, item: NavItem) {
+  const activePaths = item.activePaths ?? [item.href];
+  return activePaths.some((path) => pathname === path || (path !== "/" && pathname.startsWith(`${path}/`)));
 }
 
 function NavIcon({ name }: { name: NavIconName }) {
@@ -338,6 +345,19 @@ function NavIcon({ name }: { name: NavIconName }) {
         <path d="M14 14h1.5" />
         <path d="M18 14v4" />
         <path d="M14 18h4" />
+      </svg>
+    );
+  }
+
+  if (name === "scan") {
+    return (
+      <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
+        <path d="M4 8V5a1 1 0 0 1 1-1h3" />
+        <path d="M16 4h3a1 1 0 0 1 1 1v3" />
+        <path d="M20 16v3a1 1 0 0 1-1 1h-3" />
+        <path d="M8 20H5a1 1 0 0 1-1-1v-3" />
+        <path d="M8 8h8v8H8z" />
+        <path d="M11 11h2v2h-2z" />
       </svg>
     );
   }
