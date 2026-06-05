@@ -6,9 +6,9 @@ export default function LoginPage() {
   return (
     <AppShell
       audience="public"
-      description="Sign in to update patient medical history and insurance or review the office check-in queue."
-      pageLabel="Authentication"
-      title="Log in to ClearPath Care"
+      description="A reusable medical history profile patients can keep current and securely share with participating offices."
+      pageLabel="ClearPath Care"
+      title="Never fill out another medical history form again."
     >
       <Suspense fallback={<section className="panel">Loading login...</section>}>
         <LoginView />
