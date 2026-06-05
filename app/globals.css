@@ -275,6 +275,9 @@ textarea {
   place-items: center;
   overflow: hidden;
   border-radius: 999px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   font-weight: 900;
 }
 

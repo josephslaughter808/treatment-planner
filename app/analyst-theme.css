@@ -738,6 +738,81 @@ select:focus {
   grid-column: 1 / -1 !important;
 }
 
+.avatar-crop-card {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: 22px !important;
+  align-items: center !important;
+  margin: 0 0 20px !important;
+  padding: 18px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, #f8fafc, #ffffff) !important;
+}
+
+.avatar-crop-preview {
+  position: relative !important;
+  width: 248px !important;
+  height: 248px !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  background: #e2e8f0 !important;
+  cursor: grab !important;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08), 0 18px 38px rgba(15, 23, 42, 0.14) !important;
+  user-select: none !important;
+}
+
+.avatar-crop-preview:active {
+  cursor: grabbing !important;
+}
+
+.avatar-crop-preview img {
+  position: absolute !important;
+  max-width: none !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.avatar-crop-ring {
+  position: absolute !important;
+  inset: 0 !important;
+  border: 3px solid rgba(37, 99, 235, 0.88) !important;
+  border-radius: inherit !important;
+  box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.02), 0 0 18px rgba(37, 99, 235, 0.28) !important;
+  pointer-events: none !important;
+}
+
+.avatar-crop-controls {
+  display: grid !important;
+  gap: 16px !important;
+  min-width: 0 !important;
+}
+
+.avatar-zoom-control {
+  margin: 0 !important;
+}
+
+.avatar-zoom-control input[type="range"] {
+  accent-color: var(--analyst-blue) !important;
+  padding: 0 !important;
+}
+
+.avatar-crop-actions,
+.avatar-current-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  align-items: center !important;
+}
+
+.avatar-current-row {
+  margin: 0 0 18px !important;
+  padding: 14px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+}
+
 .family-layout {
   align-items: start !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -1330,7 +1405,29 @@ select:focus {
   .document-actions,
   .family-card-actions,
   .dependent-edit-banner,
-  .profile-card-actions {
+  .profile-card-actions,
+  .avatar-current-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .avatar-crop-card {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    padding: 16px !important;
+  }
+
+  .avatar-crop-preview {
+    width: min(248px, calc(100vw - 72px)) !important;
+    height: min(248px, calc(100vw - 72px)) !important;
+  }
+
+  .avatar-crop-controls,
+  .avatar-crop-actions {
+    width: 100% !important;
+  }
+
+  .avatar-crop-actions {
     flex-direction: column !important;
     align-items: stretch !important;
   }
