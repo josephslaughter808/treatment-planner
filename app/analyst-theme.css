@@ -760,7 +760,7 @@ select:focus {
 .family-section-block {
   display: grid !important;
   gap: 16px !important;
-  padding: 18px !important;
+  padding: clamp(18px, 2vw, 26px) !important;
   border: 1px solid var(--analyst-line) !important;
   border-radius: 18px !important;
   background: var(--analyst-soft) !important;
@@ -783,14 +783,29 @@ select:focus {
 .child-profile-grid {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 14px !important;
+  gap: 18px !important;
+}
+
+.family-permission-panel:first-child {
+  grid-column: 1 / -1 !important;
 }
 
 .family-permission-panel,
 .family-add-child-card {
   display: grid !important;
   gap: 14px !important;
+  min-width: 0 !important;
+  padding: clamp(18px, 2vw, 24px) !important;
   background: #ffffff !important;
+}
+
+.family-hub-card p,
+.family-hub-card h2,
+.family-hub-card h3,
+.family-hub-card h4,
+.family-hub-card span,
+.family-hub-card strong {
+  overflow-wrap: anywhere !important;
 }
 
 .family-card-actions {
@@ -806,7 +821,8 @@ select:focus {
   gap: 16px !important;
   align-content: space-between !important;
   min-height: 170px !important;
-  padding: 18px !important;
+  min-width: 0 !important;
+  padding: clamp(18px, 2vw, 24px) !important;
   border: 1px solid var(--analyst-line) !important;
   border-radius: 16px !important;
   background: #ffffff !important;
@@ -815,8 +831,9 @@ select:focus {
 .family-child-modal {
   width: min(1180px, calc(100vw - 32px)) !important;
   max-height: calc(100vh - 42px) !important;
-  display: grid !important;
-  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  display: block !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
   border-radius: 22px !important;
 }
 
@@ -833,6 +850,29 @@ select:focus {
   border-top: 1px solid var(--analyst-line) !important;
   border-bottom: 1px solid var(--analyst-line) !important;
   background: var(--analyst-soft) !important;
+}
+
+.dependent-edit-banner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 16px 24px !important;
+  border-bottom: 1px solid rgba(37, 99, 235, 0.18) !important;
+  color: var(--analyst-text) !important;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.04)) !important;
+}
+
+.dependent-edit-banner strong {
+  display: block !important;
+  color: var(--analyst-text) !important;
+  font-size: 1rem !important;
+}
+
+.dependent-edit-banner span {
+  max-width: 420px !important;
+  color: var(--analyst-slate) !important;
+  font-weight: 750 !important;
 }
 
 .child-chart-summary div {
@@ -859,14 +899,15 @@ select:focus {
 .child-chart-scroll {
   display: grid !important;
   gap: 18px !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
   padding: 22px 24px 28px !important;
   background: #ffffff !important;
 }
 
 .child-chart-section {
-  padding: 18px !important;
+  min-width: 0 !important;
+  padding: clamp(18px, 2vw, 24px) !important;
   border: 1px solid var(--analyst-line) !important;
   border-radius: 18px !important;
 }
@@ -1148,6 +1189,7 @@ select:focus {
   .family-member-card,
   .document-actions,
   .family-card-actions,
+  .dependent-edit-banner,
   .profile-card-actions {
     flex-direction: column !important;
     align-items: stretch !important;

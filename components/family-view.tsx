@@ -210,6 +210,10 @@ export function FamilyView() {
             <div className="dialogue-card family-permission-panel">
               <p className="mini-label">Request access</p>
               <h4>Ask to view an adult account</h4>
+              <p className="field-help">
+                Adults must approve access from their own ClearPath account. Once approved, this connection is
+                view-only unless we later add a separate legal authority workflow.
+              </p>
               <div className="grid three-up">
                 <label>
                   Name
@@ -413,7 +417,7 @@ export function FamilyView() {
                   </div>
                   <div className="family-card-actions">
                     <button className="primary-button" onClick={() => setSelectedDependentId(dependent.id)} type="button">
-                      Open dependent chart
+                      Edit dependent history
                     </button>
                     <button className="edit-chip" onClick={() => removeDependent(dependent.id)} type="button">
                       Remove
@@ -597,6 +601,14 @@ function DependentMedicalProfileModal({
           <button className="secondary-button" onClick={onClose} type="button">
             Close chart
           </button>
+        </div>
+
+        <div className="dependent-edit-banner">
+          <div>
+            <p className="mini-label">Edit mode</p>
+            <strong>You can update this dependent&apos;s medical history directly.</strong>
+          </div>
+          <span>Children and legal dependents are managed here. Care Circle adults stay view-only.</span>
         </div>
 
         <div className="child-chart-summary">
