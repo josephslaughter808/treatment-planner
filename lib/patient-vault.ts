@@ -116,6 +116,27 @@ export type CheckInRecord = {
   historyConfirmed: boolean;
   medicationConfirmed: boolean;
   notes: string;
+  profileSnapshot?: CheckInProfileSnapshot;
+};
+
+export type CheckInProfileSnapshot = {
+  updatedAt: string;
+  phone: string;
+  dateOfBirth: string;
+  conditions: string[];
+  medications: string[];
+  allergies: string[];
+  insurance: {
+    providerName: string;
+    memberId: string;
+    groupNumber: string;
+    subscriberName: string;
+  };
+  emergencyContact: {
+    name: string;
+    relationship: string;
+    phone: string;
+  };
 };
 
 export type ShareLinkRecord = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { practicesById } from "@/lib/clinical-catalog";
 import { getSupabaseAuthHeaders } from "@/lib/supabase-browser";
@@ -11,13 +11,25 @@ import {
   readVaultFromStorage,
   writeCheckInsToStorage,
   type CheckInRecord,
+  type CheckInProfileSnapshot,
   type PatientVault,
   type ShareLinkRecord
 } from "@/lib/patient-vault";
 
+type BarcodeDetectorConstructor = new (options?: { formats?: string[] }) => {
+  detect(source: HTMLVideoElement): Promise<Array<{ rawValue: string }>>;
+};
+
+type WindowWithBarcodeDetector = Window & {
+  BarcodeDetector?: BarcodeDetectorConstructor;
+};
+
 export function IntakeCheckInView() {
   const { currentUser, authMode } = useAuth();
   const searchParams = useSearchParams();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const scanLoopRef = useRef<number | null>(null);
   const initialMemberId = searchParams.get("memberId") || searchParams.get("accessCode") || "";
   const initialAccessCode = searchParams.get("accessCode") || "";
   const [vault] = useState<PatientVault>(() => readVaultFromStorage());
@@ -43,6 +55,7 @@ export function IntakeCheckInView() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingPatients, setIsLoadingPatients] = useState(false);
   const [serverShareLink, setServerShareLink] = useState<ShareLinkRecord | null>(null);
+  const [scanStatus, setScanStatus] = useState<"idle" | "starting" | "scanning" | "found" | "unsupported" | "error">("idle");
 
   useEffect(() => {
     const practiceId = currentUser?.practiceId;
@@ -96,6 +109,18 @@ export function IntakeCheckInView() {
       active = false;
     };
   }, [currentUser?.practiceId]);
+
+  useEffect(
+    () => () => {
+      if (scanLoopRef.current !== null) {
+        window.clearTimeout(scanLoopRef.current);
+        scanLoopRef.current = null;
+      }
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    },
+    []
+  );
 
   useEffect(() => {
     const normalizedAccessCode = accessCode.trim();
@@ -185,6 +210,7 @@ export function IntakeCheckInView() {
     () => (matched ? buildCheckInChangeAlerts(matched, previousCheckIn, profileUpdatedAfterLastVisit) : []),
     [matched, previousCheckIn, profileUpdatedAfterLastVisit]
   );
+  const isCameraActive = scanStatus === "starting" || scanStatus === "scanning";
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
@@ -205,7 +231,8 @@ export function IntakeCheckInView() {
       insuranceConfirmed: true,
       historyConfirmed: true,
       medicationConfirmed: true,
-      notes
+      notes,
+      profileSnapshot: buildCheckInProfileSnapshot(matched)
     };
 
     const existing = readCheckInsFromStorage();
@@ -272,6 +299,91 @@ export function IntakeCheckInView() {
     setMessage(null);
   }
 
+  async function startQrScan() {
+    setMessage(null);
+
+    if (typeof window === "undefined" || !("mediaDevices" in navigator)) {
+      setScanStatus("unsupported");
+      setMessage("This browser cannot access a camera. Enter the access code manually instead.");
+      return;
+    }
+
+    const BarcodeDetector = (window as WindowWithBarcodeDetector).BarcodeDetector;
+    if (!BarcodeDetector) {
+      setScanStatus("unsupported");
+      setMessage("QR scanning is not supported in this browser yet. Enter the access code manually.");
+      return;
+    }
+
+    setScanStatus("starting");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: "environment" }
+      });
+      streamRef.current = stream;
+
+      if (!videoRef.current) {
+        stopCamera();
+        return;
+      }
+
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play();
+      setScanStatus("scanning");
+
+      const detector = new BarcodeDetector({ formats: ["qr_code"] });
+
+      async function detectCode() {
+        if (!videoRef.current || scanLoopRef.current === null) {
+          return;
+        }
+
+        try {
+          const results = await detector.detect(videoRef.current);
+          const rawValue = results[0]?.rawValue;
+          if (rawValue) {
+            const scannedCode = extractAccessCode(rawValue);
+            setAccessCode(scannedCode);
+            setMemberId(scannedCode);
+            setSelectedPatient(null);
+            setMessage("QR code found. Loading the patient history.");
+            stopCamera();
+            setScanStatus("found");
+            return;
+          }
+        } catch {
+          setMessage("The camera is open, but ClearPath could not read a QR code yet.");
+        }
+
+        scanLoopRef.current = window.setTimeout(detectCode, 450);
+      }
+
+      scanLoopRef.current = window.setTimeout(detectCode, 300);
+    } catch {
+      stopCamera();
+      setScanStatus("error");
+      setMessage("Camera access was blocked or unavailable. Enter the access code manually.");
+    }
+  }
+
+  function stopCamera() {
+    if (scanLoopRef.current !== null) {
+      window.clearTimeout(scanLoopRef.current);
+      scanLoopRef.current = null;
+    }
+
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
+    setScanStatus((current) => (current === "scanning" || current === "starting" ? "idle" : current));
+  }
+
   function selectPatientFromFinder(result: PatientFinderResult) {
     const nextPatient = serverPatients.find((patient) => patient.profileId === result.patientProfileId) ?? null;
     setSelectedPatient(nextPatient);
@@ -320,9 +432,23 @@ export function IntakeCheckInView() {
               Load history
             </button>
           </div>
+          <button className="secondary-button checkin-search-button" onClick={isCameraActive ? stopCamera : startQrScan} type="button">
+            {isCameraActive ? "Stop scanner" : "Scan QR code"}
+          </button>
           <button className="secondary-button checkin-search-button" onClick={openPatientFinder} type="button">
             Search for patient
           </button>
+        </div>
+
+        <div className={`checkin-camera-strip ${isCameraActive ? "active" : ""}`}>
+          <video aria-label="QR code scanner camera" muted playsInline ref={videoRef} />
+          <p>
+            {isCameraActive
+              ? "Hold the patient's QR pass in front of the camera."
+              : scanStatus === "found"
+                ? "QR code found. The patient history will load below."
+                : "Use the scanner button when the patient has their QR pass open."}
+          </p>
         </div>
 
         <div className={`patient-match-status ${matched ? "matched" : "unmatched"}`}>
@@ -335,6 +461,7 @@ export function IntakeCheckInView() {
               : "Use New Patient first if this person has never connected to the practice."}
           </span>
         </div>
+        {message ? <p className="info-text">{message}</p> : null}
       </section>
 
       {isPatientFinderOpen ? (
@@ -465,27 +592,26 @@ export function IntakeCheckInView() {
         </div>
       ) : null}
 
+      {matched ? (
       <section className="panel v0-profile-panel checkin-history-panel">
         <div className="panel-heading provider-review-heading">
           <div>
             <p className="eyebrow">Patient medical history</p>
-            <h2>{matched ? matched.fullName : "No patient open"}</h2>
+            <h2>{matched.fullName}</h2>
             <p>
-              {matched
-                ? "Review the current medical history, medication, allergy, emergency contact, and insurance details before saving today's verification."
-                : "The patient history will appear here after you scan a QR code, enter a code, or search for a patient."}
+              Review the current medical history, medication, allergy, emergency contact, and insurance details before saving today&apos;s verification.
             </p>
           </div>
         </div>
-        {matched ? (
           <div className="dialogue-list provider-review-grid">
+            {changeAlerts.length > 0 ? (
             <div className="dialogue-card provider-change-panel provider-review-card-wide">
               <div className="provider-change-panel-header">
                 <div>
-                  <p className="eyebrow">Since last visit</p>
-                  <h4>{profileUpdatedAfterLastVisit || !previousCheckIn ? "Review updates before seating" : "No new profile update recorded"}</h4>
+                  <p className="eyebrow">Changes since last check-in</p>
+                  <h4>{previousCheckIn ? "Review what changed" : "First ClearPath check-in"}</h4>
                 </div>
-                <span className={`provider-change-pill ${profileUpdatedAfterLastVisit || !previousCheckIn ? "attention" : "clear"}`}>
+                <span className="provider-change-pill attention">
                   {previousCheckIn ? `Last check-in ${formatCheckInDate(previousCheckIn.verifiedAt)}` : "First ClearPath check-in"}
                 </span>
               </div>
@@ -498,6 +624,7 @@ export function IntakeCheckInView() {
                 ))}
               </div>
             </div>
+            ) : null}
 
             <div className="dialogue-card provider-review-card provider-review-card-wide">
               <h4>{matched.fullName}</h4>
@@ -614,11 +741,8 @@ export function IntakeCheckInView() {
               </div>
             </div>
           </div>
-        ) : (
-          <p>Scan the patient QR code, enter their access code, or use patient finder to open the returning check-in profile.</p>
-        )}
-        {message ? <p className="info-text">{message}</p> : null}
       </section>
+      ) : null}
     </div>
   );
 }
@@ -659,46 +783,124 @@ function buildCheckInChangeAlerts(
   previousCheckIn: CheckInRecord | null,
   profileUpdatedAfterLastVisit: boolean
 ) {
-  const profileSummary = [
-    `${patient.medicalConditions.length} condition${patient.medicalConditions.length === 1 ? "" : "s"}`,
-    `${patient.medications.length} medication${patient.medications.length === 1 ? "" : "s"}`,
-    `${patient.allergies.length} allerg${patient.allergies.length === 1 ? "y" : "ies"}`,
-    patient.insurance.providerName ? "insurance on file" : "insurance missing",
-    patient.emergencyContact.name ? "emergency contact on file" : "emergency contact missing"
-  ].join(" • ");
+  const currentSnapshot = buildCheckInProfileSnapshot(patient);
 
   if (!previousCheckIn) {
     return [
       {
         title: "First ClearPath verification for this practice",
-        body: `Review the full chart once before saving today. Current profile: ${profileSummary}.`,
+        body: "This is the first saved check-in baseline for this patient at this practice. Review the full chart once before saving today.",
         tone: "attention"
       }
     ];
+  }
+
+  if (previousCheckIn.profileSnapshot) {
+    return buildSnapshotChanges(previousCheckIn.profileSnapshot, currentSnapshot);
   }
 
   if (profileUpdatedAfterLastVisit) {
     return [
       {
         title: "Patient profile changed after the last visit",
-        body: `Last profile update was ${formatCheckInDate(patient.lastUpdatedAt)}. Current profile: ${profileSummary}.`,
+        body: "This older check-in does not include an itemized comparison baseline yet. After today's verification is saved, future visits will show exact additions, removals, and field changes.",
         tone: "attention"
-      },
-      {
-        title: "Review current details below",
-        body: "The sections below show what is currently in the patient's ClearPath profile for today's visit.",
-        tone: "neutral"
       }
     ];
   }
 
+  return [];
+}
+
+function buildCheckInProfileSnapshot(patient: PatientVault): CheckInProfileSnapshot {
+  return {
+    updatedAt: patient.lastUpdatedAt,
+    phone: patient.phone,
+    dateOfBirth: patient.dateOfBirth,
+    conditions: patient.medicalConditions.map((condition) =>
+      [condition.name, condition.notes].map((value) => value.trim()).filter(Boolean).join(": ")
+    ).filter(Boolean),
+    medications: patient.medications.map((medication) =>
+      [medication.name, medication.dose, medication.frequency].map((value) => value.trim()).filter(Boolean).join(" • ")
+    ).filter(Boolean),
+    allergies: patient.allergies.map((allergy) =>
+      [allergy.allergen, allergy.reaction, allergy.severity].map((value) => value.trim()).filter(Boolean).join(" • ")
+    ).filter(Boolean),
+    insurance: {
+      providerName: patient.insurance.providerName,
+      memberId: patient.insurance.memberId,
+      groupNumber: patient.insurance.groupNumber,
+      subscriberName: patient.insurance.subscriberName
+    },
+    emergencyContact: {
+      name: patient.emergencyContact.name,
+      relationship: patient.emergencyContact.relationship,
+      phone: patient.emergencyContact.phone
+    }
+  };
+}
+
+function buildSnapshotChanges(previous: CheckInProfileSnapshot, current: CheckInProfileSnapshot) {
+  return [
+    ...compareStringList("Medical conditions", previous.conditions, current.conditions),
+    ...compareStringList("Medications", previous.medications, current.medications),
+    ...compareStringList("Allergies", previous.allergies, current.allergies),
+    ...compareField("Phone", previous.phone, current.phone),
+    ...compareField("Date of birth", previous.dateOfBirth, current.dateOfBirth),
+    ...compareField("Insurance provider", previous.insurance.providerName, current.insurance.providerName),
+    ...compareField("Insurance member ID", previous.insurance.memberId, current.insurance.memberId),
+    ...compareField("Insurance group", previous.insurance.groupNumber, current.insurance.groupNumber),
+    ...compareField("Subscriber", previous.insurance.subscriberName, current.insurance.subscriberName),
+    ...compareField("Emergency contact", previous.emergencyContact.name, current.emergencyContact.name),
+    ...compareField("Emergency relationship", previous.emergencyContact.relationship, current.emergencyContact.relationship),
+    ...compareField("Emergency phone", previous.emergencyContact.phone, current.emergencyContact.phone)
+  ];
+}
+
+function compareStringList(label: string, previousValues: string[], currentValues: string[]) {
+  const previous = new Set(previousValues.map(normalizeSnapshotValue).filter(Boolean));
+  const current = new Set(currentValues.map(normalizeSnapshotValue).filter(Boolean));
+  const changes: { title: string; body: string; tone: string }[] = [];
+
+  currentValues.forEach((value) => {
+    if (value.trim() && !previous.has(normalizeSnapshotValue(value))) {
+      changes.push({
+        title: `${label} added`,
+        body: value,
+        tone: "attention"
+      });
+    }
+  });
+
+  previousValues.forEach((value) => {
+    if (value.trim() && !current.has(normalizeSnapshotValue(value))) {
+      changes.push({
+        title: `${label} removed`,
+        body: value,
+        tone: "attention"
+      });
+    }
+  });
+
+  return changes;
+}
+
+function compareField(label: string, previousValue: string, currentValue: string) {
+  if (normalizeSnapshotValue(previousValue) === normalizeSnapshotValue(currentValue)) {
+    return [];
+  }
+
   return [
     {
-      title: "No new profile update recorded",
-      body: `The patient profile has not been updated since the last saved check-in. Current profile: ${profileSummary}.`,
-      tone: "clear"
+      title: `${label} changed`,
+      body: `${previousValue || "Not entered"} -> ${currentValue || "Not entered"}`,
+      tone: "attention"
     }
   ];
+}
+
+function normalizeSnapshotValue(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
 function formatCheckInDate(value: string) {

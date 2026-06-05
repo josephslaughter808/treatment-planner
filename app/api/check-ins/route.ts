@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       historyConfirmed: Boolean(body.historyConfirmed),
       medicationConfirmed: Boolean(body.medicationConfirmed),
       notes: body.notes || "",
+      profileSnapshot: body.profileSnapshot,
       createdByUserId: actor?.appUserId ?? (typeof body.createdByUserId === "string" ? body.createdByUserId : null)
     },
     actor

@@ -806,6 +806,29 @@ select:focus {
   white-space: nowrap !important;
 }
 
+.checkin-camera-strip {
+  display: none !important;
+  gap: 10px !important;
+}
+
+.checkin-camera-strip.active {
+  display: grid !important;
+}
+
+.checkin-camera-strip video {
+  width: 100% !important;
+  max-height: 320px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 18px !important;
+  background: #0f172a !important;
+  object-fit: cover !important;
+}
+
+.checkin-camera-strip p {
+  margin: 0 !important;
+  color: var(--analyst-muted) !important;
+}
+
 .checkin-history-panel {
   display: grid !important;
   gap: 20px !important;

@@ -8,7 +8,13 @@ import {
 import type { AccountProfile } from "@/lib/account-directory";
 import type { AnalysisResponse, IntakePayload } from "@/lib/mock-analysis";
 import type { RequestActor } from "@/lib/request-auth";
-import { createMemberId, type CheckInRecord, type PatientVault, type ShareLinkRecord } from "@/lib/patient-vault";
+import {
+  createMemberId,
+  type CheckInProfileSnapshot,
+  type CheckInRecord,
+  type PatientVault,
+  type ShareLinkRecord
+} from "@/lib/patient-vault";
 import { createAdminSupabaseClient } from "@/lib/supabase";
 import { decryptJsonField, decryptTextField, encryptJsonField, encryptTextField } from "@/lib/field-encryption";
 
@@ -842,7 +848,7 @@ export async function saveOfficeCheckInRecord(
       insurance_confirmed: input.insuranceConfirmed,
       history_confirmed: input.historyConfirmed,
       medication_confirmed: input.medicationConfirmed,
-      notes: input.notes ? encryptTextField(input.notes) : null,
+      notes: buildEncryptedCheckInPayload(input.notes, input.profileSnapshot),
       created_by_user_id: input.createdByUserId || null
     })
     .select("id")
@@ -950,7 +956,7 @@ export async function getOfficeCheckInRecords(input: {
       insuranceConfirmed: Boolean(row.insurance_confirmed),
       historyConfirmed: Boolean(row.history_confirmed),
       medicationConfirmed: Boolean(row.medication_confirmed),
-      notes: decryptTextField(row.notes)
+      ...parseCheckInPayload(decryptTextField(row.notes))
     })) || [];
 
   await logAuditEvent({
@@ -1531,6 +1537,60 @@ function buildPatientVaultFromRows(
 
 function toSlug(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function buildEncryptedCheckInPayload(notes: string, profileSnapshot?: CheckInProfileSnapshot) {
+  if (!notes && !profileSnapshot) {
+    return null;
+  }
+
+  return encryptTextField(
+    JSON.stringify({
+      kind: "clearpath-check-in-v1",
+      notes,
+      profileSnapshot
+    })
+  );
+}
+
+function parseCheckInPayload(decryptedValue: string): Pick<CheckInRecord, "notes" | "profileSnapshot"> {
+  if (!decryptedValue) {
+    return { notes: "" };
+  }
+
+  try {
+    const parsed = JSON.parse(decryptedValue) as {
+      kind?: string;
+      notes?: unknown;
+      profileSnapshot?: unknown;
+    };
+
+    if (parsed.kind !== "clearpath-check-in-v1") {
+      return { notes: decryptedValue };
+    }
+
+    return {
+      notes: typeof parsed.notes === "string" ? parsed.notes : "",
+      profileSnapshot: isCheckInProfileSnapshot(parsed.profileSnapshot) ? parsed.profileSnapshot : undefined
+    };
+  } catch {
+    return { notes: decryptedValue };
+  }
+}
+
+function isCheckInProfileSnapshot(value: unknown): value is CheckInProfileSnapshot {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<CheckInProfileSnapshot>;
+  return (
+    Array.isArray(candidate.conditions) &&
+    Array.isArray(candidate.medications) &&
+    Array.isArray(candidate.allergies) &&
+    typeof candidate.insurance === "object" &&
+    typeof candidate.emergencyContact === "object"
+  );
 }
 
 function sanitizeFileName(value: string) {
