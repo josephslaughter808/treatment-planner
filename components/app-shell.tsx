@@ -9,7 +9,7 @@ import { AvatarBadge } from "@/components/avatar-badge";
 import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
-type NavIconName = "patients" | "health" | "account";
+type NavIconName = "patients" | "health" | "family" | "account";
 
 type NavItem = {
   href: string;
@@ -23,6 +23,7 @@ const providerNavItems: NavItem[] = [
 
 const patientNavItems: NavItem[] = [
   { href: "/vault", label: "Health Profile", icon: "health" },
+  { href: "/family", label: "Family", icon: "family" },
   { href: "/profile", label: "Account", icon: "account" }
 ];
 
@@ -266,6 +267,17 @@ function NavIcon({ name }: { name: NavIconName }) {
       <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
         <path d="M12 21s-8-4.7-8-11a4.8 4.8 0 0 1 8-3.6A4.8 4.8 0 0 1 20 10c0 6.3-8 11-8 11Z" />
         <path d="M8 12h2.5l1.2-3 2.1 6 1.2-3H17" />
+      </svg>
+    );
+  }
+
+  if (name === "family") {
+    return (
+      <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
+        <path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+        <path d="M15.5 10a3 3 0 1 0 0-6" />
+        <path d="M3 21a6 6 0 0 1 12 0" />
+        <path d="M14.5 15.5A5 5 0 0 1 21 21" />
       </svg>
     );
   }

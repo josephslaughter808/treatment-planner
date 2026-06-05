@@ -721,6 +721,37 @@ select:focus {
   margin: 20px 22px !important;
 }
 
+.profile-card-actions,
+.family-member-card {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+}
+
+.account-summary-card,
+.profile-message {
+  align-self: start !important;
+}
+
+.profile-message {
+  grid-column: 1 / -1 !important;
+}
+
+.family-layout {
+  align-items: start !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.family-card {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+.family-card .saved-entry-list {
+  margin-top: 4px !important;
+}
+
 @media (max-width: 1080px) {
   .shell-with-nav,
   .provider-app-shell.shell-with-nav,
@@ -830,6 +861,38 @@ select:focus {
     display: none !important;
   }
 
+  .patient-app-shell .topbar {
+    min-height: 82px !important;
+    padding: 12px 16px !important;
+    align-items: center !important;
+  }
+
+  .patient-app-shell .topbar-logo,
+  .patient-app-shell .brand-logo {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .patient-app-shell .brand-lockup {
+    gap: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .patient-app-shell .brand-name {
+    max-width: 160px !important;
+    font-size: 1rem !important;
+    line-height: 1.05 !important;
+  }
+
+  .patient-app-shell .eyebrow {
+    font-size: 0.66rem !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .patient-app-shell .topbar-user {
+    display: none !important;
+  }
+
   .public-auth-header {
     padding: 26px 20px !important;
   }
@@ -845,10 +908,38 @@ select:focus {
     padding: 18px !important;
   }
 
+  .mobile-tabbar {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    gap: 4px !important;
+    padding: 8px !important;
+    border-radius: 18px !important;
+  }
+
+  .mobile-tab {
+    min-height: 48px !important;
+    gap: 5px !important;
+    font-size: 0.78rem !important;
+    font-weight: 850 !important;
+  }
+
+  .mobile-tab .nav-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
   .guided-option-grid,
   .two-up,
   .three-up,
+  .family-layout,
   .v0-command-metrics {
     grid-template-columns: 1fr !important;
+  }
+
+  .family-member-card,
+  .profile-card-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
   }
 }

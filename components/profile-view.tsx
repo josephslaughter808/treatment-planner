@@ -29,6 +29,7 @@ export function ProfileView() {
   const [bio, setBio] = useState(currentUser?.bio ?? "");
   const [avatarDataUrl, setAvatarDataUrl] = useState<string | undefined>(currentUser?.avatarDataUrl);
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [vault, setVault] = useState<PatientVault>(() => readVaultFromStorage());
   const [checkIns, setCheckIns] = useState(() => readCheckInsFromStorage());
   const [shareLinks, setShareLinks] = useState<ShareLinkRecord[]>(() => readShareLinksFromStorage());
@@ -69,6 +70,9 @@ export function ProfileView() {
     });
 
     setMessage(result.message);
+    if (result.ok) {
+      setIsEditingProfile(false);
+    }
     setIsSaving(false);
   }
 
@@ -130,65 +134,91 @@ export function ProfileView() {
             <p className="catalog-note">{phone || currentUser.phone}</p>
           </div>
         </div>
-        <button className="secondary-button profile-logout-button" onClick={handleSignOut} type="button">
-          Log out
-        </button>
+        <div className="profile-card-actions">
+          <button className="primary-button" onClick={() => setIsEditingProfile(true)} type="button">
+            Edit profile
+          </button>
+          <button className="secondary-button profile-logout-button" onClick={handleSignOut} type="button">
+            Log out
+          </button>
+        </div>
       </article>
 
-      <form className="panel form-card" onSubmit={handleSubmit}>
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">Profile settings</p>
-            <h2>{isPatientAccount ? "Update your account profile" : "Update your office profile"}</h2>
+      {isEditingProfile ? (
+        <form className="panel form-card" onSubmit={handleSubmit}>
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Profile settings</p>
+              <h2>{isPatientAccount ? "Update your account profile" : "Update your office profile"}</h2>
+            </div>
+            <button className="edit-chip" onClick={() => setIsEditingProfile(false)} type="button">
+              Close
+            </button>
           </div>
-        </div>
 
-        <div className="grid two-up">
-          <label>
-            Full name
-            <input onChange={(event) => setName(event.target.value)} value={name} />
+          <div className="grid two-up">
+            <label>
+              Full name
+              <input onChange={(event) => setName(event.target.value)} value={name} />
+            </label>
+            <label>
+              Title
+              <input onChange={(event) => setTitle(event.target.value)} value={title} />
+            </label>
+          </div>
+
+          <div className="grid two-up">
+            <label>
+              Email
+              <input disabled value={currentUser.email} />
+            </label>
+            <label>
+              Phone
+              <input onChange={(event) => setPhone(event.target.value)} value={phone} />
+            </label>
+          </div>
+
+          <label className="upload-field">
+            Profile picture
+            <input
+              accept="image/*"
+              onChange={(event) => handleAvatarChange(event.target.files?.[0] ?? null)}
+              type="file"
+            />
+            <span>This photo appears in your app header and profile views.</span>
           </label>
+
           <label>
-            Title
-            <input onChange={(event) => setTitle(event.target.value)} value={title} />
+            Bio
+            <textarea onChange={(event) => setBio(event.target.value)} rows={5} value={bio} />
           </label>
-        </div>
 
-        <div className="grid two-up">
-          <label>
-            Email
-            <input disabled value={currentUser.email} />
-          </label>
-          <label>
-            Phone
-            <input onChange={(event) => setPhone(event.target.value)} value={phone} />
-          </label>
-        </div>
+          <div className="form-footer">
+            <button className="primary-button" disabled={isSaving} type="submit">
+              {isSaving ? "Saving profile..." : "Save profile"}
+            </button>
+            <p>Saving closes the editor and returns to your profile card.</p>
+          </div>
+        </form>
+      ) : (
+        <article className="panel account-summary-card">
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Account profile</p>
+              <h2>Your account details</h2>
+              <p>Review your account card. Open the editor only when you need to make a change.</p>
+            </div>
+          </div>
+          <div className="saved-value-grid">
+            <SavedProfileValue label="Full name" value={name || currentUser.name} />
+            <SavedProfileValue label="Email" value={currentUser.email} />
+            <SavedProfileValue label="Phone" value={phone || currentUser.phone} />
+            <SavedProfileValue label="Role" value={currentUser.role} />
+          </div>
+        </article>
+      )}
 
-        <label className="upload-field">
-          Profile picture
-          <input
-            accept="image/*"
-            onChange={(event) => handleAvatarChange(event.target.files?.[0] ?? null)}
-            type="file"
-          />
-          <span>This photo appears in your app header and profile views.</span>
-        </label>
-
-        <label>
-          Bio
-          <textarea onChange={(event) => setBio(event.target.value)} rows={5} value={bio} />
-        </label>
-
-        <div className="form-footer">
-          <button className="primary-button" disabled={isSaving} type="submit">
-            {isSaving ? "Saving profile..." : "Save profile"}
-          </button>
-          <p>Changes save to the signed-in ClearPath profile used by this pilot.</p>
-        </div>
-
-        {message ? <p className="info-text">{message}</p> : null}
-      </form>
+      {message ? <p className="info-text profile-message">{message}</p> : null}
 
       {isPatientAccount ? (
         <section className="panel patient-office-panel">
@@ -281,6 +311,15 @@ function formatProfileDate(value: string) {
     month: "long",
     day: "numeric"
   });
+}
+
+function SavedProfileValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="saved-value-card">
+      <p className="saved-value-label">{label}</p>
+      <p className="saved-value-text">{value || "Not added"}</p>
+    </div>
+  );
 }
 
 function readFileAsDataUrl(file: File) {
