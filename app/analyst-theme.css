@@ -159,7 +159,10 @@ h4,
 }
 
 .patient-app-shell .topbar {
+  position: fixed !important;
+  inset: 0 auto 0 0 !important;
   width: 88px !important;
+  height: 100vh !important;
   z-index: 20 !important;
   overflow: hidden !important;
   transition: width 180ms ease, box-shadow 180ms ease !important;
@@ -245,6 +248,10 @@ h4,
   padding: 18px 36px !important;
   border-bottom: 1px solid var(--analyst-line) !important;
   background: var(--analyst-surface) !important;
+}
+
+.patient-app-shell .app-utility-bar {
+  justify-content: flex-end !important;
 }
 
 .app-utility-bar input {
@@ -695,6 +702,14 @@ select:focus {
   top: 34px !important;
 }
 
+.patient-office-panel {
+  grid-column: 1 / -1 !important;
+}
+
+.patient-office-panel .saved-entry-list {
+  margin: 20px 22px !important;
+}
+
 @media (max-width: 1080px) {
   .shell-with-nav,
   .provider-app-shell.shell-with-nav,
@@ -707,7 +722,9 @@ select:focus {
   .provider-app-shell .topbar,
   .patient-app-shell .topbar {
     position: static !important;
+    inset: auto !important;
     width: auto !important;
+    height: auto !important;
     min-height: auto !important;
     grid-row: 1 !important;
     overflow: visible !important;
@@ -744,6 +761,15 @@ select:focus {
     width: auto !important;
     padding: 0 !important;
     border: 0 !important;
+  }
+
+  .patient-app-shell .topbar-brand {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .patient-app-shell .user-copy {
+    display: none !important;
   }
 
   .app-utility-bar,

@@ -8,22 +8,15 @@ import {
   makeBlankAllergy,
   makeBlankCondition,
   makeBlankMedication,
-  readCheckInsFromStorage,
-  readShareLinksFromStorage,
   readVaultFromStorage,
-  writeCheckInsToStorage,
-  writeShareLinksToStorage,
   writeVaultToStorage,
-  type PatientVault,
-  type ShareLinkRecord
+  type PatientVault
 } from "@/lib/patient-vault";
 
 export function PatientVaultView() {
   const { currentUser } = useAuth();
   const [vault, setVault] = useState<PatientVault>(() => readVaultFromStorage());
   const [message, setMessage] = useState<string | null>(null);
-  const [checkIns, setCheckIns] = useState(() => readCheckInsFromStorage());
-  const [shareLinks, setShareLinks] = useState<ShareLinkRecord[]>(() => readShareLinksFromStorage());
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingServer, setIsLoadingServer] = useState(false);
   const [editingSections, setEditingSections] = useState(initialEditingSections);
@@ -83,7 +76,6 @@ export function PatientVaultView() {
       lastUpdatedAt: new Date().toISOString()
     });
     writeVaultToStorage(nextVault);
-    setCheckIns(readCheckInsFromStorage());
     void syncVaultToServer(nextVault, { showSuccessMessage: true });
   }
 
@@ -120,8 +112,6 @@ export function PatientVaultView() {
 
       setVault(data.vault);
       writeVaultToStorage(data.vault);
-      await loadCheckInsFromServer(data.vault.email);
-      await loadShareLinksFromServer(data.vault.email);
       setMessage("Loaded your saved health profile.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to load your health profile right now.");
@@ -129,40 +119,6 @@ export function PatientVaultView() {
       setIsLoadingServer(false);
     }
   }
-
-  const loadCheckInsFromServer = useCallback(async (patientEmail: string) => {
-    if (!patientEmail) {
-      return;
-    }
-
-    const response = await fetch(`/api/check-ins?patientEmail=${encodeURIComponent(patientEmail)}`, {
-      headers: await getSupabaseAuthHeaders()
-    });
-    const data = (await response.json()) as { records?: typeof checkIns; error?: string };
-    if (!response.ok || !data.records) {
-      return;
-    }
-
-    setCheckIns(data.records);
-    writeCheckInsToStorage(data.records);
-  }, []);
-
-  const loadShareLinksFromServer = useCallback(async (patientEmail: string) => {
-    if (!patientEmail) {
-      return;
-    }
-
-    const response = await fetch(`/api/share-links?patientEmail=${encodeURIComponent(patientEmail)}`, {
-      headers: await getSupabaseAuthHeaders()
-    });
-    const data = (await response.json()) as { shareLinks?: ShareLinkRecord[]; error?: string };
-    if (!response.ok || !data.shareLinks) {
-      return;
-    }
-
-    setShareLinks(data.shareLinks);
-    writeShareLinksToStorage(data.shareLinks);
-  }, []);
 
   useEffect(() => {
     const nextVault = sanitizeVault({
@@ -231,32 +187,8 @@ export function PatientVaultView() {
     });
   }, [currentUser, vault]);
 
-  useEffect(() => {
-    if (vault.email) {
-      void loadCheckInsFromServer(vault.email);
-      void loadShareLinksFromServer(vault.email);
-    }
-  }, [loadCheckInsFromServer, loadShareLinksFromServer, vault.email]);
-
-  const activeOffices = getActiveOffices(vault, checkIns, shareLinks);
   const completionItems = getPatientCompletionItems(vault);
   const completedItemCount = completionItems.filter((item) => item.complete).length;
-
-  function removeActiveOffice(practiceId: string) {
-    const nextCheckIns = checkIns.filter((entry) => entry.practiceId !== practiceId);
-    const nextShareLinks = shareLinks.filter((entry) => entry.practiceId !== practiceId);
-    const nextVault = {
-      ...vault,
-      officeConnections: vault.officeConnections.filter((entry) => entry.practiceId !== practiceId)
-    };
-
-    setCheckIns(nextCheckIns);
-    writeCheckInsToStorage(nextCheckIns);
-    setShareLinks(nextShareLinks);
-    writeShareLinksToStorage(nextShareLinks);
-    updateVault(nextVault);
-    setMessage("Office removed from your active list.");
-  }
 
   function hasConditionNamed(name: string) {
     return vault.medicalConditions.some((condition) => condition.name.toLowerCase() === name.toLowerCase());
@@ -1078,37 +1010,6 @@ export function PatientVaultView() {
         {message ? <p className="info-text">{message}</p> : null}
       </section>
 
-      <section className="panel">
-        <p className="eyebrow">Active offices</p>
-        <h2>Active offices</h2>
-        {activeOffices.length > 0 ? (
-          <div className="saved-entry-list">
-            {activeOffices.map((office) => (
-              <div className="saved-entry-card active-office-card" key={office.practiceId}>
-                <div className="saved-section-header active-office-header">
-                  <div>
-                    <p className="saved-entry-title">{office.practiceName}</p>
-                    <p className="saved-entry-subtitle">
-                      Active since {formatVaultDate(office.lastVerifiedAt)}
-                    </p>
-                  </div>
-                  <button
-                    className="edit-chip"
-                    onClick={() => removeActiveOffice(office.practiceId)}
-                    type="button"
-                  >
-                    Remove
-                  </button>
-                </div>
-                {office.notes ? <p className="saved-entry-subtitle">{office.notes}</p> : null}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EmptySavedState text="No active offices yet." />
-        )}
-      </section>
-
     </div>
   );
 }
@@ -1391,53 +1292,6 @@ function sanitizeVault(vault: PatientVault): PatientVault {
       phone: vault.emergencyContact.phone.trim()
     }
   };
-}
-
-function getActiveOffices(vault: PatientVault, checkIns: ReturnType<typeof readCheckInsFromStorage>, shareLinks: ShareLinkRecord[]) {
-  const officeMap = new Map<
-    string,
-    { practiceId: string; practiceName: string; lastVerifiedAt: string; notes: string }
-  >();
-
-  vault.officeConnections.forEach((entry) => {
-    officeMap.set(entry.practiceId, entry);
-  });
-
-  checkIns.forEach((entry) => {
-    const existing = officeMap.get(entry.practiceId);
-    const nextDate =
-      existing && new Date(existing.lastVerifiedAt).getTime() > new Date(entry.verifiedAt).getTime()
-        ? existing.lastVerifiedAt
-        : entry.verifiedAt;
-
-    officeMap.set(entry.practiceId, {
-      practiceId: entry.practiceId,
-      practiceName: entry.practiceName,
-      lastVerifiedAt: nextDate,
-      notes: entry.notes || existing?.notes || ""
-    });
-  });
-
-  shareLinks
-    .filter((entry) => entry.status === "active" || entry.status === "used")
-    .forEach((entry) => {
-      const existing = officeMap.get(entry.practiceId);
-      const nextDate =
-        existing && new Date(existing.lastVerifiedAt).getTime() > new Date(entry.createdAt).getTime()
-          ? existing.lastVerifiedAt
-          : entry.createdAt;
-
-      officeMap.set(entry.practiceId, {
-        practiceId: entry.practiceId,
-        practiceName: entry.practiceName,
-        lastVerifiedAt: nextDate,
-        notes: existing?.notes || ""
-      });
-    });
-
-  return Array.from(officeMap.values()).sort(
-    (a, b) => new Date(b.lastVerifiedAt).getTime() - new Date(a.lastVerifiedAt).getTime()
-  );
 }
 
 function formatVaultDate(value: string) {

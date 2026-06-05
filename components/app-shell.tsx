@@ -213,7 +213,7 @@ export function AppShell({
       </header>
 
       <section className="app-utility-bar" aria-label="Workspace tools">
-        <input aria-label="Search ClearPath" placeholder="Search..." />
+        {resolvedAudience === "provider" ? <input aria-label="Search ClearPath" placeholder="Search..." /> : null}
         <div className="utility-actions">
           <span className="sync-status">Sync: Live</span>
           <Link className="primary-button" href={resolvedAudience === "patient" ? "/vault" : "/"}>
