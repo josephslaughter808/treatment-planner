@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return {
             ok: false,
             message:
-              "Production auth is not configured yet. Add the Supabase environment variables in Vercel before pilot use."
+              "Account access is not configured yet. Add the Supabase environment variables in Vercel before pilot use."
           };
         }
 
@@ -243,7 +243,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return {
             ok: false,
             message:
-              "Production auth is not configured yet. Add the Supabase environment variables in Vercel before creating accounts."
+              "Account access is not configured yet. Add the Supabase environment variables in Vercel before creating accounts."
           };
         }
 
@@ -359,7 +359,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return {
             ok: false,
             message:
-              "Production auth is not configured yet. Profile updates are disabled until Supabase is connected."
+              "Account access is not configured yet. Profile updates are disabled until Supabase is connected."
           };
         }
 

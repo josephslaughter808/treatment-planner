@@ -152,25 +152,6 @@ export function AppShell({
   if (audience === "public") {
     return (
       <main className={shellClassName}>
-        <section className="public-auth-header">
-          <Link className="brand-lockup brand-link" href="/login">
-            <Image alt="ClearPath Care logo" className="brand-logo" priority src={clearPathLogo} />
-            <div>
-              <p className="eyebrow">{pageLabel}</p>
-              <p className="brand-name">ClearPath Care</p>
-            </div>
-          </Link>
-          <div className="public-auth-copy">
-            <h1 className="page-title">{title}</h1>
-            <p className="lede">{description}</p>
-            <p className="catalog-note">
-              {pathname === "/signup"
-                ? "Use the same email address your office used for your invite so your profile can be matched correctly."
-                : "Office accounts are approved and provisioned by ClearPath. Patient access stays limited to patient pages only."}
-            </p>
-          </div>
-        </section>
-
         {children}
       </main>
     );

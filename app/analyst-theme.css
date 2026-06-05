@@ -1,4 +1,4 @@
-/* Analyst Cool: final visual system for the phase-one pilot. */
+/* Final visual system for the phase-one pilot. */
 :root {
   --analyst-bg: #f1f5f9;
   --analyst-surface: #ffffff;
@@ -328,7 +328,7 @@ h4,
 .public-app-shell {
   min-height: 100vh !important;
   display: grid !important;
-  grid-template-columns: minmax(360px, 0.7fr) minmax(0, 1fr) !important;
+  grid-template-columns: minmax(0, 1fr) !important;
   grid-template-rows: 1fr !important;
   background:
     radial-gradient(circle at 12% 10%, rgba(37, 99, 235, 0.12), transparent 30%),
@@ -349,20 +349,6 @@ h4,
 
 .public-auth-copy {
   max-width: 520px !important;
-}
-
-.public-auth-copy::before {
-  content: "Analyst Cool";
-  display: inline-flex;
-  margin-bottom: 18px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  color: #ffffff;
-  background: var(--analyst-blue);
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .public-app-shell > .grid,
@@ -506,6 +492,10 @@ h4,
   color: var(--analyst-slate) !important;
   font-size: 1.12rem !important;
   line-height: 1.72 !important;
+}
+
+.landing-hero-copy .landing-kicker {
+  color: #ffffff !important;
 }
 
 .wallet-tap-scene {

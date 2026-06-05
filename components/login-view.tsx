@@ -21,7 +21,7 @@ export function LoginView() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isAuthConfigured) {
-      setMessage("Production auth is not configured yet. Add Supabase environment variables before pilot use.");
+      setMessage("Account access is not configured yet. Add Supabase environment variables before pilot use.");
       return;
     }
 
@@ -53,7 +53,7 @@ export function LoginView() {
         </div>
 
         <div className="landing-hero-copy">
-          <p className="landing-kicker">For patients</p>
+          <p className="landing-kicker">For Patients</p>
           <h2>Never fill out another medical history form again.</h2>
           <p>
             Build one guided health profile, keep it current, and share the right information with an office
@@ -137,7 +137,7 @@ export function LoginView() {
               {isSubmitting ? "Logging in..." : "Log in"}
             </button>
             <Link className="secondary-button" href="/signup">
-              Create patient account
+              Create Patient Access
             </Link>
             <p>
               {isAuthConfigured
@@ -187,17 +187,7 @@ export function LoginView() {
               ))}
             </div>
           </section>
-        ) : (
-          <section className="panel landing-demo-card">
-            <p className="eyebrow">Production auth</p>
-            <h2>{isAuthConfigured ? "Supabase connected" : "Supabase setup required"}</h2>
-            <p>
-              {isAuthConfigured
-                ? "Use the account provisioned for the pilot office or patient."
-                : "Add NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, and SUPABASE_SERVICE_ROLE_KEY in Vercel, then redeploy."}
-            </p>
-          </section>
-        )}
+        ) : null}
       </aside>
     </section>
   );

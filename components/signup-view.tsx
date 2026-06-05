@@ -356,7 +356,7 @@ export function SignupView() {
 
         <div className="form-footer">
           <button className="primary-button" disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Creating account..." : "Create patient account"}
+            {isSubmitting ? "Creating account..." : "Create Patient Account"}
           </button>
           <Link className="secondary-button" href={email ? `/login?email=${encodeURIComponent(email)}` : "/login"}>
             I already have an account
