@@ -89,6 +89,15 @@ export function PatientVaultView() {
     setEditingSections((current) => ({ ...current, [section]: true }));
   }
 
+  function openAndScrollToSection(section: EditablePatientSection) {
+    setEditingSections((current) => ({ ...current, [section]: true }));
+    window.setTimeout(() => {
+      document
+        .querySelector<HTMLElement>(`[data-patient-section="${section}"]`)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+  }
+
   async function loadFromServer() {
     if (!vault.email) {
       setMessage("Enter your email first so ClearPath can find your saved health profile.");
@@ -337,7 +346,7 @@ export function PatientVaultView() {
             <button
               className={`patient-checkin-item ${item.complete ? "complete" : ""}`}
               key={item.section}
-              onClick={() => setEditingSections((current) => ({ ...current, [item.section]: true }))}
+              onClick={() => openAndScrollToSection(item.section)}
               type="button"
             >
               <span>{item.complete ? "Done" : "Open"}</span>
@@ -347,7 +356,7 @@ export function PatientVaultView() {
         </div>
       </section>
 
-      <section className="panel medical-questionnaire-panel">
+      <section className="panel medical-questionnaire-panel" data-patient-section="questionnaire">
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Medical questionnaire</p>
@@ -454,7 +463,7 @@ export function PatientVaultView() {
           </div>
         </div>
         <div className="saved-section-list">
-          <article className="saved-section-card">
+          <article className="saved-section-card" data-patient-section="profile">
             <div className="saved-section-header">
               <div>
                 <p className="mini-label">Profile</p>
@@ -513,7 +522,7 @@ export function PatientVaultView() {
             )}
           </article>
 
-          <article className="saved-section-card">
+          <article className="saved-section-card" data-patient-section="conditions">
             <div className="saved-section-header">
               <div>
                 <p className="mini-label">Conditions</p>
@@ -595,7 +604,7 @@ export function PatientVaultView() {
             )}
           </article>
 
-          <article className="saved-section-card">
+          <article className="saved-section-card" data-patient-section="medications">
             <div className="saved-section-header">
               <div>
                 <p className="mini-label">Medications</p>
@@ -693,7 +702,7 @@ export function PatientVaultView() {
             )}
           </article>
 
-          <article className="saved-section-card">
+          <article className="saved-section-card" data-patient-section="allergies">
             <div className="saved-section-header">
               <div>
                 <p className="mini-label">Allergies</p>
@@ -799,7 +808,7 @@ export function PatientVaultView() {
             )}
           </article>
 
-          <article className="saved-section-card">
+          <article className="saved-section-card" data-patient-section="insurance">
             <div className="saved-section-header">
               <div>
                 <p className="mini-label">Insurance</p>
@@ -889,7 +898,7 @@ export function PatientVaultView() {
             )}
           </article>
 
-          <article className="saved-section-card">
+          <article className="saved-section-card" data-patient-section="emergency">
             <div className="saved-section-header">
               <div>
                 <p className="mini-label">Emergency contact</p>

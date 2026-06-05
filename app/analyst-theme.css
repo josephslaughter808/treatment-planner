@@ -752,6 +752,67 @@ select:focus {
   margin-top: 4px !important;
 }
 
+.medical-questionnaire-panel,
+.saved-section-card {
+  scroll-margin-top: 96px !important;
+}
+
+.documents-layout {
+  display: grid !important;
+  gap: 18px !important;
+}
+
+.documents-intro-panel {
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent 44%),
+    #ffffff !important;
+}
+
+.document-slot-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+}
+
+.document-slot-card {
+  display: grid !important;
+  align-content: start !important;
+  gap: 16px !important;
+}
+
+.document-preview-card {
+  display: grid !important;
+  gap: 12px !important;
+  padding: 14px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 14px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.document-preview-card img {
+  width: 100% !important;
+  max-height: 220px !important;
+  object-fit: cover !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+}
+
+.document-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+}
+
+.document-upload-button {
+  cursor: pointer !important;
+}
+
+.document-upload-button input {
+  display: none !important;
+}
+
 @media (max-width: 1080px) {
   .shell-with-nav,
   .provider-app-shell.shell-with-nav,
@@ -843,6 +904,7 @@ select:focus {
   .v0-checkin-layout,
   .patient-signup-layout,
   .login-layout,
+  .document-slot-grid,
   .patient-checkin-list,
   .questionnaire-summary-grid,
   .repeatable-history-row,
@@ -932,12 +994,14 @@ select:focus {
   .guided-option-grid,
   .two-up,
   .three-up,
+  .document-slot-grid,
   .family-layout,
   .v0-command-metrics {
     grid-template-columns: 1fr !important;
   }
 
   .family-member-card,
+  .document-actions,
   .profile-card-actions {
     flex-direction: column !important;
     align-items: stretch !important;
