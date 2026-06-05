@@ -246,12 +246,16 @@ export function IntakeCheckInView() {
   }
 
   function openPatientFinder() {
-    setPatientSearch((current) => ({
-      ...current,
-      email,
-      memberId,
-      accessCode
-    }));
+    setPatientSearch({
+      firstName: "",
+      lastName: "",
+      dateOfBirth: "",
+      phone: "",
+      address: "",
+      email: "",
+      memberId: "",
+      accessCode: ""
+    });
     setIsPatientFinderOpen(true);
   }
 
@@ -265,11 +269,6 @@ export function IntakeCheckInView() {
     setAccessCode(normalizedCode);
     setMemberId(normalizedCode);
     setSelectedPatient(null);
-    setPatientSearch((current) => ({
-      ...current,
-      memberId: normalizedCode,
-      accessCode: normalizedCode
-    }));
     setMessage(null);
   }
 
@@ -291,101 +290,51 @@ export function IntakeCheckInView() {
 
   return (
     <div className="v0-checkin-stage">
-      <section className="v0-command-hero">
-        <div>
-          <p className="eyebrow">Returning patient check-in</p>
-          <h2>Scan, review, verify.</h2>
+      <section className="panel checkin-command-bar">
+        <div className="checkin-command-copy">
+          <p className="eyebrow">Patient check-in</p>
+          <h2>Load the patient, then review the chart below.</h2>
           <p>
-            New patients are added from the New Patient tab. Use this page when an existing patient arrives and the
-            office needs to confirm their medical history, insurance, medications, allergies, and emergency contact are current.
+            Scan the returning patient&apos;s QR code, enter their ClearPath access code, or search manually if the
+            patient does not have their code with them.
           </p>
         </div>
-        <div className="v0-flow-bars" aria-label="Daily check-in rhythm">
-          <span style={{ height: "42%" }} />
-          <span style={{ height: "64%" }} />
-          <span style={{ height: "49%" }} />
-          <span style={{ height: "78%" }} />
-          <span style={{ height: "58%" }} />
-          <span style={{ height: "92%" }} />
-          <span style={{ height: "70%" }} />
-        </div>
-      </section>
 
-      <div className="grid checkin-layout v0-checkin-layout">
-      <section className="panel v0-lookup-panel">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">Visit verification</p>
-            <h2>Load the patient history</h2>
-            <p>Scan the QR code, enter the access code, or use patient finder if the code is not available.</p>
+        <div className="checkin-command-actions">
+          <div className="returning-scan-card">
+            <label>
+              Scan or enter code
+              <input
+                autoComplete="off"
+                onChange={(event) => setAccessCode(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    loadPatientFromScan();
+                  }
+                }}
+                placeholder="QR code or patient access code"
+                value={accessCode}
+              />
+            </label>
+            <button className="primary-button" onClick={loadPatientFromScan} type="button">
+              Load history
+            </button>
           </div>
-        </div>
-
-        <div className="returning-scan-card">
-          <label>
-            QR scan or access code
-            <input
-              autoComplete="off"
-              onChange={(event) => setAccessCode(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  loadPatientFromScan();
-                }
-              }}
-              placeholder="Scan QR code or type patient code"
-              value={accessCode}
-            />
-          </label>
-          <button className="primary-button" onClick={loadPatientFromScan} type="button">
-            Load patient history
-          </button>
-        </div>
-
-        <div className="patient-select-launcher">
-          <div>
-            <p className="eyebrow">Fallback search</p>
-            <h3>{matched ? matched.fullName : "No patient loaded"}</h3>
-            <p>
-              {matched
-                ? `${matched.email} ${matched.dateOfBirth ? `• DOB ${matched.dateOfBirth}` : ""}`
-                : isLoadingPatients
-                  ? "Loading connected patients for this practice."
-                  : "If the QR or code is not available, search by name, birthday, phone, address, email, or ID."}
-            </p>
-          </div>
-          <button className="primary-button" onClick={openPatientFinder} type="button">
-            Select patient
+          <button className="secondary-button checkin-search-button" onClick={openPatientFinder} type="button">
+            Search for patient
           </button>
         </div>
 
         <div className={`patient-match-status ${matched ? "matched" : "unmatched"}`}>
-          <strong>{matched ? "Patient matched" : "No patient matched yet"}</strong>
+          <strong>{matched ? matched.fullName : "No patient loaded"}</strong>
           <span>
             {matched
               ? lookupMethod === "share-code"
                 ? "Matched by approved practice access code."
-                : "Matched by email plus secondary identifier."
-              : "Use the New Patient tab first if this patient has never connected to your practice."}
+                : `${matched.email} ${matched.dateOfBirth ? `• DOB ${matched.dateOfBirth}` : ""}`
+              : "Use New Patient first if this person has never connected to the practice."}
           </span>
         </div>
-
-        <label>
-          Office note for today
-          <input
-            onChange={(event) => setNotes(event.target.value)}
-            placeholder="Optional note for the provider or front desk"
-            value={notes}
-          />
-        </label>
-
-        <div className="form-footer">
-          <button className="primary-button" disabled={isSaving} onClick={saveCheckIn} type="button">
-            {isSaving ? "Saving verification..." : "Save today's verification"}
-          </button>
-          <p>Save only after the office has reviewed any changes and confirmed the patient is ready for today&apos;s visit.</p>
-        </div>
-
-        {message ? <p className="info-text">{message}</p> : null}
       </section>
 
       {isPatientFinderOpen ? (
@@ -465,7 +414,6 @@ export function IntakeCheckInView() {
                 <input
                   onChange={(event) => {
                     setPatientSearch((current) => ({ ...current, accessCode: event.target.value }));
-                    setAccessCode(event.target.value);
                   }}
                   placeholder="Use only when patient presents a code"
                   value={patientSearch.accessCode}
@@ -517,15 +465,15 @@ export function IntakeCheckInView() {
         </div>
       ) : null}
 
-      <section className="panel v0-profile-panel">
+      <section className="panel v0-profile-panel checkin-history-panel">
         <div className="panel-heading provider-review-heading">
           <div>
-            <p className="eyebrow">Matched profile</p>
-            <h2>{matched ? "Review patient information" : "No patient open"}</h2>
+            <p className="eyebrow">Patient medical history</p>
+            <h2>{matched ? matched.fullName : "No patient open"}</h2>
             <p>
               {matched
-                ? "Review what is current now. Any profile update since the last saved visit is highlighted first."
-                : "Select a patient to see the medical history and insurance details for check-in."}
+                ? "Review the current medical history, medication, allergy, emergency contact, and insurance details before saving today's verification."
+                : "The patient history will appear here after you scan a QR code, enter a code, or search for a patient."}
             </p>
           </div>
         </div>
@@ -647,12 +595,30 @@ export function IntakeCheckInView() {
                 <p>No check-ins saved yet.</p>
               )}
             </div>
+
+            <div className="dialogue-card provider-review-card provider-review-card-wide checkin-save-card">
+              <h4>Save today&apos;s verification</h4>
+              <label>
+                Office note for today
+                <input
+                  onChange={(event) => setNotes(event.target.value)}
+                  placeholder="Optional note for the provider or front desk"
+                  value={notes}
+                />
+              </label>
+              <div className="form-footer">
+                <button className="primary-button" disabled={isSaving} onClick={saveCheckIn} type="button">
+                  {isSaving ? "Saving verification..." : "Save today's verification"}
+                </button>
+                <p>Save only after the office has reviewed any changes and confirmed the patient is ready for today&apos;s visit.</p>
+              </div>
+            </div>
           </div>
         ) : (
           <p>Scan the patient QR code, enter their access code, or use patient finder to open the returning check-in profile.</p>
         )}
+        {message ? <p className="info-text">{message}</p> : null}
       </section>
-      </div>
     </div>
   );
 }

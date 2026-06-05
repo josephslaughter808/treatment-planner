@@ -374,6 +374,30 @@ textarea {
   margin-bottom: 0;
 }
 
+.checkin-command-bar {
+  display: grid;
+  gap: 18px;
+}
+
+.checkin-command-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.checkin-search-button {
+  min-height: 48px;
+}
+
+.checkin-history-panel {
+  min-height: 360px;
+}
+
+.checkin-save-card label {
+  margin-bottom: 0;
+}
+
 .provider-change-panel {
   display: grid;
   gap: 16px;
@@ -483,6 +507,7 @@ textarea {
   }
 
   .returning-scan-card,
+  .checkin-command-actions,
   .provider-change-panel-header {
     grid-template-columns: 1fr;
   }

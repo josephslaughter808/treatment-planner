@@ -759,6 +759,69 @@ select:focus {
   align-items: start !important;
 }
 
+.checkin-command-bar {
+  display: grid !important;
+  gap: 20px !important;
+  padding: 28px !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.075), rgba(255, 255, 255, 0) 58%),
+    #ffffff !important;
+}
+
+.checkin-command-copy {
+  max-width: 920px !important;
+}
+
+.checkin-command-copy h2 {
+  margin: 0 0 10px !important;
+  color: var(--analyst-text) !important;
+  font-size: clamp(2rem, 4vw, 4.1rem) !important;
+  letter-spacing: -0.07em !important;
+  line-height: 0.92 !important;
+}
+
+.checkin-command-copy p:last-child {
+  max-width: 760px !important;
+  margin: 0 !important;
+  color: var(--analyst-muted) !important;
+}
+
+.checkin-command-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 14px !important;
+  align-items: end !important;
+}
+
+.checkin-command-bar .returning-scan-card {
+  margin-bottom: 0 !important;
+  padding: 14px !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+}
+
+.checkin-search-button {
+  min-height: 54px !important;
+  white-space: nowrap !important;
+}
+
+.checkin-history-panel {
+  display: grid !important;
+  gap: 20px !important;
+}
+
+.checkin-save-card {
+  border-color: rgba(37, 99, 235, 0.2) !important;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.055), rgba(255, 255, 255, 0) 70%),
+    #ffffff !important;
+}
+
+.checkin-save-card label {
+  margin-bottom: 0 !important;
+}
+
 .v0-lookup-panel,
 .v0-profile-panel {
   display: grid !important;
@@ -1706,6 +1769,10 @@ select:focus {
 
   .v0-flow-bars {
     min-height: 86px !important;
+  }
+
+  .checkin-command-actions {
+    grid-template-columns: 1fr !important;
   }
 
   .provider-detail-grid {
