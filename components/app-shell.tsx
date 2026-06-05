@@ -19,7 +19,7 @@ type NavItem = {
 };
 
 const providerNavItems: NavItem[] = [
-  { href: "/", label: "Patients", icon: "patients" }
+  { href: "/", label: "Check-in", icon: "patients" }
 ];
 
 const patientNavItems: NavItem[] = [
@@ -245,11 +245,16 @@ export function AppShell({
       </header>
 
       <section className="app-utility-bar" aria-label="Workspace tools">
-        {resolvedAudience === "provider" ? <input aria-label="Search ClearPath" placeholder="Search..." /> : null}
+        {resolvedAudience === "provider" ? (
+          <div className="provider-utility-copy">
+            <span>{pageLabel}</span>
+            <strong>{title}</strong>
+          </div>
+        ) : null}
         <div className="utility-actions">
           <span className="sync-status">Sync: Live</span>
           <Link className="primary-button" href={resolvedAudience === "patient" ? "/vault" : "/"}>
-            {resolvedAudience === "patient" ? "Update profile" : "New Record"}
+            {resolvedAudience === "patient" ? "Update profile" : "Open check-in"}
           </Link>
         </div>
       </section>

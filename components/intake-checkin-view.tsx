@@ -394,16 +394,45 @@ export function IntakeCheckInView() {
           <div>
             <p className="eyebrow">Office intake</p>
             <h2>Find the correct patient</h2>
+            <p>Select the patient first. Then verify their medical history, medications, allergies, emergency contact, and insurance.</p>
           </div>
+        </div>
+
+        <div className="patient-select-launcher">
+          <div>
+            <p className="eyebrow">Patient selection</p>
+            <h3>{matched ? matched.fullName : "No patient selected"}</h3>
+            <p>
+              {matched
+                ? `${matched.email} ${matched.dateOfBirth ? `• DOB ${matched.dateOfBirth}` : ""}`
+                : isLoadingPatients
+                  ? "Loading connected patients for this practice."
+                  : "Open patient selection to search by name, birthday, phone, address, email, or ID."}
+            </p>
+          </div>
+          <button className="primary-button" onClick={openPatientFinder} type="button">
+            Select patient
+          </button>
+        </div>
+
+        <div className={`patient-match-status ${matched ? "matched" : "unmatched"}`}>
+          <strong>{matched ? "Patient matched" : "No patient matched yet"}</strong>
+          <span>
+            {matched
+              ? lookupMethod === "share-code"
+                ? "Matched by approved practice access code."
+                : "Matched by email plus secondary identifier."
+              : "Use the patient finder, or create an invite if this patient has not connected yet."}
+          </span>
         </div>
 
         <div className="pilot-invite-card">
           <div>
             <p className="eyebrow">Pilot invite</p>
-            <h3>Invite or reconnect a patient</h3>
+            <h3>Invite a new patient</h3>
             <p>
-              Use this when a patient is not in the finder yet. ClearPath creates the practice connection,
-              generates an access code, and gives you a message to send from the office.
+              Use this only when the patient is not in the finder yet. ClearPath creates the practice
+              connection, generates an access code, and gives you a message to send from the office.
             </p>
           </div>
           <div className="grid two-up">
@@ -446,34 +475,6 @@ export function IntakeCheckInView() {
           ) : null}
         </div>
 
-        <div className="patient-select-launcher">
-          <div>
-            <p className="eyebrow">Patient selection</p>
-            <h3>{matched ? matched.fullName : "No patient selected"}</h3>
-            <p>
-              {matched
-                ? `${matched.email} ${matched.dateOfBirth ? `• DOB ${matched.dateOfBirth}` : ""}`
-                : isLoadingPatients
-                  ? "Loading connected patients for this practice."
-                : "Open patient selection to search by name, birthday, phone, address, email, or ID."}
-            </p>
-          </div>
-          <button className="primary-button" onClick={openPatientFinder} type="button">
-            Select patient
-          </button>
-        </div>
-
-        <div className={`patient-match-status ${matched ? "matched" : "unmatched"}`}>
-          <strong>{matched ? "Patient matched" : "No patient matched yet"}</strong>
-          <span>
-            {matched
-              ? lookupMethod === "share-code"
-                ? "Matched by approved practice access code."
-                : "Matched by email plus secondary identifier."
-              : "Use email with member ID or wallet code. Use the access code only when the patient presents one."}
-          </span>
-        </div>
-
         <div className="grid two-up">
           <label>
             Intake result
@@ -493,7 +494,7 @@ export function IntakeCheckInView() {
         </div>
 
         <div className="option-grid compact-options">
-          <label className="option-card selected">
+          <label className={`option-card ${insuranceConfirmed ? "selected" : ""}`}>
             <input
               checked={insuranceConfirmed}
               onChange={(event) => setInsuranceConfirmed(event.target.checked)}
@@ -504,7 +505,7 @@ export function IntakeCheckInView() {
               <p>Patient confirmed current insurance details are still accurate.</p>
             </div>
           </label>
-          <label className="option-card selected">
+          <label className={`option-card ${historyConfirmed ? "selected" : ""}`}>
             <input
               checked={historyConfirmed}
               onChange={(event) => setHistoryConfirmed(event.target.checked)}
@@ -515,7 +516,7 @@ export function IntakeCheckInView() {
               <p>Patient confirmed the major history items are unchanged.</p>
             </div>
           </label>
-          <label className="option-card selected">
+          <label className={`option-card ${medicationConfirmed ? "selected" : ""}`}>
             <input
               checked={medicationConfirmed}
               onChange={(event) => setMedicationConfirmed(event.target.checked)}
@@ -668,18 +669,57 @@ export function IntakeCheckInView() {
       ) : null}
 
       <section className="panel v0-profile-panel">
-        <p className="eyebrow">Matched profile</p>
+        <div className="panel-heading provider-review-heading">
+          <div>
+            <p className="eyebrow">Matched profile</p>
+            <h2>{matched ? "Review patient information" : "No patient open"}</h2>
+            <p>
+              {matched
+                ? "Review the sections below, mark what the patient confirmed, then save the office check-in."
+                : "Select a patient to see the medical history and insurance details for check-in."}
+            </p>
+          </div>
+        </div>
         {matched ? (
-          <div className="dialogue-list">
-            <div className="dialogue-card">
+          <div className="dialogue-list provider-review-grid">
+            <div className="dialogue-card provider-review-card provider-review-card-wide">
               <h4>{matched.fullName}</h4>
-              <p>{matched.email}</p>
-              <p>DOB: {matched.dateOfBirth || "Not entered yet"}</p>
-              <p>Insurance: {matched.insurance.providerName || "Not entered yet"}</p>
-              <p>Last updated: {matched.lastUpdatedAt ? formatCheckInDate(matched.lastUpdatedAt) : "Not available"}</p>
-              <p>{accessCode.trim() ? "Matched from practice access code" : "Matched from reusable office intake profile"}</p>
+              <div className="provider-detail-grid">
+                <ProviderDetail label="Email" value={matched.email} />
+                <ProviderDetail label="Phone" value={matched.phone} />
+                <ProviderDetail label="Date of birth" value={matched.dateOfBirth} />
+                <ProviderDetail label="Member ID" value={matched.memberId} />
+                <ProviderDetail label="Wallet code" value={matched.walletCode} />
+                <ProviderDetail
+                  label="Last updated"
+                  value={matched.lastUpdatedAt ? formatCheckInDate(matched.lastUpdatedAt) : ""}
+                />
+              </div>
+              <p className="provider-match-note">
+                {accessCode.trim() ? "Matched from practice access code." : "Matched from reusable office intake profile."}
+              </p>
             </div>
-            <div className="dialogue-card">
+
+            <div className="dialogue-card provider-review-card">
+              <h4>Emergency contact</h4>
+              <div className="provider-detail-list">
+                <ProviderDetail label="Name" value={matched.emergencyContact.name} />
+                <ProviderDetail label="Relationship" value={matched.emergencyContact.relationship} />
+                <ProviderDetail label="Phone" value={matched.emergencyContact.phone} />
+              </div>
+            </div>
+
+            <div className="dialogue-card provider-review-card">
+              <h4>Insurance</h4>
+              <div className="provider-detail-list">
+                <ProviderDetail label="Provider" value={matched.insurance.providerName} />
+                <ProviderDetail label="Member ID" value={matched.insurance.memberId} />
+                <ProviderDetail label="Group" value={matched.insurance.groupNumber} />
+                <ProviderDetail label="Subscriber" value={matched.insurance.subscriberName} />
+              </div>
+            </div>
+
+            <div className="dialogue-card provider-review-card">
               <h4>Conditions</h4>
               <ul>
                 {matched.medicalConditions.length > 0 ? (
@@ -691,13 +731,15 @@ export function IntakeCheckInView() {
                 )}
               </ul>
             </div>
-            <div className="dialogue-card">
+            <div className="dialogue-card provider-review-card">
               <h4>Medications</h4>
               <ul>
                 {matched.medications.length > 0 ? (
                   matched.medications.map((medication) => (
                     <li key={medication.id}>
-                      {medication.name || "Unnamed medication"} {medication.dose ? `• ${medication.dose}` : ""}
+                      {[medication.name || "Unnamed medication", medication.dose, medication.frequency]
+                        .filter(Boolean)
+                        .join(" • ")}
                     </li>
                   ))
                 ) : (
@@ -705,13 +747,15 @@ export function IntakeCheckInView() {
                 )}
               </ul>
             </div>
-            <div className="dialogue-card">
+            <div className="dialogue-card provider-review-card allergy-review-card">
               <h4>Allergies</h4>
               <ul>
                 {matched.allergies.length > 0 ? (
                   matched.allergies.map((allergy) => (
                     <li key={allergy.id}>
-                      {allergy.allergen || "Unnamed allergy"} {allergy.reaction ? `• ${allergy.reaction}` : ""}
+                      {[allergy.allergen || "Unnamed allergy", allergy.reaction, allergy.severity]
+                        .filter(Boolean)
+                        .join(" • ")}
                     </li>
                   ))
                 ) : (
@@ -719,7 +763,7 @@ export function IntakeCheckInView() {
                 )}
               </ul>
             </div>
-            <div className="dialogue-card">
+            <div className="dialogue-card provider-review-card provider-review-card-wide">
               <h4>Recent check-ins</h4>
               {matchedCheckIns.length > 0 ? (
                 <ul>
@@ -783,6 +827,15 @@ function formatCheckInDate(value: string) {
     hour: "numeric",
     minute: "2-digit"
   }).format(date);
+}
+
+function ProviderDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="provider-detail-item">
+      <span>{label}</span>
+      <strong>{value || "Not entered"}</strong>
+    </div>
+  );
 }
 
 type PatientFinderResult = {

@@ -130,6 +130,10 @@ h4,
   text-transform: uppercase;
 }
 
+.provider-app-shell .topnav::before {
+  content: "Workspace";
+}
+
 .topnav-link,
 .provider-app-shell .topnav-link {
   min-height: 46px !important;
@@ -266,6 +270,25 @@ h4,
   display: flex !important;
   align-items: center !important;
   gap: 18px !important;
+}
+
+.provider-utility-copy {
+  display: grid !important;
+  gap: 2px !important;
+}
+
+.provider-utility-copy span {
+  color: var(--analyst-slate) !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+}
+
+.provider-utility-copy strong {
+  color: var(--analyst-text) !important;
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif !important;
+  font-size: 1.08rem !important;
 }
 
 .sync-status {
@@ -639,6 +662,11 @@ select:focus {
 }
 
 .v0-command-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.55fr) minmax(150px, 220px) !important;
+  gap: 24px !important;
+  align-items: stretch !important;
+  padding: 8px 0 2px !important;
   border: 0 !important;
   color: var(--analyst-text) !important;
   background: transparent !important;
@@ -646,8 +674,22 @@ select:focus {
 }
 
 .v0-command-hero h2 {
+  margin: 0 0 8px !important;
   max-width: none !important;
   color: var(--analyst-text) !important;
+  font-size: clamp(2.4rem, 4vw, 4.5rem) !important;
+  line-height: 0.95 !important;
+}
+
+.v0-command-hero p {
+  max-width: 720px !important;
+  margin: 0 !important;
+}
+
+.v0-command-metrics {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
 }
 
 .v0-command-metrics div,
@@ -656,13 +698,332 @@ select:focus {
   background: var(--analyst-surface) !important;
 }
 
+.v0-command-metrics div {
+  display: grid !important;
+  gap: 8px !important;
+  align-content: center !important;
+  min-height: 104px !important;
+  padding: 16px !important;
+  border-radius: 16px !important;
+}
+
+.v0-command-metrics span {
+  color: var(--analyst-slate) !important;
+  font-size: 0.75rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
 .v0-command-metrics strong {
   color: var(--analyst-text) !important;
+  font-size: 2.25rem !important;
+  line-height: 1 !important;
+}
+
+.v0-flow-bars {
+  min-height: 104px !important;
+  display: flex !important;
+  align-items: end !important;
+  gap: 8px !important;
+  padding: 14px !important;
+  border-radius: 16px !important;
 }
 
 .v0-flow-bars span {
+  width: 100% !important;
+  min-width: 10px !important;
+  border-radius: 999px 999px 4px 4px !important;
   background: var(--analyst-blue) !important;
   box-shadow: none !important;
+}
+
+.provider-app-shell .shell-content {
+  padding-top: 34px !important;
+}
+
+.v0-checkin-stage {
+  width: min(1520px, 100%) !important;
+  display: grid !important;
+  gap: 30px !important;
+}
+
+.v0-checkin-layout {
+  display: grid !important;
+  grid-template-columns: minmax(440px, 0.82fr) minmax(560px, 1.18fr) !important;
+  gap: 26px !important;
+  align-items: start !important;
+}
+
+.v0-lookup-panel,
+.v0-profile-panel {
+  display: grid !important;
+  gap: 20px !important;
+}
+
+.v0-lookup-panel .panel-heading,
+.provider-review-heading {
+  margin-bottom: 0 !important;
+}
+
+.v0-lookup-panel .panel-heading h2,
+.provider-review-heading h2 {
+  margin: 0 0 8px !important;
+}
+
+.patient-select-launcher,
+.patient-match-status,
+.pilot-invite-card {
+  padding: 20px !important;
+}
+
+.patient-select-launcher {
+  justify-content: space-between !important;
+  gap: 22px !important;
+  border-color: rgba(37, 99, 235, 0.22) !important;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(255, 255, 255, 0) 68%),
+    #ffffff !important;
+}
+
+.patient-select-launcher h3,
+.pilot-invite-card h3 {
+  margin: 4px 0 8px !important;
+  color: var(--analyst-text) !important;
+  font-size: 1.25rem !important;
+}
+
+.patient-select-launcher p,
+.pilot-invite-card p,
+.patient-match-status span {
+  margin: 0 !important;
+}
+
+.patient-select-launcher .primary-button {
+  flex: 0 0 auto !important;
+}
+
+.patient-match-status {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: flex-start !important;
+  border-color: rgba(100, 116, 139, 0.22) !important;
+  background: var(--analyst-soft) !important;
+}
+
+.patient-match-status::before {
+  content: "" !important;
+  width: 10px !important;
+  height: 10px !important;
+  flex: 0 0 10px !important;
+  grid-row: 1 / span 2 !important;
+  margin-top: 6px !important;
+  border-radius: 999px !important;
+  background: var(--analyst-slate) !important;
+}
+
+.patient-match-status.matched {
+  border-color: rgba(22, 163, 74, 0.25) !important;
+  background: #f0fdf4 !important;
+}
+
+.patient-match-status.matched::before {
+  background: var(--analyst-green) !important;
+}
+
+.patient-match-status strong {
+  display: block !important;
+  grid-column: 2 !important;
+  margin: 0 !important;
+}
+
+.patient-match-status span {
+  grid-column: 2 !important;
+}
+
+.pilot-invite-card {
+  display: grid !important;
+  gap: 16px !important;
+  background: #ffffff !important;
+}
+
+.invite-action-row,
+.form-footer {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.pilot-invite-message {
+  min-height: 138px !important;
+}
+
+.compact-options {
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+}
+
+.provider-app-shell .option-card {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: flex-start !important;
+  padding: 15px !important;
+}
+
+.provider-app-shell .option-card.selected {
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  background: rgba(37, 99, 235, 0.055) !important;
+}
+
+.provider-app-shell .option-card input {
+  width: 18px !important;
+  height: 18px !important;
+  margin-top: 3px !important;
+}
+
+.provider-app-shell .option-card strong {
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+.provider-review-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+
+.provider-review-card {
+  min-width: 0 !important;
+  padding: 20px !important;
+}
+
+.provider-review-card-wide {
+  grid-column: 1 / -1 !important;
+}
+
+.provider-review-card h4 {
+  margin: 0 0 14px !important;
+  color: var(--analyst-text) !important;
+  font-size: 1.15rem !important;
+}
+
+.provider-review-card ul {
+  display: grid !important;
+  gap: 9px !important;
+  margin: 0 !important;
+  padding-left: 20px !important;
+}
+
+.provider-review-card li {
+  color: var(--analyst-text) !important;
+  line-height: 1.45 !important;
+}
+
+.allergy-review-card {
+  border-color: rgba(220, 51, 69, 0.2) !important;
+  background:
+    linear-gradient(135deg, rgba(220, 51, 69, 0.045), rgba(255, 255, 255, 0) 72%),
+    #ffffff !important;
+}
+
+.provider-detail-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+.provider-detail-list {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.provider-detail-item {
+  min-width: 0 !important;
+  display: grid !important;
+  gap: 4px !important;
+  padding: 12px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 12px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.provider-detail-item span {
+  color: var(--analyst-slate) !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+}
+
+.provider-detail-item strong {
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+  color: var(--analyst-text) !important;
+  font-size: 0.96rem !important;
+}
+
+.provider-match-note {
+  margin: 14px 0 0 !important;
+  padding-top: 12px !important;
+  border-top: 1px solid var(--analyst-line) !important;
+}
+
+.patient-finder-backdrop {
+  align-items: start !important;
+  padding: 42px 28px !important;
+}
+
+.patient-finder-dialog {
+  width: min(1180px, 100%) !important;
+  max-height: calc(100vh - 84px) !important;
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  overflow: hidden !important;
+  border-radius: 24px !important;
+}
+
+.patient-finder-header {
+  padding: 24px 28px !important;
+}
+
+.patient-finder-header h2 {
+  margin: 0 !important;
+}
+
+.patient-finder-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  padding: 22px 28px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.patient-finder-grid label {
+  margin-bottom: 0 !important;
+}
+
+.patient-finder-results {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 22px 28px 28px !important;
+}
+
+.patient-finder-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 18px !important;
+  align-items: center !important;
+  padding: 18px !important;
+}
+
+.patient-finder-row h4 {
+  margin: 0 0 6px !important;
+}
+
+.patient-finder-row p {
+  margin: 0 0 3px !important;
 }
 
 .signup-questionnaire {
@@ -1125,6 +1486,33 @@ select:focus {
   color: var(--analyst-text) !important;
   font-size: clamp(2rem, 5vw, 3.6rem) !important;
   line-height: 0.98 !important;
+}
+
+@media (max-width: 1280px) and (min-width: 1081px) {
+  .provider-app-shell.shell-with-nav {
+    grid-template-columns: 236px minmax(0, 1fr) !important;
+  }
+
+  .provider-app-shell .shell-content {
+    padding: 28px 32px 58px !important;
+  }
+
+  .v0-command-hero,
+  .v0-checkin-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .v0-command-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .v0-flow-bars {
+    min-height: 86px !important;
+  }
+
+  .provider-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
 }
 
 @media (max-width: 1080px) {
