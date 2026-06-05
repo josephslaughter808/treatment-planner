@@ -302,6 +302,7 @@ export function SignupView() {
               Pregnancy or nursing
               <select onChange={(event) => setPregnancyStatus(event.target.value)} value={pregnancyStatus}>
                 <option value="">Select one</option>
+                <option value="No">No</option>
                 <option value="Not applicable">Not applicable</option>
                 <option value="Pregnant">Pregnant</option>
                 <option value="Nursing">Nursing</option>

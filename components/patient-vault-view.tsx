@@ -20,6 +20,7 @@ export function PatientVaultView() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingServer, setIsLoadingServer] = useState(false);
   const [editingSections, setEditingSections] = useState(initialEditingSections);
+  const [surgeryDraftRowCount, setSurgeryDraftRowCount] = useState(1);
   const hasAutosaveMountedRef = useRef(false);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedSignatureRef = useRef("");
@@ -257,7 +258,8 @@ export function PatientVaultView() {
 
   function getSurgeryHistoryEntries() {
     const entries = parseSurgeryHistoryEntries(getQuestionnaireNote(surgeryHistoryTitle));
-    return entries.length > 0 ? entries : [{ description: "", year: "" }];
+    const rowCount = Math.max(surgeryDraftRowCount, entries.length, 1);
+    return Array.from({ length: rowCount }, (_, index) => entries[index] ?? { description: "", year: "" });
   }
 
   function updateSurgeryHistoryEntry(index: number, field: keyof SurgeryHistoryEntry, value: string) {
@@ -270,14 +272,12 @@ export function PatientVaultView() {
   }
 
   function addSurgeryHistoryEntry() {
-    updateQuestionnaireNote(surgeryHistoryTitle, serializeSurgeryHistoryEntries([
-      ...getSurgeryHistoryEntries(),
-      { description: "", year: "" }
-    ]));
+    setSurgeryDraftRowCount(getSurgeryHistoryEntries().length + 1);
   }
 
   function removeSurgeryHistoryEntry(index: number) {
     const nextEntries = getSurgeryHistoryEntries().filter((_, entryIndex) => entryIndex !== index);
+    setSurgeryDraftRowCount(Math.max(nextEntries.length, 1));
     updateQuestionnaireNote(surgeryHistoryTitle, serializeSurgeryHistoryEntries(nextEntries));
   }
 
@@ -387,49 +387,7 @@ export function PatientVaultView() {
             <div className="grid two-up">
               {questionnaireNarrativePrompts.map((prompt) => {
                 if (prompt.title === surgeryHistoryTitle) {
-                  const entries = getSurgeryHistoryEntries();
-
-                  return (
-                    <div className="questionnaire-field-block" key={prompt.title}>
-                      <p className="questionnaire-field-label">{prompt.label}</p>
-                      <div className="repeatable-history-list">
-                        {entries.map((entry, index) => (
-                          <div className="repeatable-history-row" key={`${prompt.title}-${index}`}>
-                            <label>
-                              Surgery, hospitalization, or major illness
-                              <input
-                                onChange={(event) =>
-                                  updateSurgeryHistoryEntry(index, "description", event.target.value)
-                                }
-                                placeholder="Example: Open heart surgery"
-                                value={entry.description}
-                              />
-                            </label>
-                            <label>
-                              Year
-                              <input
-                                inputMode="numeric"
-                                maxLength={4}
-                                onChange={(event) => updateSurgeryHistoryEntry(index, "year", event.target.value)}
-                                placeholder="2013"
-                                value={entry.year}
-                              />
-                            </label>
-                            <button
-                              className="secondary-button"
-                              onClick={() => removeSurgeryHistoryEntry(index)}
-                              type="button"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                      <button className="secondary-button" onClick={addSurgeryHistoryEntry} type="button">
-                        Add another surgery or hospitalization
-                      </button>
-                    </div>
-                  );
+                  return null;
                 }
 
                 if (prompt.title === pregnancyStatusTitle) {
@@ -441,6 +399,7 @@ export function PatientVaultView() {
                         value={getQuestionnaireNote(prompt.title)}
                       >
                         <option value="">Select one</option>
+                        <option value="No">No</option>
                         <option value="Not applicable">Not applicable</option>
                         <option value="Pregnant">Pregnant</option>
                         <option value="Nursing">Nursing</option>
@@ -461,6 +420,13 @@ export function PatientVaultView() {
                 );
               })}
             </div>
+
+            <SurgeryHistoryEditor
+              entries={getSurgeryHistoryEntries()}
+              onAdd={addSurgeryHistoryEntry}
+              onRemove={removeSurgeryHistoryEntry}
+              onUpdate={updateSurgeryHistoryEntry}
+            />
           </div>
         ) : (
           <div className="questionnaire-summary-grid">
@@ -1054,6 +1020,57 @@ function SavedEntry({
 
 function EmptySavedState({ text }: { text: string }) {
   return <p className="saved-empty-state">{text}</p>;
+}
+
+function SurgeryHistoryEditor({
+  entries,
+  onAdd,
+  onRemove,
+  onUpdate
+}: {
+  entries: SurgeryHistoryEntry[];
+  onAdd: () => void;
+  onRemove: (index: number) => void;
+  onUpdate: (index: number, field: keyof SurgeryHistoryEntry, value: string) => void;
+}) {
+  return (
+    <div className="questionnaire-field-block surgery-history-block">
+      <div>
+        <p className="questionnaire-field-label">Surgeries, hospitalizations, or major illnesses</p>
+        <p className="field-help">Add each item separately so your care team can review the timeline clearly.</p>
+      </div>
+      <div className="repeatable-history-list">
+        {entries.map((entry, index) => (
+          <div className="repeatable-history-row" key={`surgery-history-${index}`}>
+            <label>
+              Surgery, hospitalization, or major illness
+              <input
+                onChange={(event) => onUpdate(index, "description", event.target.value)}
+                placeholder="Example: Open heart surgery"
+                value={entry.description}
+              />
+            </label>
+            <label>
+              Year
+              <input
+                inputMode="numeric"
+                maxLength={4}
+                onChange={(event) => onUpdate(index, "year", event.target.value)}
+                placeholder="2013"
+                value={entry.year}
+              />
+            </label>
+            <button className="secondary-button" onClick={() => onRemove(index)} type="button">
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+      <button className="secondary-button" onClick={onAdd} type="button">
+        Add another surgery or hospitalization
+      </button>
+    </div>
+  );
 }
 
 function getConditionDisplayNote(notes: string) {
