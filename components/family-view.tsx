@@ -54,11 +54,6 @@ export function FamilyView() {
     legalAuthority: "Parent or legal guardian"
   });
   const [adultDraft, setAdultDraft] = useState({ name: "", email: "", relationship: "Spouse" });
-  const [incomingDraft, setIncomingDraft] = useState({
-    name: "Taylor Morgan",
-    email: "taylor@example.com",
-    relationship: "Spouse"
-  });
 
   const selectedDependent = family.dependents.find((dependent) => dependent.id === selectedDependentId) ?? null;
   const incomingRequests = family.adultLinks.filter((link) => link.status === "pending-received");
@@ -145,28 +140,6 @@ export function FamilyView() {
     setAdultDraft({ name: "", email: "", relationship: "Spouse" });
   }
 
-  function addIncomingRequest() {
-    if (!incomingDraft.email.trim()) {
-      return;
-    }
-
-    updateFamily({
-      ...family,
-      adultLinks: [
-        ...family.adultLinks,
-        {
-          id: crypto.randomUUID(),
-          name: incomingDraft.name.trim() || incomingDraft.email.trim(),
-          email: incomingDraft.email.trim(),
-          relationship: incomingDraft.relationship.trim() || "Adult family member",
-          status: "pending-received",
-          requestedAt: new Date().toISOString()
-        }
-      ]
-    });
-    setIncomingDraft({ name: "", email: "", relationship: "Spouse" });
-  }
-
   function respondToAdultRequest(id: string, status: "approved" | "rejected") {
     updateFamily({
       ...family,
@@ -244,43 +217,6 @@ export function FamilyView() {
               </div>
               <button className="primary-button" onClick={requestAdultAccess} type="button">
                 Send permission request
-              </button>
-            </div>
-
-            <div className="dialogue-card family-permission-panel">
-              <p className="mini-label">Incoming requests</p>
-              <h4>Approve or reject account links</h4>
-              <p className="field-help">
-                This simulates the inbox patients will use when another adult asks to link accounts.
-              </p>
-              <div className="grid three-up">
-                <label>
-                  Requester
-                  <input
-                    onChange={(event) => setIncomingDraft((current) => ({ ...current, name: event.target.value }))}
-                    value={incomingDraft.name}
-                  />
-                </label>
-                <label>
-                  Email
-                  <input
-                    onChange={(event) => setIncomingDraft((current) => ({ ...current, email: event.target.value }))}
-                    type="email"
-                    value={incomingDraft.email}
-                  />
-                </label>
-                <label>
-                  Relationship
-                  <input
-                    onChange={(event) =>
-                      setIncomingDraft((current) => ({ ...current, relationship: event.target.value }))
-                    }
-                    value={incomingDraft.relationship}
-                  />
-                </label>
-              </div>
-              <button className="secondary-button" onClick={addIncomingRequest} type="button">
-                Add demo incoming request
               </button>
             </div>
           </div>
