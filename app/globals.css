@@ -358,6 +358,92 @@ textarea {
   padding: 16px;
 }
 
+.returning-scan-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%);
+}
+
+.returning-scan-card label {
+  margin-bottom: 0;
+}
+
+.provider-change-panel {
+  display: grid;
+  gap: 16px;
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+
+.provider-change-panel-header,
+.provider-change-list {
+  display: grid;
+  gap: 12px;
+}
+
+.provider-change-panel-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.provider-change-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border-radius: 999px;
+  padding: 7px 12px;
+  color: #1f2937;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  font-size: 0.82rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.provider-change-pill.attention {
+  color: #075985;
+  border-color: #93c5fd;
+  background: #dbeafe;
+}
+
+.provider-change-pill.clear {
+  color: #166534;
+  border-color: #bbf7d0;
+  background: #dcfce7;
+}
+
+.provider-change-alert {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.provider-change-alert strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.provider-change-alert p {
+  margin: 0;
+}
+
+.provider-change-alert.attention {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.provider-change-alert.clear {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
 .option-card {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -394,6 +480,11 @@ textarea {
 
   .patient-finder-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .returning-scan-card,
+  .provider-change-panel-header {
+    grid-template-columns: 1fr;
   }
 }
 

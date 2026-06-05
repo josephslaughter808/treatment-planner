@@ -37,20 +37,12 @@ export function IntakeCheckInView() {
     memberId: initialMemberId,
     accessCode: initialAccessCode
   });
-  const [insuranceConfirmed, setInsuranceConfirmed] = useState(true);
-  const [historyConfirmed, setHistoryConfirmed] = useState(true);
-  const [medicationConfirmed, setMedicationConfirmed] = useState(true);
   const [notes, setNotes] = useState("");
-  const [status, setStatus] = useState<CheckInRecord["status"]>("confirmed-no-changes");
   const [checkIns, setCheckIns] = useState(() => readCheckInsFromStorage());
   const [message, setMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingPatients, setIsLoadingPatients] = useState(false);
   const [serverShareLink, setServerShareLink] = useState<ShareLinkRecord | null>(null);
-  const [inviteName, setInviteName] = useState("");
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteMessage, setInviteMessage] = useState("");
-  const [isCreatingInvite, setIsCreatingInvite] = useState(false);
 
   useEffect(() => {
     const practiceId = currentUser?.practiceId;
@@ -174,11 +166,6 @@ export function IntakeCheckInView() {
     () => buildPatientFinderResults([vault, ...serverPatients], patientSearch, currentUser?.practiceId, serverShareLink),
     [currentUser?.practiceId, patientSearch, serverPatients, serverShareLink, vault]
   );
-  const confirmedCount = checkIns.filter((entry) => entry.status === "confirmed-no-changes").length;
-  const updatedCount = checkIns.filter((entry) => entry.status === "updated").length;
-  const reviewCount = checkIns.filter(
-    (entry) => !entry.insuranceConfirmed || !entry.historyConfirmed || !entry.medicationConfirmed
-  ).length;
   const matchedCheckIns = useMemo(
     () =>
       matched
@@ -187,6 +174,16 @@ export function IntakeCheckInView() {
             .slice(0, 5)
         : checkIns.slice(0, 5),
     [checkIns, matched]
+  );
+  const previousCheckIn = matchedCheckIns[0] ?? null;
+  const profileUpdatedAfterLastVisit = Boolean(
+    matched?.lastUpdatedAt &&
+      previousCheckIn &&
+      new Date(matched.lastUpdatedAt).getTime() > new Date(previousCheckIn.verifiedAt).getTime()
+  );
+  const changeAlerts = useMemo(
+    () => (matched ? buildCheckInChangeAlerts(matched, previousCheckIn, profileUpdatedAfterLastVisit) : []),
+    [matched, previousCheckIn, profileUpdatedAfterLastVisit]
   );
 
   async function saveCheckIn() {
@@ -204,10 +201,10 @@ export function IntakeCheckInView() {
       patientEmail: matched.email,
       memberId: matched.memberId,
       verifiedAt: new Date().toISOString(),
-      status,
-      insuranceConfirmed,
-      historyConfirmed,
-      medicationConfirmed,
+      status: profileUpdatedAfterLastVisit || !previousCheckIn ? "updated" : "confirmed-no-changes",
+      insuranceConfirmed: true,
+      historyConfirmed: true,
+      medicationConfirmed: true,
       notes
     };
 
@@ -233,9 +230,7 @@ export function IntakeCheckInView() {
         throw new Error(data.error || "Unable to save the office check-in.");
       }
 
-      setMessage(
-        `${data.message || "Office check-in saved."} This patient can now return and confirm no changes more quickly next time.`
-      );
+      setMessage(`${data.message || "Office check-in saved."} Today's verification is now in this patient's history.`);
       if (authMode === "supabase") {
         setNotes("");
       }
@@ -250,83 +245,6 @@ export function IntakeCheckInView() {
     }
   }
 
-  async function refreshPracticePatients() {
-    if (!currentUser?.practiceId) {
-      return;
-    }
-
-    const response = await fetch(`/api/patients?practiceId=${encodeURIComponent(currentUser.practiceId)}`, {
-      headers: await getSupabaseAuthHeaders()
-    });
-    const data = (await response.json()) as { patients?: PatientVault[]; error?: string };
-    if (!response.ok || !data.patients) {
-      throw new Error(data.error || "Unable to refresh the patient list.");
-    }
-
-    setServerPatients(data.patients);
-  }
-
-  async function createPatientInvite() {
-    if (!currentUser?.practiceId) {
-      setMessage("Sign in as the office before creating a patient invite.");
-      return;
-    }
-
-    const emailForInvite = inviteEmail.trim();
-    if (!emailForInvite) {
-      setMessage("Enter the patient's email before creating an invite.");
-      return;
-    }
-
-    setIsCreatingInvite(true);
-    setInviteMessage("");
-    try {
-      const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-      const response = await fetch("/api/share-links", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(await getSupabaseAuthHeaders())
-        },
-        body: JSON.stringify({
-          patientEmail: emailForInvite,
-          patientName: inviteName.trim(),
-          practiceId: currentUser.practiceId,
-          expiresAt
-        })
-      });
-      const data = (await response.json()) as { shareLink?: ShareLinkRecord; error?: string };
-      if (!response.ok || !data.shareLink) {
-        throw new Error(data.error || "Unable to create the patient invite.");
-      }
-
-      const nextInviteMessage = buildPilotInviteMessage(data.shareLink, inviteName.trim(), window.location.origin);
-      setInviteMessage(nextInviteMessage);
-      setEmail(emailForInvite);
-      setAccessCode(data.shareLink.accessCode);
-      setPatientSearch((current) => ({
-        ...current,
-        email: emailForInvite,
-        accessCode: data.shareLink?.accessCode ?? ""
-      }));
-      setMessage("Patient invite created. The patient is connected to this practice and ready to complete their health profile.");
-      await refreshPracticePatients();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Unable to create the patient invite.");
-    } finally {
-      setIsCreatingInvite(false);
-    }
-  }
-
-  async function copyInviteMessage() {
-    if (!inviteMessage) {
-      return;
-    }
-
-    await navigator.clipboard.writeText(inviteMessage);
-    setMessage("Invite message copied. Send it by text or email from the office.");
-  }
-
   function openPatientFinder() {
     setPatientSearch((current) => ({
       ...current,
@@ -335,6 +253,24 @@ export function IntakeCheckInView() {
       accessCode
     }));
     setIsPatientFinderOpen(true);
+  }
+
+  function loadPatientFromScan() {
+    const normalizedCode = extractAccessCode(accessCode);
+    if (!normalizedCode) {
+      setMessage("Scan the patient's QR code or enter their ClearPath access code before loading the chart.");
+      return;
+    }
+
+    setAccessCode(normalizedCode);
+    setMemberId(normalizedCode);
+    setSelectedPatient(null);
+    setPatientSearch((current) => ({
+      ...current,
+      memberId: normalizedCode,
+      accessCode: normalizedCode
+    }));
+    setMessage(null);
   }
 
   function selectPatientFromFinder(result: PatientFinderResult) {
@@ -357,25 +293,12 @@ export function IntakeCheckInView() {
     <div className="v0-checkin-stage">
       <section className="v0-command-hero">
         <div>
-          <p className="eyebrow">Medical check-in</p>
-          <h2>Today&apos;s patient flow</h2>
+          <p className="eyebrow">Returning patient check-in</p>
+          <h2>Scan, review, verify.</h2>
           <p>
-            Select the patient, verify the updated history, and clear the record before the appointment starts.
+            New patients are added from the New Patient tab. Use this page when an existing patient arrives and the
+            office needs to confirm their medical history, insurance, medications, allergies, and emergency contact are current.
           </p>
-        </div>
-        <div className="v0-command-metrics" aria-label="Check-in summary">
-          <div>
-            <span>Confirmed</span>
-            <strong>{confirmedCount}</strong>
-          </div>
-          <div>
-            <span>Updated</span>
-            <strong>{updatedCount}</strong>
-          </div>
-          <div>
-            <span>Needs review</span>
-            <strong>{reviewCount}</strong>
-          </div>
         </div>
         <div className="v0-flow-bars" aria-label="Daily check-in rhythm">
           <span style={{ height: "42%" }} />
@@ -392,22 +315,42 @@ export function IntakeCheckInView() {
       <section className="panel v0-lookup-panel">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Office intake</p>
-            <h2>Find the correct patient</h2>
-            <p>Select the patient first. Then verify their medical history, medications, allergies, emergency contact, and insurance.</p>
+            <p className="eyebrow">Visit verification</p>
+            <h2>Load the patient history</h2>
+            <p>Scan the QR code, enter the access code, or use patient finder if the code is not available.</p>
           </div>
+        </div>
+
+        <div className="returning-scan-card">
+          <label>
+            QR scan or access code
+            <input
+              autoComplete="off"
+              onChange={(event) => setAccessCode(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  loadPatientFromScan();
+                }
+              }}
+              placeholder="Scan QR code or type patient code"
+              value={accessCode}
+            />
+          </label>
+          <button className="primary-button" onClick={loadPatientFromScan} type="button">
+            Load patient history
+          </button>
         </div>
 
         <div className="patient-select-launcher">
           <div>
-            <p className="eyebrow">Patient selection</p>
-            <h3>{matched ? matched.fullName : "No patient selected"}</h3>
+            <p className="eyebrow">Fallback search</p>
+            <h3>{matched ? matched.fullName : "No patient loaded"}</h3>
             <p>
               {matched
                 ? `${matched.email} ${matched.dateOfBirth ? `• DOB ${matched.dateOfBirth}` : ""}`
                 : isLoadingPatients
                   ? "Loading connected patients for this practice."
-                  : "Open patient selection to search by name, birthday, phone, address, email, or ID."}
+                  : "If the QR or code is not available, search by name, birthday, phone, address, email, or ID."}
             </p>
           </div>
           <button className="primary-button" onClick={openPatientFinder} type="button">
@@ -422,118 +365,24 @@ export function IntakeCheckInView() {
               ? lookupMethod === "share-code"
                 ? "Matched by approved practice access code."
                 : "Matched by email plus secondary identifier."
-              : "Use the patient finder, or create an invite if this patient has not connected yet."}
+              : "Use the New Patient tab first if this patient has never connected to your practice."}
           </span>
         </div>
 
-        <div className="pilot-invite-card">
-          <div>
-            <p className="eyebrow">Pilot invite</p>
-            <h3>Invite a new patient</h3>
-            <p>
-              Use this only when the patient is not in the finder yet. ClearPath creates the practice
-              connection, generates an access code, and gives you a message to send from the office.
-            </p>
-          </div>
-          <div className="grid two-up">
-            <label>
-              Patient name
-              <input
-                onChange={(event) => setInviteName(event.target.value)}
-                placeholder="Optional"
-                value={inviteName}
-              />
-            </label>
-            <label>
-              Patient email
-              <input
-                autoComplete="email"
-                onChange={(event) => setInviteEmail(event.target.value)}
-                type="email"
-                value={inviteEmail}
-              />
-            </label>
-          </div>
-          <div className="invite-action-row">
-            <button className="secondary-button" disabled={isCreatingInvite} onClick={createPatientInvite} type="button">
-              {isCreatingInvite ? "Creating invite..." : "Create patient invite"}
-            </button>
-            {inviteMessage ? (
-              <button className="secondary-button" onClick={copyInviteMessage} type="button">
-                Copy invite message
-              </button>
-            ) : null}
-          </div>
-          {inviteMessage ? (
-            <textarea
-              aria-label="Patient invite message"
-              className="pilot-invite-message"
-              onChange={(event) => setInviteMessage(event.target.value)}
-              rows={5}
-              value={inviteMessage}
-            />
-          ) : null}
-        </div>
-
-        <div className="grid two-up">
-          <label>
-            Intake result
-            <select
-              onChange={(event) => setStatus(event.target.value as CheckInRecord["status"])}
-              value={status}
-            >
-              <option value="new-share">New office share</option>
-              <option value="confirmed-no-changes">Confirmed no changes</option>
-              <option value="updated">Patient updated information</option>
-            </select>
-          </label>
-          <label>
-            Office note
-            <input onChange={(event) => setNotes(event.target.value)} value={notes} />
-          </label>
-        </div>
-
-        <div className="option-grid compact-options">
-          <label className={`option-card ${insuranceConfirmed ? "selected" : ""}`}>
-            <input
-              checked={insuranceConfirmed}
-              onChange={(event) => setInsuranceConfirmed(event.target.checked)}
-              type="checkbox"
-            />
-            <div>
-              <strong>Insurance confirmed</strong>
-              <p>Patient confirmed current insurance details are still accurate.</p>
-            </div>
-          </label>
-          <label className={`option-card ${historyConfirmed ? "selected" : ""}`}>
-            <input
-              checked={historyConfirmed}
-              onChange={(event) => setHistoryConfirmed(event.target.checked)}
-              type="checkbox"
-            />
-            <div>
-              <strong>Medical history confirmed</strong>
-              <p>Patient confirmed the major history items are unchanged.</p>
-            </div>
-          </label>
-          <label className={`option-card ${medicationConfirmed ? "selected" : ""}`}>
-            <input
-              checked={medicationConfirmed}
-              onChange={(event) => setMedicationConfirmed(event.target.checked)}
-              type="checkbox"
-            />
-            <div>
-              <strong>Medications confirmed</strong>
-              <p>Patient confirmed medications and allergies are still current.</p>
-            </div>
-          </label>
-        </div>
+        <label>
+          Office note for today
+          <input
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder="Optional note for the provider or front desk"
+            value={notes}
+          />
+        </label>
 
         <div className="form-footer">
           <button className="primary-button" disabled={isSaving} onClick={saveCheckIn} type="button">
-            {isSaving ? "Saving check-in..." : "Save office check-in"}
+            {isSaving ? "Saving verification..." : "Save today's verification"}
           </button>
-          <p>This is the “tap once, verify changes, move on” workflow for returning patients.</p>
+          <p>Save only after the office has reviewed any changes and confirmed the patient is ready for today&apos;s visit.</p>
         </div>
 
         {message ? <p className="info-text">{message}</p> : null}
@@ -659,7 +508,7 @@ export function IntakeCheckInView() {
                   {isLoadingPatients
                     ? "Loading the practice patient list..."
                     : serverPatients.length === 0
-                      ? "No patients are connected yet. Create a patient invite, send the message, then have the patient complete their health profile."
+                      ? "No patients are connected yet. Use New Patient to add a patient from QR scan or manual code."
                       : "No matching patients found. Add more details or use a practice access code."}
                 </p>
               )}
@@ -675,13 +524,33 @@ export function IntakeCheckInView() {
             <h2>{matched ? "Review patient information" : "No patient open"}</h2>
             <p>
               {matched
-                ? "Review the sections below, mark what the patient confirmed, then save the office check-in."
+                ? "Review what is current now. Any profile update since the last saved visit is highlighted first."
                 : "Select a patient to see the medical history and insurance details for check-in."}
             </p>
           </div>
         </div>
         {matched ? (
           <div className="dialogue-list provider-review-grid">
+            <div className="dialogue-card provider-change-panel provider-review-card-wide">
+              <div className="provider-change-panel-header">
+                <div>
+                  <p className="eyebrow">Since last visit</p>
+                  <h4>{profileUpdatedAfterLastVisit || !previousCheckIn ? "Review updates before seating" : "No new profile update recorded"}</h4>
+                </div>
+                <span className={`provider-change-pill ${profileUpdatedAfterLastVisit || !previousCheckIn ? "attention" : "clear"}`}>
+                  {previousCheckIn ? `Last check-in ${formatCheckInDate(previousCheckIn.verifiedAt)}` : "First ClearPath check-in"}
+                </span>
+              </div>
+              <div className="provider-change-list">
+                {changeAlerts.map((alert) => (
+                  <article className={`provider-change-alert ${alert.tone}`} key={alert.title}>
+                    <strong>{alert.title}</strong>
+                    <p>{alert.body}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+
             <div className="dialogue-card provider-review-card provider-review-card-wide">
               <h4>{matched.fullName}</h4>
               <div className="provider-detail-grid">
@@ -780,27 +649,12 @@ export function IntakeCheckInView() {
             </div>
           </div>
         ) : (
-          <p>Enter the patient email and member ID, or use an approved practice access code, to open the patient check-in profile.</p>
+          <p>Scan the patient QR code, enter their access code, or use patient finder to open the returning check-in profile.</p>
         )}
       </section>
       </div>
     </div>
   );
-}
-
-function buildPilotInviteMessage(shareLink: ShareLinkRecord, patientName: string, origin: string) {
-  const greeting = patientName ? `Hi ${patientName},` : "Hi,";
-  const signupUrl = new URL("/signup", origin);
-  signupUrl.searchParams.set("email", shareLink.patientEmail);
-  signupUrl.searchParams.set("accessCode", shareLink.accessCode);
-
-  return [
-    greeting,
-    `${shareLink.practiceName} is using ClearPath Care for medical history, medication, allergy, emergency contact, and insurance updates before your visit.`,
-    `Please open ${signupUrl.toString()} to create your patient account or connect your existing account, then complete your health profile.`,
-    `Your office access code is ${shareLink.accessCode}.`,
-    `This code expires on ${new Date(shareLink.expiresAt).toLocaleDateString()}.`
-  ].join("\n\n");
 }
 
 function formatCheckInStatus(status: CheckInRecord["status"]) {
@@ -813,6 +667,72 @@ function formatCheckInStatus(status: CheckInRecord["status"]) {
   }
 
   return "New office share";
+}
+
+function extractAccessCode(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    return (
+      parsed.searchParams.get("accessCode") ||
+      parsed.searchParams.get("memberId") ||
+      parsed.pathname.split("/").filter(Boolean).at(-1) ||
+      trimmed
+    ).trim();
+  } catch {
+    return trimmed;
+  }
+}
+
+function buildCheckInChangeAlerts(
+  patient: PatientVault,
+  previousCheckIn: CheckInRecord | null,
+  profileUpdatedAfterLastVisit: boolean
+) {
+  const profileSummary = [
+    `${patient.medicalConditions.length} condition${patient.medicalConditions.length === 1 ? "" : "s"}`,
+    `${patient.medications.length} medication${patient.medications.length === 1 ? "" : "s"}`,
+    `${patient.allergies.length} allerg${patient.allergies.length === 1 ? "y" : "ies"}`,
+    patient.insurance.providerName ? "insurance on file" : "insurance missing",
+    patient.emergencyContact.name ? "emergency contact on file" : "emergency contact missing"
+  ].join(" • ");
+
+  if (!previousCheckIn) {
+    return [
+      {
+        title: "First ClearPath verification for this practice",
+        body: `Review the full chart once before saving today. Current profile: ${profileSummary}.`,
+        tone: "attention"
+      }
+    ];
+  }
+
+  if (profileUpdatedAfterLastVisit) {
+    return [
+      {
+        title: "Patient profile changed after the last visit",
+        body: `Last profile update was ${formatCheckInDate(patient.lastUpdatedAt)}. Current profile: ${profileSummary}.`,
+        tone: "attention"
+      },
+      {
+        title: "Review current details below",
+        body: "The sections below show what is currently in the patient's ClearPath profile for today's visit.",
+        tone: "neutral"
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "No new profile update recorded",
+      body: `The patient profile has not been updated since the last saved check-in. Current profile: ${profileSummary}.`,
+      tone: "clear"
+    }
+  ];
 }
 
 function formatCheckInDate(value: string) {
