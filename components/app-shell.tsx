@@ -14,6 +14,7 @@ type NavIconName = "patients" | "health" | "family" | "documents" | "share" | "a
 type NavItem = {
   href: string;
   label: string;
+  mobileLabel?: string;
   icon: NavIconName;
 };
 
@@ -22,9 +23,9 @@ const providerNavItems: NavItem[] = [
 ];
 
 const patientNavItems: NavItem[] = [
-  { href: "/vault", label: "Health Profile", icon: "health" },
+  { href: "/vault", label: "Health Profile", mobileLabel: "Health", icon: "health" },
   { href: "/family", label: "Family", icon: "family" },
-  { href: "/documents", label: "Documents", icon: "documents" },
+  { href: "/documents", label: "Documents", mobileLabel: "Docs", icon: "documents" },
   { href: "/share", label: "Share", icon: "share" },
   { href: "/profile", label: "Account", icon: "account" }
 ];
@@ -270,7 +271,7 @@ export function AppShell({
             return (
               <Link className={`mobile-tab ${active ? "active" : ""}`} href={item.href} key={item.href}>
                 <NavIcon name={item.icon} />
-                <span>{item.label}</span>
+                <span>{item.mobileLabel ?? item.label}</span>
               </Link>
             );
           })}
