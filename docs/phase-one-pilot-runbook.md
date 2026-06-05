@@ -18,13 +18,12 @@ Diagnosis, treatment education, timeline, page editing, integrations, payments, 
 ## Office Workflow
 
 1. Provider signs in on a desktop or laptop.
-2. Provider opens the medical check-in dashboard.
-3. Provider creates or copies a patient invite when needed.
-4. Provider selects a patient from the patient finder.
-5. Provider reviews medical history, medications, allergies, emergency contact, and insurance.
-6. Provider marks medical history, medication, and insurance confirmation.
-7. Provider saves the office check-in.
-8. Provider confirms the saved check-in appears in recent history.
+2. If the person is new to the practice, provider opens New Patient and scans the patient's QR code or enters the access code to add the patient to the practice database.
+3. For each returning visit, provider opens Patient Check-In and scans the patient QR code, enters the access code, or searches for the patient manually.
+4. Provider reviews medical history, medications, allergies, emergency contact, and insurance in the patient history panel.
+5. Provider reviews the since-last-visit update callout before seating the patient.
+6. Provider saves today's verification with an optional office note.
+7. Provider confirms the saved check-in appears in recent history.
 
 ## Patient Workflow
 
@@ -33,7 +32,15 @@ Diagnosis, treatment education, timeline, page editing, integrations, payments, 
 3. If email confirmation is required, patient confirms the email and logs in.
 4. Patient opens the health profile on mobile.
 5. Patient updates profile details, medical conditions, medications, allergies, insurance, and emergency contact.
-6. Patient saves the health profile before the visit.
+6. Patient opens the Share tab to show their QR check-in pass when the office needs to connect or verify the record.
+
+## Dependent and Wallet Pass Notes
+
+Dependents need their own scannable identity, even when a parent or guardian manages the profile from the same account. If a parent is checking in a child, the office should scan the child's QR code, not the parent's QR code. That QR should resolve to the child's medical history, medications, allergies, emergency contact, insurance, and saved check-in history.
+
+For phase one, dependent profiles can stay under the Family tab, but future share/wallet work should include a separate QR/access code for each dependent vault. Children and legal dependents are editable by the parent or guardian. Adult family members remain view-only unless authorization or legal authority allows management.
+
+Future mobile wallet behavior should feel like multiple concert tickets in one wallet. Double tap opens the primary patient pass first, then the patient can swipe horizontally to the right to show each dependent's pass. Each card should clearly show the person's name, relationship, and QR/access code so the office scans the correct record.
 
 ## Launch Verification
 
