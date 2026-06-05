@@ -752,6 +752,125 @@ select:focus {
   margin-top: 4px !important;
 }
 
+.family-hub-card {
+  display: grid !important;
+  gap: 24px !important;
+}
+
+.family-section-block {
+  display: grid !important;
+  gap: 16px !important;
+  padding: 18px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 18px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.family-section-heading {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+}
+
+.family-section-heading h3,
+.child-profile-card h4 {
+  margin: 0 !important;
+  color: var(--analyst-text) !important;
+}
+
+.family-permission-grid,
+.child-profile-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.family-permission-panel,
+.family-add-child-card {
+  display: grid !important;
+  gap: 14px !important;
+  background: #ffffff !important;
+}
+
+.family-card-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.child-profile-card {
+  display: grid !important;
+  gap: 16px !important;
+  align-content: space-between !important;
+  min-height: 170px !important;
+  padding: 18px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+}
+
+.family-child-modal {
+  width: min(1180px, calc(100vw - 32px)) !important;
+  max-height: calc(100vh - 42px) !important;
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  border-radius: 22px !important;
+}
+
+.family-modal-backdrop {
+  align-items: start !important;
+  padding: 20px !important;
+}
+
+.child-chart-summary {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  padding: 16px 24px !important;
+  border-top: 1px solid var(--analyst-line) !important;
+  border-bottom: 1px solid var(--analyst-line) !important;
+  background: var(--analyst-soft) !important;
+}
+
+.child-chart-summary div {
+  padding: 12px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+}
+
+.child-chart-summary span {
+  display: block !important;
+  color: var(--analyst-slate) !important;
+  font-size: 0.75rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+.child-chart-summary strong {
+  color: var(--analyst-text) !important;
+  font-size: 1.4rem !important;
+}
+
+.child-chart-scroll {
+  display: grid !important;
+  gap: 18px !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 22px 24px 28px !important;
+  background: #ffffff !important;
+}
+
+.child-chart-section {
+  padding: 18px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 18px !important;
+}
+
 .medical-questionnaire-panel,
 .saved-section-card {
   scroll-margin-top: 96px !important;
@@ -905,6 +1024,9 @@ select:focus {
   .patient-signup-layout,
   .login-layout,
   .document-slot-grid,
+  .family-permission-grid,
+  .child-profile-grid,
+  .child-chart-summary,
   .patient-checkin-list,
   .questionnaire-summary-grid,
   .repeatable-history-row,
@@ -1002,8 +1124,21 @@ select:focus {
 
   .family-member-card,
   .document-actions,
+  .family-card-actions,
   .profile-card-actions {
     flex-direction: column !important;
     align-items: stretch !important;
+  }
+
+  .family-child-modal {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 20px) !important;
+  }
+
+  .child-chart-scroll,
+  .child-chart-summary,
+  .patient-finder-header {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 }

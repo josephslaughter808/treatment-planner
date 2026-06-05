@@ -5,9 +5,9 @@ export default function FamilyPage() {
   return (
     <AppShell
       audience="patient"
-      description="Manage children, spouse or partner access, and medical-history authorizations."
+      description="Manage dependent profiles, adult care-circle requests, and medical-history permissions."
       pageLabel="Family access"
-      title="Family profiles and permissions"
+      title="Family and care permissions"
     >
       <FamilyView />
     </AppShell>
