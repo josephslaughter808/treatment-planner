@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useCallback, useEffect, useState } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { getSupabaseAuthHeaders } from "@/lib/supabase-browser";
 import {
@@ -27,6 +27,9 @@ export function PatientVaultView() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingServer, setIsLoadingServer] = useState(false);
   const [editingSections, setEditingSections] = useState(initialEditingSections);
+  const hasAutosaveMountedRef = useRef(false);
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedSignatureRef = useRef("");
 
   function updateVault(next: PatientVault) {
     const updated = { ...next, lastUpdatedAt: new Date().toISOString() };
@@ -34,14 +37,16 @@ export function PatientVaultView() {
     writeVaultToStorage(updated);
   }
 
-  async function saveVault() {
-    setIsSaving(true);
-    const nextVault = sanitizeVault({
-      ...vault,
-      lastUpdatedAt: new Date().toISOString()
+  function updateDraftVault(updater: PatientVault | ((current: PatientVault) => PatientVault)) {
+    const savedAt = new Date().toISOString();
+    setVault((current) => {
+      const next = typeof updater === "function" ? updater(current) : updater;
+      return { ...next, lastUpdatedAt: savedAt };
     });
-    updateVault(nextVault);
-    setCheckIns(readCheckInsFromStorage());
+  }
+
+  const syncVaultToServer = useCallback(async (nextVault: PatientVault, options?: { showSuccessMessage?: boolean }) => {
+    setIsSaving(true);
 
     try {
       const response = await fetch("/api/patient-vault", {
@@ -59,30 +64,32 @@ export function PatientVaultView() {
         throw new Error("Unable to save your health profile right now.");
       }
 
-      setMessage("Your health profile has been saved for your next office check-in.");
-      setEditingSections({
-        questionnaire: false,
-        profile: false,
-        conditions: false,
-        medications: false,
-        allergies: false,
-        insurance: false,
-        emergency: false
-      });
+      lastSavedSignatureRef.current = JSON.stringify(nextVault);
+      setMessage(options?.showSuccessMessage ? "Your health profile is saved automatically." : null);
     } catch (error) {
       setMessage(
         error instanceof Error
-          ? `${error.message} Your changes are still on this screen. Please try saving again before you close it.`
-          : "Your changes are still on this screen. Please try saving again before you close it."
+          ? `${error.message} Your changes are saved on this device.`
+          : "Your changes are saved on this device."
       );
     } finally {
       setIsSaving(false);
     }
+  }, []);
+
+  function syncVaultNow() {
+    const nextVault = sanitizeVault({
+      ...vault,
+      lastUpdatedAt: new Date().toISOString()
+    });
+    writeVaultToStorage(nextVault);
+    setCheckIns(readCheckInsFromStorage());
+    void syncVaultToServer(nextVault, { showSuccessMessage: true });
   }
 
   function toggleEditSection(section: EditablePatientSection) {
     if (editingSections[section]) {
-      void saveVault();
+      setEditingSections((current) => ({ ...current, [section]: false }));
       return;
     }
 
@@ -158,6 +165,39 @@ export function PatientVaultView() {
   }, []);
 
   useEffect(() => {
+    const nextVault = sanitizeVault({
+      ...vault,
+      lastUpdatedAt: new Date().toISOString()
+    });
+    const nextSignature = JSON.stringify(nextVault);
+    writeVaultToStorage(nextVault);
+
+    if (!hasAutosaveMountedRef.current) {
+      hasAutosaveMountedRef.current = true;
+      lastSavedSignatureRef.current = nextSignature;
+      return;
+    }
+
+    if (nextSignature === lastSavedSignatureRef.current) {
+      return;
+    }
+
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+
+    autosaveTimerRef.current = setTimeout(() => {
+      void syncVaultToServer(nextVault);
+    }, 900);
+
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
+    };
+  }, [syncVaultToServer, vault]);
+
+  useEffect(() => {
     if (!currentUser || currentUser.role !== "patient") {
       return;
     }
@@ -223,7 +263,7 @@ export function PatientVaultView() {
   }
 
   function toggleQuestionnaireCondition(name: string) {
-    setVault((current) => {
+    updateDraftVault((current) => {
       const exists = current.medicalConditions.some(
         (condition) => condition.name.toLowerCase() === name.toLowerCase()
       );
@@ -249,7 +289,7 @@ export function PatientVaultView() {
   }
 
   function updateQuestionnaireNote(title: string, notes: string) {
-    setVault((current) => {
+    updateDraftVault((current) => {
       const trimmedNotes = notes;
       const existing = current.medicalConditions.find((condition) => condition.name === title);
 
@@ -351,7 +391,7 @@ export function PatientVaultView() {
           <p className="eyebrow">Before your visit</p>
           <h2>Complete these sections for your office.</h2>
           <p>
-            You can leave a section blank if it does not apply. Save your health profile when the list looks right.
+            You can leave a section blank if it does not apply. Changes save automatically as you fill them in.
           </p>
         </div>
         <div className="patient-progress-meter" aria-label="Health profile completion">
@@ -387,15 +427,10 @@ export function PatientVaultView() {
           </div>
           <button
             className="primary-button"
-            disabled={isSaving}
             onClick={() => toggleEditSection("questionnaire")}
             type="button"
           >
-            {editingSections.questionnaire
-              ? isSaving
-                ? "Saving..."
-                : "Save questionnaire"
-              : "Update questionnaire"}
+            {editingSections.questionnaire ? "Done" : "Update questionnaire"}
           </button>
         </div>
 
@@ -529,11 +564,10 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                disabled={isSaving}
                 onClick={() => toggleEditSection("profile")}
                 type="button"
               >
-                {editingSections.profile ? (isSaving ? "Saving..." : "Save") : "Edit"}
+                {editingSections.profile ? "Done" : "Edit"}
               </button>
             </div>
             {editingSections.profile ? (
@@ -541,14 +575,14 @@ export function PatientVaultView() {
                 <label>
                   Full name
                   <input
-                    onChange={(event) => setVault((current) => ({ ...current, fullName: event.target.value }))}
+                    onChange={(event) => updateDraftVault((current) => ({ ...current, fullName: event.target.value }))}
                     value={vault.fullName}
                   />
                 </label>
                 <label>
                   Email
                   <input
-                    onChange={(event) => setVault((current) => ({ ...current, email: event.target.value }))}
+                    onChange={(event) => updateDraftVault((current) => ({ ...current, email: event.target.value }))}
                     type="email"
                     value={vault.email}
                   />
@@ -556,7 +590,7 @@ export function PatientVaultView() {
                 <label>
                   Phone
                   <input
-                    onChange={(event) => setVault((current) => ({ ...current, phone: event.target.value }))}
+                    onChange={(event) => updateDraftVault((current) => ({ ...current, phone: event.target.value }))}
                     value={vault.phone}
                   />
                 </label>
@@ -564,7 +598,7 @@ export function PatientVaultView() {
                   Date of birth
                   <input
                     onChange={(event) =>
-                      setVault((current) => ({ ...current, dateOfBirth: event.target.value }))
+                      updateDraftVault((current) => ({ ...current, dateOfBirth: event.target.value }))
                     }
                     type="date"
                     value={vault.dateOfBirth}
@@ -589,11 +623,10 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                disabled={isSaving}
                 onClick={() => toggleEditSection("conditions")}
                 type="button"
               >
-                {editingSections.conditions ? (isSaving ? "Saving..." : "Save") : "Edit"}
+                {editingSections.conditions ? "Done" : "Edit"}
               </button>
             </div>
             {editingSections.conditions ? (
@@ -606,7 +639,7 @@ export function PatientVaultView() {
                           Condition
                           <input
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 medicalConditions: current.medicalConditions.map((item) =>
                                   item.id === condition.id ? { ...item, name: event.target.value } : item
@@ -620,7 +653,7 @@ export function PatientVaultView() {
                           Notes
                           <input
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 medicalConditions: current.medicalConditions.map((item) =>
                                   item.id === condition.id ? { ...item, notes: event.target.value } : item
@@ -637,7 +670,7 @@ export function PatientVaultView() {
                 <button
                   className="secondary-button"
                   onClick={() =>
-                    setVault((current) => ({
+                    updateDraftVault((current) => ({
                       ...current,
                       medicalConditions: [...current.medicalConditions, makeBlankCondition()]
                     }))
@@ -672,11 +705,10 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                disabled={isSaving}
                 onClick={() => toggleEditSection("medications")}
                 type="button"
               >
-                {editingSections.medications ? (isSaving ? "Saving..." : "Save") : "Edit"}
+                {editingSections.medications ? "Done" : "Edit"}
               </button>
             </div>
             {editingSections.medications ? (
@@ -689,7 +721,7 @@ export function PatientVaultView() {
                           Medication
                           <input
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 medications: current.medications.map((item) =>
                                   item.id === medication.id ? { ...item, name: event.target.value } : item
@@ -703,7 +735,7 @@ export function PatientVaultView() {
                           Dose
                           <input
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 medications: current.medications.map((item) =>
                                   item.id === medication.id ? { ...item, dose: event.target.value } : item
@@ -717,7 +749,7 @@ export function PatientVaultView() {
                           Frequency
                           <input
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 medications: current.medications.map((item) =>
                                   item.id === medication.id
@@ -736,7 +768,7 @@ export function PatientVaultView() {
                 <button
                   className="secondary-button"
                   onClick={() =>
-                    setVault((current) => ({
+                    updateDraftVault((current) => ({
                       ...current,
                       medications: [...current.medications, makeBlankMedication()]
                     }))
@@ -771,11 +803,10 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                disabled={isSaving}
                 onClick={() => toggleEditSection("allergies")}
                 type="button"
               >
-                {editingSections.allergies ? (isSaving ? "Saving..." : "Save") : "Edit"}
+                {editingSections.allergies ? "Done" : "Edit"}
               </button>
             </div>
             {editingSections.allergies ? (
@@ -788,7 +819,7 @@ export function PatientVaultView() {
                           Allergen
                           <input
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 allergies: current.allergies.map((item) =>
                                   item.id === allergy.id ? { ...item, allergen: event.target.value } : item
@@ -802,7 +833,7 @@ export function PatientVaultView() {
                           Reaction
                           <input
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 allergies: current.allergies.map((item) =>
                                   item.id === allergy.id ? { ...item, reaction: event.target.value } : item
@@ -816,7 +847,7 @@ export function PatientVaultView() {
                           Severity
                           <select
                             onChange={(event) =>
-                              setVault((current) => ({
+                              updateDraftVault((current) => ({
                                 ...current,
                                 allergies: current.allergies.map((item) =>
                                   item.id === allergy.id
@@ -842,7 +873,7 @@ export function PatientVaultView() {
                 <button
                   className="secondary-button"
                   onClick={() =>
-                    setVault((current) => ({
+                    updateDraftVault((current) => ({
                       ...current,
                       allergies: [...current.allergies, makeBlankAllergy()]
                     }))
@@ -878,11 +909,10 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                disabled={isSaving}
                 onClick={() => toggleEditSection("insurance")}
                 type="button"
               >
-                {editingSections.insurance ? (isSaving ? "Saving..." : "Save") : "Edit"}
+                {editingSections.insurance ? "Done" : "Edit"}
               </button>
             </div>
             {editingSections.insurance ? (
@@ -892,7 +922,7 @@ export function PatientVaultView() {
                     Insurance provider
                     <input
                       onChange={(event) =>
-                        setVault((current) => ({
+                        updateDraftVault((current) => ({
                           ...current,
                           insurance: { ...current.insurance, providerName: event.target.value }
                         }))
@@ -904,7 +934,7 @@ export function PatientVaultView() {
                     Insurance member ID
                     <input
                       onChange={(event) =>
-                        setVault((current) => ({
+                        updateDraftVault((current) => ({
                           ...current,
                           insurance: { ...current.insurance, memberId: event.target.value }
                         }))
@@ -918,7 +948,7 @@ export function PatientVaultView() {
                     Group number
                     <input
                       onChange={(event) =>
-                        setVault((current) => ({
+                        updateDraftVault((current) => ({
                           ...current,
                           insurance: { ...current.insurance, groupNumber: event.target.value }
                         }))
@@ -930,7 +960,7 @@ export function PatientVaultView() {
                     Subscriber name
                     <input
                       onChange={(event) =>
-                        setVault((current) => ({
+                        updateDraftVault((current) => ({
                           ...current,
                           insurance: { ...current.insurance, subscriberName: event.target.value }
                         }))
@@ -969,11 +999,10 @@ export function PatientVaultView() {
               </div>
               <button
                 className="edit-chip"
-                disabled={isSaving}
                 onClick={() => toggleEditSection("emergency")}
                 type="button"
               >
-                {editingSections.emergency ? (isSaving ? "Saving..." : "Save") : "Edit"}
+                {editingSections.emergency ? "Done" : "Edit"}
               </button>
             </div>
             {editingSections.emergency ? (
@@ -982,7 +1011,7 @@ export function PatientVaultView() {
                   Contact name
                   <input
                     onChange={(event) =>
-                      setVault((current) => ({
+                      updateDraftVault((current) => ({
                         ...current,
                         emergencyContact: { ...current.emergencyContact, name: event.target.value }
                       }))
@@ -994,7 +1023,7 @@ export function PatientVaultView() {
                   Relationship
                   <input
                     onChange={(event) =>
-                      setVault((current) => ({
+                      updateDraftVault((current) => ({
                         ...current,
                         emergencyContact: {
                           ...current.emergencyContact,
@@ -1009,7 +1038,7 @@ export function PatientVaultView() {
                   Phone
                   <input
                     onChange={(event) =>
-                      setVault((current) => ({
+                      updateDraftVault((current) => ({
                         ...current,
                         emergencyContact: { ...current.emergencyContact, phone: event.target.value }
                       }))
@@ -1032,8 +1061,8 @@ export function PatientVaultView() {
         </div>
 
         <div className="form-footer">
-          <button className="primary-button" disabled={isSaving} onClick={saveVault} type="button">
-            {isSaving ? "Saving health profile..." : "Save health profile"}
+          <button className="primary-button" disabled={isSaving} onClick={syncVaultNow} type="button">
+            {isSaving ? "Syncing..." : "Sync now"}
           </button>
           <button
             className="secondary-button"
@@ -1043,7 +1072,7 @@ export function PatientVaultView() {
           >
             {isLoadingServer ? "Loading..." : "Load saved profile"}
           </button>
-          <p>{vault.lastUpdatedAt ? `Last saved ${new Date(vault.lastUpdatedAt).toLocaleString()}` : "Save your health profile when these sections look right."}</p>
+          <p>{vault.lastUpdatedAt ? `Autosaved ${new Date(vault.lastUpdatedAt).toLocaleString()}` : "Changes save automatically as you type."}</p>
         </div>
 
         {message ? <p className="info-text">{message}</p> : null}
