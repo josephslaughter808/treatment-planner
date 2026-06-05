@@ -922,6 +922,62 @@ select:focus {
   gap: 18px !important;
 }
 
+.patient-share-layout {
+  display: grid !important;
+  grid-template-columns: minmax(320px, 0.85fr) minmax(280px, 0.55fr) !important;
+  gap: 18px !important;
+  align-items: start !important;
+}
+
+.patient-share-pass,
+.patient-share-instructions {
+  display: grid !important;
+  gap: 20px !important;
+}
+
+.qr-card {
+  width: min(360px, 100%) !important;
+  display: grid !important;
+  place-items: center !important;
+  justify-self: center !important;
+  padding: clamp(16px, 5vw, 28px) !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 24px !important;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent 42%),
+    #ffffff !important;
+}
+
+.qr-card img {
+  width: min(100%, 320px) !important;
+  height: auto !important;
+  border-radius: 18px !important;
+}
+
+.share-code-card {
+  display: grid !important;
+  gap: 6px !important;
+  padding: 18px !important;
+  border: 1px solid rgba(37, 99, 235, 0.2) !important;
+  border-radius: 18px !important;
+  background: rgba(37, 99, 235, 0.06) !important;
+}
+
+.share-code-card span {
+  color: var(--analyst-slate) !important;
+  font-size: 0.78rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.share-code-card strong {
+  color: var(--analyst-text) !important;
+  font-size: clamp(1.65rem, 7vw, 3.2rem) !important;
+  letter-spacing: -0.06em !important;
+  overflow-wrap: anywhere !important;
+}
+
 .documents-intro-panel {
   background:
     linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent 44%),
@@ -998,6 +1054,7 @@ select:focus {
 
 @media (max-width: 1080px) {
   .shell-with-nav,
+  .patient-app-shell.shell-with-nav,
   .provider-app-shell.shell-with-nav,
   .public-app-shell {
     grid-template-columns: 1fr !important;
@@ -1009,10 +1066,11 @@ select:focus {
   .patient-app-shell .topbar {
     position: static !important;
     inset: auto !important;
-    width: auto !important;
+    width: 100% !important;
     height: auto !important;
     min-height: auto !important;
     grid-row: 1 !important;
+    grid-column: 1 !important;
     overflow: visible !important;
     padding: 14px 18px !important;
     border-right: 0 !important;
@@ -1023,6 +1081,7 @@ select:focus {
 
   .topbar-brand,
   .provider-app-shell .topbar-brand,
+  .patient-app-shell .topbar-brand,
   .patient-app-shell .brand-lockup {
     width: auto !important;
     display: flex !important;
@@ -1035,6 +1094,11 @@ select:focus {
   .patient-app-shell .user-copy {
     opacity: 1 !important;
     pointer-events: auto !important;
+  }
+
+  .patient-app-shell .brand-lockup,
+  .patient-app-shell .topnav-link {
+    width: auto !important;
   }
 
   .topnav,
@@ -1087,6 +1151,7 @@ select:focus {
   .v0-checkin-layout,
   .patient-signup-layout,
   .login-layout,
+  .patient-share-layout,
   .document-slot-grid,
   .family-permission-grid,
   .child-profile-grid,
@@ -1105,14 +1170,31 @@ select:focus {
 }
 
 @media (max-width: 720px) {
+  html,
+  body {
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .patient-app-shell.shell-with-nav {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: block !important;
+  }
+
   .app-utility-bar {
     display: none !important;
   }
 
   .patient-app-shell .topbar {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
     min-height: 82px !important;
     padding: 12px 16px !important;
     align-items: center !important;
+    justify-content: flex-start !important;
   }
 
   .patient-app-shell .topbar-logo,
@@ -1122,6 +1204,7 @@ select:focus {
   }
 
   .patient-app-shell .brand-lockup {
+    width: auto !important;
     gap: 10px !important;
     overflow: hidden !important;
   }
@@ -1141,6 +1224,27 @@ select:focus {
     display: none !important;
   }
 
+  .patient-app-shell .page-banner {
+    width: 100% !important;
+    padding: 24px 16px 12px !important;
+  }
+
+  .patient-app-shell .shell-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 14px 96px !important;
+  }
+
+  .vault-layout,
+  .v0-patient-vault,
+  .patient-share-layout,
+  .documents-layout,
+  .family-hub-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
   .public-auth-header {
     padding: 26px 20px !important;
   }
@@ -1153,6 +1257,8 @@ select:focus {
   }
 
   .panel {
+    width: 100% !important;
+    min-width: 0 !important;
     padding: 18px !important;
   }
 
@@ -1168,7 +1274,7 @@ select:focus {
   .mobile-tab {
     min-height: 48px !important;
     gap: 5px !important;
-    font-size: 0.78rem !important;
+    font-size: 0.7rem !important;
     font-weight: 850 !important;
   }
 

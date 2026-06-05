@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { practicesById } from "@/lib/clinical-catalog";
@@ -16,12 +17,15 @@ import {
 
 export function IntakeCheckInView() {
   const { currentUser, authMode } = useAuth();
+  const searchParams = useSearchParams();
+  const initialMemberId = searchParams.get("memberId") || searchParams.get("accessCode") || "";
+  const initialAccessCode = searchParams.get("accessCode") || "";
   const [vault] = useState<PatientVault>(() => readVaultFromStorage());
   const [serverPatients, setServerPatients] = useState<PatientVault[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<PatientVault | null>(null);
   const [email, setEmail] = useState(() => readVaultFromStorage().email);
-  const [memberId, setMemberId] = useState(() => readVaultFromStorage().memberId);
-  const [accessCode, setAccessCode] = useState("");
+  const [memberId, setMemberId] = useState(() => initialMemberId || readVaultFromStorage().memberId);
+  const [accessCode, setAccessCode] = useState(initialAccessCode);
   const [isPatientFinderOpen, setIsPatientFinderOpen] = useState(false);
   const [patientSearch, setPatientSearch] = useState({
     firstName: "",
@@ -30,8 +34,8 @@ export function IntakeCheckInView() {
     phone: "",
     address: "",
     email: "",
-    memberId: "",
-    accessCode: ""
+    memberId: initialMemberId,
+    accessCode: initialAccessCode
   });
   const [insuranceConfirmed, setInsuranceConfirmed] = useState(true);
   const [historyConfirmed, setHistoryConfirmed] = useState(true);
@@ -140,7 +144,7 @@ export function IntakeCheckInView() {
       const patientMemberMatch =
         patient.memberId === normalizedMemberId || patient.walletCode === normalizedMemberId;
 
-      return patientEmailMatch && (!normalizedMemberId || patientMemberMatch);
+      return normalizedMemberId ? patientMemberMatch && (!email.trim() || patientEmailMatch) : patientEmailMatch;
     });
     const localShareLinkMatch = readShareLinksFromStorage().find(
       (link) =>
