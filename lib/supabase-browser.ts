@@ -35,8 +35,13 @@ export async function getSupabaseAccessToken() {
     return null;
   }
 
-  const { data } = await supabase.auth.getSession();
-  return data.session?.access_token ?? null;
+  try {
+    const { data } = await supabase.auth.getSession();
+    return data.session?.access_token ?? null;
+  } catch (error) {
+    console.error("Unable to reach Supabase while reading the current session.", error);
+    return null;
+  }
 }
 
 export async function getSupabaseAuthHeaders() {

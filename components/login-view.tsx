@@ -26,14 +26,22 @@ export function LoginView() {
     }
 
     setIsSubmitting(true);
-    const result = await signIn({ email, password });
-    setMessage(result.message);
+    try {
+      const result = await signIn({ email, password });
+      setMessage(result.message);
 
-    if (result.ok) {
-      router.push(result.redirectTo || "/");
+      if (result.ok) {
+        router.push(result.redirectTo || "/");
+      }
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Login could not finish. Please try again in a moment."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   }
 
   function selectDemoAccount(nextEmail: string) {

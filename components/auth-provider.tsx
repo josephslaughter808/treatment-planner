@@ -94,10 +94,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const profile = await fetchServerProfile({
-        authUserId: session.user.id,
-        email: session.user.email || undefined
-      });
+      let profile: AccountProfile | null = null;
+      try {
+        profile = await fetchServerProfile({
+          authUserId: session.user.id,
+          email: session.user.email || undefined
+        });
+      } catch (error) {
+        console.error("Unable to hydrate ClearPath profile.", error);
+      }
 
       if (!mounted) {
         return;
@@ -110,7 +115,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsReady(true);
     }
 
-    void supabase.auth.getSession().then(({ data }) => hydrateFromSession(data.session));
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => hydrateFromSession(data.session))
+      .catch((error) => {
+        console.error("Unable to read Supabase session.", error);
+        if (mounted) {
+          setCurrentUser(null);
+          setIsReady(true);
+        }
+      });
 
     const {
       data: { subscription }
@@ -186,10 +200,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { ok: false, message: "Supabase auth is not configured yet." };
         }
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: input.email.trim(),
-          password: input.password
-        });
+        let data;
+        let error;
+        try {
+          const result = await supabase.auth.signInWithPassword({
+            email: input.email.trim(),
+            password: input.password
+          });
+          data = result.data;
+          error = result.error;
+        } catch (signInError) {
+          return {
+            ok: false,
+            message: getFriendlyAuthErrorMessage(signInError)
+          };
+        }
 
         if (error || !data.user) {
           return {
@@ -198,10 +223,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           };
         }
 
-        let profile = await fetchServerProfile({
-          authUserId: data.user.id,
-          email: data.user.email || input.email.trim()
-        });
+        let profile: AccountProfile | null = null;
+        try {
+          profile = await fetchServerProfile({
+            authUserId: data.user.id,
+            email: data.user.email || input.email.trim()
+          });
+        } catch (profileError) {
+          return {
+            ok: false,
+            message: getFriendlyProfileErrorMessage(profileError)
+          };
+        }
 
         if (!profile) {
           const patientProfileResult = await saveServerProfile({
@@ -286,10 +319,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { ok: false, message: "Supabase auth is not configured yet." };
         }
 
-        const { data, error } = await supabase.auth.signUp({
-          email: input.email.trim(),
-          password: input.password
-        });
+        let data;
+        let error;
+        try {
+          const result = await supabase.auth.signUp({
+            email: input.email.trim(),
+            password: input.password
+          });
+          data = result.data;
+          error = result.error;
+        } catch (signUpError) {
+          return {
+            ok: false,
+            message: getFriendlyAuthErrorMessage(signUpError)
+          };
+        }
 
         if (error || !data.user) {
           return {
@@ -350,7 +394,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const supabase = getSupabaseBrowserClient();
         if (supabase) {
-          await supabase.auth.signOut();
+          try {
+            await supabase.auth.signOut();
+          } catch (error) {
+            console.error("Unable to sign out of Supabase.", error);
+          }
         }
         setCurrentUser(null);
       },
@@ -384,7 +432,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const supabase = getSupabaseBrowserClient();
-        const session = supabase ? (await supabase.auth.getSession()).data.session : null;
+        let session: Session | null = null;
+        try {
+          session = supabase ? (await supabase.auth.getSession()).data.session : null;
+        } catch (error) {
+          return {
+            ok: false,
+            message: getFriendlyAuthErrorMessage(error)
+          };
+        }
         if (!session?.user) {
           return { ok: false, message: "Supabase session was not found." };
         }
@@ -501,7 +557,7 @@ async function fetchServerProfile(input: { authUserId?: string; email?: string }
 
   const headers = await getSupabaseAuthHeaders();
   const response = await fetch(`/api/account-profiles?${params.toString()}`, { headers });
-  const data = (await response.json()) as {
+  const data = (await readJsonResponse(response)) as {
     profile?: AccountProfile | null;
     error?: string;
   };
@@ -523,32 +579,70 @@ async function saveServerProfile(input: {
   avatarColor: string;
   avatarDataUrl?: string;
 }) {
-  const headers = await getSupabaseAuthHeaders();
-  const response = await fetch("/api/account-profiles", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...headers
-    },
-    body: JSON.stringify(input)
-  });
+  try {
+    const headers = await getSupabaseAuthHeaders();
+    const response = await fetch("/api/account-profiles", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...headers
+      },
+      body: JSON.stringify(input)
+    });
 
-  const data = (await response.json()) as {
-    mode?: "supabase" | "mock";
-    message?: string;
-    profile?: AccountProfile | null;
-    error?: string;
-  };
+    const data = (await readJsonResponse(response)) as {
+      mode?: "supabase" | "mock";
+      message?: string;
+      profile?: AccountProfile | null;
+      error?: string;
+    };
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return {
+        profile: null,
+        message: data.error || "Unable to save the office profile."
+      };
+    }
+
+    return {
+      profile: data.profile ?? null,
+      message: data.message || ""
+    };
+  } catch (error) {
     return {
       profile: null,
-      message: data.error || "Unable to save the office profile."
+      message: getFriendlyProfileErrorMessage(error)
     };
   }
+}
 
-  return {
-    profile: data.profile ?? null,
-    message: data.message || ""
-  };
+async function readJsonResponse(response: Response) {
+  const text = await response.text();
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return { error: text };
+  }
+}
+
+function getFriendlyAuthErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || "");
+  if (message.toLowerCase().includes("failed to fetch")) {
+    return "ClearPath cannot reach Supabase right now. Check the Supabase project URL/key in Vercel or whether the Supabase project is paused.";
+  }
+
+  return message || "ClearPath could not connect to the account service.";
+}
+
+function getFriendlyProfileErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || "");
+  if (message.toLowerCase().includes("failed to fetch")) {
+    return "ClearPath signed in, but could not reach the profile database. Check Supabase connectivity and Vercel environment variables.";
+  }
+
+  return message || "ClearPath could not load the profile database.";
 }
