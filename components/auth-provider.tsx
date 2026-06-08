@@ -17,10 +17,12 @@ import {
   type UserRole
 } from "@/lib/account-directory";
 import {
+  clearSupabaseProxySession,
   getSupabaseBrowserClient,
   getSupabaseAuthHeaders,
   isSupabaseBrowserConfigured,
-  isSupabaseRequiredInBrowser
+  isSupabaseRequiredInBrowser,
+  storeSupabaseProxySession
 } from "@/lib/supabase-browser";
 
 type SignInInput = {
@@ -200,6 +202,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { ok: false, message: "Supabase auth is not configured yet." };
         }
 
+        const proxiedSignIn = await signInThroughServer(input);
+        if (proxiedSignIn.ok && proxiedSignIn.profile) {
+          setCurrentUser(proxiedSignIn.profile);
+          setAccounts((current) => mergeProfiles(current, proxiedSignIn.profile!));
+          return {
+            ok: true,
+            message: `Signed in as ${proxiedSignIn.profile.name}.`,
+            redirectTo: isPatientRole(proxiedSignIn.profile.role) ? "/patient" : "/"
+          };
+        }
+        if (proxiedSignIn.completed) {
+          return {
+            ok: false,
+            message: proxiedSignIn.message
+          };
+        }
+
         let data;
         let error;
         try {
@@ -212,7 +231,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (signInError) {
           return {
             ok: false,
-            message: getFriendlyAuthErrorMessage(signInError)
+            message: proxiedSignIn.message || getFriendlyAuthErrorMessage(signInError)
           };
         }
 
@@ -400,6 +419,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Unable to sign out of Supabase.", error);
           }
         }
+        clearSupabaseProxySession();
         setCurrentUser(null);
       },
       async updateProfile(input) {
@@ -645,4 +665,62 @@ function getFriendlyProfileErrorMessage(error: unknown) {
   }
 
   return message || "ClearPath could not load the profile database.";
+}
+
+async function signInThroughServer(input: SignInInput): Promise<{
+  ok: boolean;
+  completed: boolean;
+  message: string;
+  profile: AccountProfile | null;
+}> {
+  try {
+    const response = await fetch("/api/auth/sign-in", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: input.email.trim(),
+        password: input.password
+      })
+    });
+
+    const data = (await readJsonResponse(response)) as {
+      error?: string;
+      profile?: AccountProfile | null;
+      accessToken?: string;
+      refreshToken?: string | null;
+      expiresAt?: number | null;
+    };
+
+    if (!response.ok || !data.profile || !data.accessToken) {
+      return {
+        ok: false,
+        completed: true,
+        message: data.error || "Unable to sign in through ClearPath.",
+        profile: null
+      };
+    }
+
+    storeSupabaseProxySession({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      expiresAt: data.expiresAt
+    });
+
+    return {
+      ok: true,
+      completed: true,
+      message: `Signed in as ${data.profile.name}.`,
+      profile: data.profile
+    };
+  } catch (error) {
+    console.error("ClearPath proxy sign-in failed, falling back to browser Supabase auth.", error);
+    return {
+      ok: false,
+      completed: false,
+      message: "",
+      profile: null
+    };
+  }
 }
