@@ -1192,6 +1192,146 @@ select:focus {
   grid-column: 2 !important;
 }
 
+.change-review-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 95 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 28px !important;
+  background: rgba(15, 23, 42, 0.38) !important;
+  backdrop-filter: blur(7px) !important;
+}
+
+.change-review-modal {
+  width: min(620px, 100%) !important;
+  max-height: calc(100vh - 56px) !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  border: 3px solid var(--analyst-red) !important;
+  border-radius: 26px !important;
+  color: var(--analyst-text) !important;
+  background: #ffffff !important;
+  box-shadow: 0 28px 90px rgba(15, 23, 42, 0.18) !important;
+}
+
+.change-review-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  padding: 22px 24px !important;
+  border-bottom: 1px solid rgba(220, 51, 69, 0.3) !important;
+  background: linear-gradient(135deg, #fff1f2, #ffffff) !important;
+}
+
+.change-review-header h2 {
+  margin: 0 0 6px !important;
+  color: #991b1b !important;
+  font-size: 1.8rem !important;
+  line-height: 1 !important;
+}
+
+.change-review-header p {
+  margin: 0 !important;
+  color: var(--analyst-slate) !important;
+}
+
+.change-review-count {
+  height: fit-content !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: var(--analyst-red) !important;
+  font-size: 0.78rem !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+}
+
+.change-review-body {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 20px 24px 24px !important;
+}
+
+.change-review-patient {
+  display: grid !important;
+  gap: 3px !important;
+  margin-bottom: 16px !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--analyst-line) !important;
+  border-radius: 16px !important;
+  background: var(--analyst-soft) !important;
+}
+
+.change-review-patient strong {
+  color: var(--analyst-text) !important;
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif !important;
+  font-size: 1.15rem !important;
+  letter-spacing: -0.04em !important;
+}
+
+.change-review-patient span {
+  color: var(--analyst-slate) !important;
+  font-weight: 800 !important;
+}
+
+.change-review-list {
+  display: grid !important;
+  gap: 12px !important;
+  margin-bottom: 18px !important;
+}
+
+.change-review-item {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  gap: 12px !important;
+  padding: 14px !important;
+  border: 1px solid #fecaca !important;
+  border-radius: 16px !important;
+  background: #fff7f7 !important;
+}
+
+.change-review-item > span {
+  width: 34px !important;
+  height: 34px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: var(--analyst-red) !important;
+  font-weight: 950 !important;
+}
+
+.change-review-item strong {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: var(--analyst-text) !important;
+}
+
+.change-review-item p {
+  margin: 0 !important;
+  color: var(--analyst-slate) !important;
+  line-height: 1.5 !important;
+}
+
+.change-review-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  padding-top: 4px !important;
+}
+
+.change-review-actions .danger-button {
+  min-height: 46px !important;
+  color: #ffffff !important;
+  background: var(--analyst-red) !important;
+}
+
 .pilot-invite-card {
   display: grid !important;
   gap: 16px !important;

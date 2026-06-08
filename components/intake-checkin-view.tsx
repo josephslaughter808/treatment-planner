@@ -56,6 +56,7 @@ export function IntakeCheckInView() {
   const [isLoadingPatients, setIsLoadingPatients] = useState(false);
   const [serverShareLink, setServerShareLink] = useState<ShareLinkRecord | null>(null);
   const [scanStatus, setScanStatus] = useState<"idle" | "starting" | "scanning" | "found" | "unsupported" | "error">("idle");
+  const [acknowledgedChangeKey, setAcknowledgedChangeKey] = useState("");
 
   useEffect(() => {
     const practiceId = currentUser?.practiceId;
@@ -210,11 +211,33 @@ export function IntakeCheckInView() {
     () => (matched ? buildCheckInChangeAlerts(matched, previousCheckIn, profileUpdatedAfterLastVisit) : []),
     [matched, previousCheckIn, profileUpdatedAfterLastVisit]
   );
+  const modalChangeAlerts = useMemo(
+    () => (previousCheckIn ? changeAlerts : []),
+    [changeAlerts, previousCheckIn]
+  );
+  const changeAlertKey = useMemo(
+    () =>
+      matched && previousCheckIn && modalChangeAlerts.length > 0
+        ? [
+            matched.profileId || matched.email,
+            previousCheckIn.id,
+            matched.lastUpdatedAt || "",
+            ...modalChangeAlerts.map((alert) => `${alert.title}:${alert.body}`)
+          ].join("|")
+        : "",
+    [matched, modalChangeAlerts, previousCheckIn]
+  );
+  const hasUnacknowledgedChanges = Boolean(changeAlertKey && acknowledgedChangeKey !== changeAlertKey);
   const isCameraActive = scanStatus === "starting" || scanStatus === "scanning";
 
   async function saveCheckIn() {
     if (!matched || !currentUser) {
       setMessage("Select a patient health profile and sign in to record an office check-in.");
+      return;
+    }
+
+    if (hasUnacknowledgedChanges) {
+      setMessage("Review and acknowledge the medical history changes before saving today's verification.");
       return;
     }
 
@@ -402,6 +425,64 @@ export function IntakeCheckInView() {
 
   return (
     <div className="v0-checkin-stage">
+      {matched && hasUnacknowledgedChanges ? (
+        <section
+          aria-label="Medical history changes require review"
+          aria-modal="true"
+          className="change-review-backdrop"
+          role="dialog"
+        >
+          <div className="change-review-modal">
+            <div className="change-review-header">
+              <div>
+                <p className="eyebrow">Medical history alert</p>
+                  <h2>Medical history changed</h2>
+                <p>
+                  Review these updates before seating or treating this patient.
+                </p>
+              </div>
+              <span className="change-review-count">
+                {modalChangeAlerts.length} {modalChangeAlerts.length === 1 ? "change" : "changes"}
+              </span>
+            </div>
+
+            <div className="change-review-body">
+              <div className="change-review-patient">
+                <strong>{matched.fullName}</strong>
+                <span>
+                  Last check-in {formatCheckInDate(previousCheckIn.verifiedAt)}
+                </span>
+              </div>
+
+              <div className="change-review-list">
+                {modalChangeAlerts.map((alert, index) => (
+                  <article className="change-review-item" key={`${alert.title}-${index}`}>
+                    <span aria-hidden="true">!</span>
+                    <div>
+                      <strong>{alert.title}</strong>
+                      <p>{alert.body}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className="change-review-actions">
+                <button
+                  className="danger-button"
+                  onClick={() => {
+                    setAcknowledgedChangeKey(changeAlertKey);
+                    setMessage("Medical history changes acknowledged. You can now save today's verification.");
+                  }}
+                  type="button"
+                >
+                  Acknowledge changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="panel checkin-command-bar">
         <div className="checkin-command-copy">
           <p className="eyebrow">Patient check-in</p>
@@ -605,7 +686,7 @@ export function IntakeCheckInView() {
         </div>
           <div className="dialogue-list provider-review-grid">
             {changeAlerts.length > 0 ? (
-            <div className="dialogue-card provider-change-panel provider-review-card-wide">
+            <div className="dialogue-card provider-change-panel provider-review-card-wide" data-checkin-change-summary>
               <div className="provider-change-panel-header">
                 <div>
                   <p className="eyebrow">Changes since last check-in</p>
@@ -734,8 +815,17 @@ export function IntakeCheckInView() {
                 />
               </label>
               <div className="form-footer">
-                <button className="primary-button" disabled={isSaving} onClick={saveCheckIn} type="button">
-                  {isSaving ? "Saving verification..." : "Save today's verification"}
+                <button
+                  className="primary-button"
+                  disabled={isSaving || hasUnacknowledgedChanges}
+                  onClick={saveCheckIn}
+                  type="button"
+                >
+                  {isSaving
+                    ? "Saving verification..."
+                    : hasUnacknowledgedChanges
+                      ? "Acknowledge changes first"
+                      : "Save today's verification"}
                 </button>
                 <p>Save only after the office has reviewed any changes and confirmed the patient is ready for today&apos;s visit.</p>
               </div>
