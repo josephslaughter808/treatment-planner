@@ -41,6 +41,7 @@ export async function GET() {
 
 async function checkSupabaseReachability(isConfigured: boolean) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!isConfigured || !supabaseUrl) {
     return { host: null, status: "not-configured" as const, error: null };
   }
@@ -49,6 +50,12 @@ async function checkSupabaseReachability(isConfigured: boolean) {
     const url = new URL("/auth/v1/health", supabaseUrl);
     const response = await fetch(url, {
       cache: "no-store",
+      headers: supabaseAnonKey
+        ? {
+            apikey: supabaseAnonKey,
+            Authorization: `Bearer ${supabaseAnonKey}`
+          }
+        : undefined,
       signal: AbortSignal.timeout(5000)
     });
 
