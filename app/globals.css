@@ -489,6 +489,42 @@ textarea {
   background: #f0fdf4;
 }
 
+.provider-change-group {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #fecaca;
+  border-radius: 18px;
+  padding: 16px;
+  background: #fff7f7;
+}
+
+.provider-change-group > strong {
+  color: #991b1b;
+}
+
+.provider-change-group > div {
+  display: grid;
+  gap: 8px;
+}
+
+.provider-change-row {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(220, 51, 69, 0.16);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.provider-change-row strong {
+  color: var(--ink);
+}
+
+.provider-change-row span {
+  color: var(--muted);
+}
+
 .option-card {
   display: grid;
   grid-template-columns: auto 1fr;

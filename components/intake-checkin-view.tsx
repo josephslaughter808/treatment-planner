@@ -24,6 +24,22 @@ type WindowWithBarcodeDetector = Window & {
   BarcodeDetector?: BarcodeDetectorConstructor;
 };
 
+type CheckInChangeAlert = {
+  title: string;
+  body: string;
+  tone: string;
+  category: string;
+  action: "added" | "removed" | "changed" | "review";
+  itemLabel: string;
+  detail?: string;
+};
+
+type GroupedCheckInChangeAlerts = {
+  key: string;
+  title: string;
+  alerts: CheckInChangeAlert[];
+};
+
 export function IntakeCheckInView() {
   const { currentUser, authMode } = useAuth();
   const searchParams = useSearchParams();
@@ -214,6 +230,14 @@ export function IntakeCheckInView() {
   const modalChangeAlerts = useMemo(
     () => (previousCheckIn ? changeAlerts : []),
     [changeAlerts, previousCheckIn]
+  );
+  const modalChangeAlertGroups = useMemo(
+    () => groupCheckInChangeAlerts(modalChangeAlerts),
+    [modalChangeAlerts]
+  );
+  const changeAlertGroups = useMemo(
+    () => groupCheckInChangeAlerts(changeAlerts),
+    [changeAlerts]
   );
   const changeAlertKey = useMemo(
     () =>
@@ -455,14 +479,21 @@ export function IntakeCheckInView() {
               </div>
 
               <div className="change-review-list">
-                {modalChangeAlerts.map((alert, index) => (
-                  <article className="change-review-item" key={`${alert.title}-${index}`}>
-                    <span aria-hidden="true">!</span>
-                    <div>
-                      <strong>{alert.title}</strong>
-                      <p>{alert.body}</p>
+                {modalChangeAlertGroups.map((group) => (
+                  <section className="change-review-group" key={group.key}>
+                    <div className="change-review-group-heading">
+                      <span aria-hidden="true">!</span>
+                      <strong>{group.title}</strong>
                     </div>
-                  </article>
+                    <div className="change-review-group-list">
+                      {group.alerts.map((alert, index) => (
+                        <article className="change-review-row" key={`${alert.title}-${alert.itemLabel}-${index}`}>
+                          <strong>{alert.itemLabel}</strong>
+                          {alert.detail ? <span>{alert.detail}</span> : null}
+                        </article>
+                      ))}
+                    </div>
+                  </section>
                 ))}
               </div>
 
@@ -697,11 +728,18 @@ export function IntakeCheckInView() {
                 </span>
               </div>
               <div className="provider-change-list">
-                {changeAlerts.map((alert) => (
-                  <article className={`provider-change-alert ${alert.tone}`} key={alert.title}>
-                    <strong>{alert.title}</strong>
-                    <p>{alert.body}</p>
-                  </article>
+                {changeAlertGroups.map((group) => (
+                  <section className="provider-change-group" key={group.key}>
+                    <strong>{group.title}</strong>
+                    <div>
+                      {group.alerts.map((alert, index) => (
+                        <p className={`provider-change-row ${alert.tone}`} key={`${alert.title}-${alert.itemLabel}-${index}`}>
+                          <strong>{alert.itemLabel}</strong>
+                          {alert.detail ? <span>{alert.detail}</span> : null}
+                        </p>
+                      ))}
+                    </div>
+                  </section>
                 ))}
               </div>
             </div>
@@ -872,7 +910,7 @@ function buildCheckInChangeAlerts(
   patient: PatientVault,
   previousCheckIn: CheckInRecord | null,
   profileUpdatedAfterLastVisit: boolean
-) {
+): CheckInChangeAlert[] {
   const currentSnapshot = buildCheckInProfileSnapshot(patient);
 
   if (!previousCheckIn) {
@@ -880,7 +918,11 @@ function buildCheckInChangeAlerts(
       {
         title: "First ClearPath verification for this practice",
         body: "This is the first saved check-in baseline for this patient at this practice. Review the full chart once before saving today.",
-        tone: "attention"
+        tone: "attention",
+        category: "baseline",
+        action: "review",
+        itemLabel: "First ClearPath verification",
+        detail: "Review the full chart once before saving today."
       }
     ];
   }
@@ -894,7 +936,11 @@ function buildCheckInChangeAlerts(
       {
         title: "Patient profile changed after the last visit",
         body: "This older check-in does not include an itemized comparison baseline yet. After today's verification is saved, future visits will show exact additions, removals, and field changes.",
-        tone: "attention"
+        tone: "attention",
+        category: "profile",
+        action: "review",
+        itemLabel: "Patient profile changed",
+        detail: "Save today after review so future visits can show exact additions, removals, and field changes."
       }
     ];
   }
@@ -932,42 +978,54 @@ function buildCheckInProfileSnapshot(patient: PatientVault): CheckInProfileSnaps
 
 function buildSnapshotChanges(previous: CheckInProfileSnapshot, current: CheckInProfileSnapshot) {
   return [
-    ...compareStringList("Medical conditions", previous.conditions, current.conditions),
-    ...compareStringList("Medications", previous.medications, current.medications),
-    ...compareStringList("Allergies", previous.allergies, current.allergies),
-    ...compareField("Phone", previous.phone, current.phone),
-    ...compareField("Date of birth", previous.dateOfBirth, current.dateOfBirth),
-    ...compareField("Insurance provider", previous.insurance.providerName, current.insurance.providerName),
-    ...compareField("Insurance member ID", previous.insurance.memberId, current.insurance.memberId),
-    ...compareField("Insurance group", previous.insurance.groupNumber, current.insurance.groupNumber),
-    ...compareField("Subscriber", previous.insurance.subscriberName, current.insurance.subscriberName),
-    ...compareField("Emergency contact", previous.emergencyContact.name, current.emergencyContact.name),
-    ...compareField("Emergency relationship", previous.emergencyContact.relationship, current.emergencyContact.relationship),
-    ...compareField("Emergency phone", previous.emergencyContact.phone, current.emergencyContact.phone)
+    ...compareStringList("condition", "Medical conditions", previous.conditions, current.conditions),
+    ...compareStringList("medication", "Medications", previous.medications, current.medications),
+    ...compareStringList("allergy", "Allergies", previous.allergies, current.allergies),
+    ...compareField("profile", "Phone", previous.phone, current.phone),
+    ...compareField("profile", "Date of birth", previous.dateOfBirth, current.dateOfBirth),
+    ...compareField("insurance", "Insurance provider", previous.insurance.providerName, current.insurance.providerName),
+    ...compareField("insurance", "Insurance member ID", previous.insurance.memberId, current.insurance.memberId),
+    ...compareField("insurance", "Insurance group", previous.insurance.groupNumber, current.insurance.groupNumber),
+    ...compareField("insurance", "Subscriber", previous.insurance.subscriberName, current.insurance.subscriberName),
+    ...compareField("emergency", "Emergency contact", previous.emergencyContact.name, current.emergencyContact.name),
+    ...compareField("emergency", "Emergency relationship", previous.emergencyContact.relationship, current.emergencyContact.relationship),
+    ...compareField("emergency", "Emergency phone", previous.emergencyContact.phone, current.emergencyContact.phone)
   ];
 }
 
-function compareStringList(label: string, previousValues: string[], currentValues: string[]) {
+function compareStringList(category: string, label: string, previousValues: string[], currentValues: string[]) {
   const previous = new Set(previousValues.map(normalizeSnapshotValue).filter(Boolean));
   const current = new Set(currentValues.map(normalizeSnapshotValue).filter(Boolean));
-  const changes: { title: string; body: string; tone: string }[] = [];
+  const changes: CheckInChangeAlert[] = [];
 
   currentValues.forEach((value) => {
     if (value.trim() && !previous.has(normalizeSnapshotValue(value))) {
+      const classifiedCategory = classifyListChangeCategory(category, value);
+      const parsed = parseChangedListValue(value);
       changes.push({
         title: `${label} added`,
         body: value,
-        tone: "attention"
+        tone: "attention",
+        category: classifiedCategory,
+        action: "added",
+        itemLabel: parsed.itemLabel,
+        detail: parsed.detail
       });
     }
   });
 
   previousValues.forEach((value) => {
     if (value.trim() && !current.has(normalizeSnapshotValue(value))) {
+      const classifiedCategory = classifyListChangeCategory(category, value);
+      const parsed = parseChangedListValue(value);
       changes.push({
         title: `${label} removed`,
         body: value,
-        tone: "attention"
+        tone: "attention",
+        category: classifiedCategory,
+        action: "removed",
+        itemLabel: parsed.itemLabel,
+        detail: parsed.detail
       });
     }
   });
@@ -975,7 +1033,7 @@ function compareStringList(label: string, previousValues: string[], currentValue
   return changes;
 }
 
-function compareField(label: string, previousValue: string, currentValue: string) {
+function compareField(category: string, label: string, previousValue: string, currentValue: string) {
   if (normalizeSnapshotValue(previousValue) === normalizeSnapshotValue(currentValue)) {
     return [];
   }
@@ -984,9 +1042,98 @@ function compareField(label: string, previousValue: string, currentValue: string
     {
       title: `${label} changed`,
       body: `${previousValue || "Not entered"} -> ${currentValue || "Not entered"}`,
-      tone: "attention"
+      tone: "attention",
+      category,
+      action: "changed" as const,
+      itemLabel: label,
+      detail: `${previousValue || "Not entered"} -> ${currentValue || "Not entered"}`
     }
   ];
+}
+
+function groupCheckInChangeAlerts(alerts: CheckInChangeAlert[]): GroupedCheckInChangeAlerts[] {
+  const groups = new Map<string, GroupedCheckInChangeAlerts>();
+
+  alerts.forEach((alert) => {
+    const key = `${alert.category}:${alert.action}`;
+    const existing = groups.get(key);
+    if (existing) {
+      existing.alerts.push(alert);
+      return;
+    }
+
+    groups.set(key, {
+      key,
+      title: getChangeGroupTitle(alert.category, alert.action),
+      alerts: [alert]
+    });
+  });
+
+  return Array.from(groups.values());
+}
+
+function getChangeGroupTitle(category: string, action: CheckInChangeAlert["action"]) {
+  const actionLabel =
+    action === "added" ? "added" : action === "removed" ? "removed" : action === "changed" ? "changed" : "needs review";
+  const categoryLabel =
+    category === "allergy"
+      ? "Allergies"
+      : category === "medication"
+        ? "Medications"
+        : category === "hospitalization"
+          ? "Hospital stays / surgeries"
+          : category === "insurance"
+            ? "Insurance"
+            : category === "emergency"
+              ? "Emergency contact"
+              : category === "dependent"
+                ? "Dependents"
+                : category === "profile"
+                  ? "Patient profile"
+                  : category === "baseline"
+                    ? "Baseline"
+                    : "Medical conditions";
+
+  return `${categoryLabel} ${actionLabel}`;
+}
+
+function classifyListChangeCategory(category: string, value: string) {
+  if (category === "condition" && isHospitalizationOrSurgeryValue(value)) {
+    return "hospitalization";
+  }
+
+  return category;
+}
+
+function isHospitalizationOrSurgeryValue(value: string) {
+  return /surgery|surgeries|hospitalization|hospital stays|major illness/i.test(value);
+}
+
+function parseChangedListValue(value: string) {
+  const normalized = value.trim();
+  const separatorIndex = normalized.indexOf(":");
+
+  if (separatorIndex > -1) {
+    const label = normalized.slice(0, separatorIndex).trim();
+    const detail = normalized.slice(separatorIndex + 1).trim();
+
+    if (isHospitalizationOrSurgeryValue(label) && detail) {
+      return {
+        itemLabel: detail,
+        detail: label
+      };
+    }
+
+    return {
+      itemLabel: label || normalized,
+      detail: detail || undefined
+    };
+  }
+
+  return {
+    itemLabel: normalized.replace(/:?\s*Selected in medical questionnaire\.?/i, "").trim() || normalized,
+    detail: /Selected in medical questionnaire/i.test(normalized) ? "Selected in medical questionnaire." : undefined
+  };
 }
 
 function normalizeSnapshotValue(value: string) {
