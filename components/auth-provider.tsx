@@ -90,20 +90,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (!session?.user) {
-        setCurrentUser(null);
-        setIsReady(true);
-        return;
+      let profile: AccountProfile | null = null;
+      if (session?.user) {
+        try {
+          profile = await fetchServerProfile({
+            authUserId: session.user.id,
+            email: session.user.email || undefined
+          });
+        } catch (error) {
+          console.error("Unable to hydrate ClearPath profile from browser Supabase session.", error);
+        }
       }
 
-      let profile: AccountProfile | null = null;
-      try {
-        profile = await fetchServerProfile({
-          authUserId: session.user.id,
-          email: session.user.email || undefined
-        });
-      } catch (error) {
-        console.error("Unable to hydrate ClearPath profile.", error);
+      if (!profile) {
+        try {
+          profile = await fetchCurrentServerProfile();
+        } catch (error) {
+          console.error("Unable to hydrate ClearPath profile from proxy session.", error);
+        }
       }
 
       if (!mounted) {
@@ -338,6 +342,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { ok: false, message: "Supabase auth is not configured yet." };
         }
 
+        const proxiedSignUp = await signUpThroughServer(input);
+        if (proxiedSignUp.ok && proxiedSignUp.profile) {
+          setCurrentUser(proxiedSignUp.profile);
+          setAccounts((current) => mergeProfiles(current, proxiedSignUp.profile!));
+          return {
+            ok: true,
+            message: isPatientRole(proxiedSignUp.profile.role)
+              ? "Your patient account has been created."
+              : "Your office account has been created in Supabase.",
+            redirectTo: isPatientRole(proxiedSignUp.profile.role) ? "/vault" : "/profile"
+          };
+        }
+        if (proxiedSignUp.completed) {
+          return {
+            ok: false,
+            message: proxiedSignUp.message
+          };
+        }
+
         let data;
         let error;
         try {
@@ -456,17 +479,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           session = supabase ? (await supabase.auth.getSession()).data.session : null;
         } catch (error) {
-          return {
-            ok: false,
-            message: getFriendlyAuthErrorMessage(error)
-          };
+          console.error("Unable to read browser Supabase session during profile update.", error);
         }
-        if (!session?.user) {
+        const authUserId = session?.user.id || currentUser.authUserId;
+        if (!authUserId) {
           return { ok: false, message: "Supabase session was not found." };
         }
 
         const profileResult = await saveServerProfile({
-          authUserId: session.user.id,
+          authUserId,
           practiceId: nextProfile.practiceId,
           name: nextProfile.name,
           email: nextProfile.email,
@@ -584,6 +605,25 @@ async function fetchServerProfile(input: { authUserId?: string; email?: string }
   if (!response.ok) {
     throw new Error(data.error || "Unable to load the office profile.");
   }
+  return data.profile ?? null;
+}
+
+async function fetchCurrentServerProfile() {
+  const headers = await getSupabaseAuthHeaders();
+  if (!headers.Authorization) {
+    return null;
+  }
+
+  const response = await fetch("/api/auth/session", { headers });
+  const data = (await readJsonResponse(response)) as {
+    profile?: AccountProfile | null;
+    error?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(data.error || "Unable to restore the signed-in profile.");
+  }
+
   return data.profile ?? null;
 }
 
@@ -716,6 +756,84 @@ async function signInThroughServer(input: SignInInput): Promise<{
     };
   } catch (error) {
     console.error("ClearPath proxy sign-in failed, falling back to browser Supabase auth.", error);
+    return {
+      ok: false,
+      completed: false,
+      message: "",
+      profile: null
+    };
+  }
+}
+
+async function signUpThroughServer(input: SignUpInput): Promise<{
+  ok: boolean;
+  completed: boolean;
+  message: string;
+  profile: AccountProfile | null;
+}> {
+  try {
+    const response = await fetch("/api/auth/sign-up", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: input.name.trim(),
+        email: input.email.trim(),
+        password: input.password,
+        practiceId: input.practiceId,
+        role: input.role,
+        title: input.title,
+        phone: input.phone,
+        bio: input.bio,
+        avatarDataUrl: input.avatarDataUrl
+      })
+    });
+
+    const data = (await readJsonResponse(response)) as {
+      error?: string;
+      message?: string;
+      profile?: AccountProfile | null;
+      accessToken?: string;
+      refreshToken?: string | null;
+      expiresAt?: number | null;
+      requiresEmailConfirmation?: boolean;
+    };
+
+    if (data.requiresEmailConfirmation) {
+      return {
+        ok: false,
+        completed: true,
+        message:
+          data.message ||
+          "Your account was created. Check your email to confirm it, then return here and log in.",
+        profile: null
+      };
+    }
+
+    if (!response.ok || !data.profile || !data.accessToken) {
+      return {
+        ok: false,
+        completed: true,
+        message: data.error || "Unable to create the ClearPath account.",
+        profile: null
+      };
+    }
+
+    storeSupabaseProxySession({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      expiresAt: data.expiresAt
+    });
+
+    return {
+      ok: true,
+      completed: true,
+      message: `Signed in as ${data.profile.name}.`,
+      profile: data.profile
+    };
+  } catch (error) {
+    console.error("ClearPath proxy sign-up failed, falling back to browser Supabase auth.", error);
     return {
       ok: false,
       completed: false,

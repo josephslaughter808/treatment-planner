@@ -1049,6 +1049,7 @@ export async function saveAppUserProfileRecord(input: {
 
   const profile: AccountProfile = {
     id: profileRow.id,
+    authUserId: profileRow.auth_user_id,
     practiceId: ((profileRow.practices as { slug?: string } | null)?.slug as string) || input.practiceId,
     name: profileRow.full_name,
     email: profileRow.email,
@@ -1107,6 +1108,7 @@ export async function getAppUserProfileRecord(input: {
 
   const profile: AccountProfile = {
     id: profileRow.id,
+    authUserId: profileRow.auth_user_id,
     practiceId: ((profileRow.practices as { slug?: string } | null)?.slug as string) || "clearpath-default",
     name: profileRow.full_name,
     email: profileRow.email,
@@ -1143,7 +1145,7 @@ export async function getPracticeProfilesRecord(practiceId: string) {
   const slug = toSlug(practice.name);
   const { data: rows, error } = await supabase
     .from("app_users")
-    .select("id, full_name, email, role, title, phone, bio, avatar_url, practices!inner(slug)")
+    .select("id, auth_user_id, full_name, email, role, title, phone, bio, avatar_url, practices!inner(slug)")
     .eq("practices.slug", slug);
 
   if (error) {
@@ -1153,6 +1155,7 @@ export async function getPracticeProfilesRecord(practiceId: string) {
   const profiles: AccountProfile[] =
     rows?.map((row) => ({
       id: row.id as string,
+      authUserId: row.auth_user_id as string,
       practiceId: ((row.practices as { slug?: string } | null)?.slug as string) || practiceId,
       name: row.full_name as string,
       email: row.email as string,

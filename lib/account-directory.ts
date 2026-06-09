@@ -2,6 +2,7 @@ export type UserRole = "admin" | "front-desk" | "provider" | "patient";
 
 export type AccountProfile = {
   id: string;
+  authUserId?: string;
   practiceId: string;
   name: string;
   email: string;
