@@ -142,6 +142,12 @@ export type ClearPathTranslatorResult = {
   warnings: string[];
 };
 
+export type ClearPathPackageValidationResult = {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+};
+
 type BuildClearPathPackageInput = {
   vault: PatientVault;
   consent?: Partial<ClearPathConsentScope>;
@@ -217,6 +223,57 @@ export function buildDefaultConsentSections(): ClearPathConsentSection[] {
   }));
 }
 
+export function validateClearPathPackage(pkg: ClearPathPackage): ClearPathPackageValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (pkg.packageVersion !== clearPathPackageVersion) {
+    errors.push(`Unsupported package version: ${pkg.packageVersion}`);
+  }
+  if (pkg.format !== "clearpath-json") {
+    errors.push(`Unsupported package format: ${pkg.format}`);
+  }
+  if (!pkg.packageId) {
+    errors.push("Package ID is required.");
+  }
+  if (!pkg.generatedAt) {
+    errors.push("Generated timestamp is required.");
+  }
+  if (!pkg.person.personId) {
+    errors.push("Person ID is required.");
+  }
+  if (!pkg.person.displayName && !pkg.person.email) {
+    errors.push("Patient name or email is required.");
+  }
+  if (!pkg.consent.consentPackageId) {
+    errors.push("Consent package ID is required.");
+  }
+  if (!pkg.consent.purposeOfUse) {
+    errors.push("Consent purpose of use is required.");
+  }
+  if (!pkg.consent.sections.length) {
+    errors.push("At least one consent section is required.");
+  }
+  if (!pkg.healthProfile.medicalConditions.length) {
+    warnings.push("No medical conditions are present in this package.");
+  }
+  if (!pkg.healthProfile.medications.length) {
+    warnings.push("No medications are present in this package.");
+  }
+  if (!pkg.healthProfile.allergies.length) {
+    warnings.push("No allergies are present in this package.");
+  }
+  if (!pkg.healthProfile.insurance.some((item) => item.value.providerName || item.value.memberId)) {
+    warnings.push("No insurance details are present in this package.");
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
 function buildConsentScope(
   vault: PatientVault,
   generatedAt: string,
@@ -269,4 +326,3 @@ function createPackageId(prefix: string) {
       : Math.random().toString(36).slice(2, 12);
   return `${prefix}-${randomPart}`;
 }
-

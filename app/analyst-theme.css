@@ -2105,6 +2105,10 @@ select:focus {
   gap: 20px !important;
 }
 
+.patient-package-export-panel {
+  grid-column: 1 / -1 !important;
+}
+
 .qr-card {
   width: min(360px, 100%) !important;
   display: grid !important;

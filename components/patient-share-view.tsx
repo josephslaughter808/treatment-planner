@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { buildClearPathPackage, validateClearPathPackage } from "@/lib/clearpath-package";
 import { readVaultFromStorage, type PatientVault } from "@/lib/patient-vault";
+import {
+  translateClearPathPackageToCsv,
+  translateClearPathPackageToOpenDentalPreview,
+  translateClearPathPackageToPdfText
+} from "@/lib/translators";
 
 export function PatientShareView() {
   const [vault] = useState<PatientVault>(() => readVaultFromStorage());
@@ -17,6 +23,20 @@ export function PatientShareView() {
     url.searchParams.set("memberId", accessCode);
     return url.toString();
   }, [accessCode, origin]);
+  const clearPathPackage = useMemo(
+    () =>
+      buildClearPathPackage({
+        vault,
+        generatedByRole: "patient",
+        consent: {
+          recipientName: "Patient self-export",
+          recipientType: "external-system",
+          purposeOfUse: "patient-request"
+        }
+      }),
+    [vault]
+  );
+  const packageValidation = useMemo(() => validateClearPathPackage(clearPathPackage), [clearPathPackage]);
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=12&data=${encodeURIComponent(shareUrl)}`;
 
   async function copyShareCode() {
@@ -27,6 +47,33 @@ export function PatientShareView() {
   async function copyShareLink() {
     await navigator.clipboard.writeText(shareUrl);
     setMessage("Office check-in link copied.");
+  }
+
+  function downloadClearPathJson() {
+    downloadPayload({
+      fileName: `${safeFileName(vault.fullName || "clearpath-package")}.clearpath.json`,
+      mimeType: "application/json",
+      payload: JSON.stringify(clearPathPackage, null, 2)
+    });
+    setMessage("ClearPath JSON package downloaded.");
+  }
+
+  function downloadCsv() {
+    const result = translateClearPathPackageToCsv(clearPathPackage);
+    downloadPayload(result);
+    setMessage("CSV package downloaded.");
+  }
+
+  function downloadPdfSource() {
+    const result = translateClearPathPackageToPdfText(clearPathPackage);
+    downloadPayload(result);
+    setMessage("PDF source summary downloaded.");
+  }
+
+  function downloadOpenDentalPreview() {
+    const result = translateClearPathPackageToOpenDentalPreview(clearPathPackage);
+    downloadPayload(result);
+    setMessage("Open Dental reviewed-import preview downloaded.");
   }
 
   return (
@@ -81,6 +128,68 @@ export function PatientShareView() {
           </div>
         </div>
       </aside>
+
+      <article className="panel patient-share-instructions patient-package-export-panel">
+        <p className="eyebrow">Translator hub package</p>
+        <h2>Your ClearPath package is ready.</h2>
+        <p>
+          This is the first version of the translating hub. ClearPath turns your health profile into
+          one package, then exports it into formats an office can review.
+        </p>
+
+        <div className="dialogue-list">
+          <div className="dialogue-card">
+            <h4>Package version</h4>
+            <p>{clearPathPackage.packageVersion}</p>
+          </div>
+          <div className="dialogue-card">
+            <h4>Included sections</h4>
+            <p>{clearPathPackage.consent.sections.length} consent-scoped sections</p>
+          </div>
+          <div className="dialogue-card">
+            <h4>Validation</h4>
+            <p>{packageValidation.valid ? "Ready to translate" : packageValidation.errors.join(" ")}</p>
+          </div>
+        </div>
+
+        {packageValidation.warnings.length ? (
+          <div className="dialogue-card">
+            <h4>Package notes</h4>
+            <p>{packageValidation.warnings.join(" ")}</p>
+          </div>
+        ) : null}
+
+        <div className="document-actions">
+          <button className="primary-button" onClick={downloadClearPathJson} type="button">
+            Download JSON
+          </button>
+          <button className="secondary-button" onClick={downloadCsv} type="button">
+            Download CSV
+          </button>
+          <button className="secondary-button" onClick={downloadPdfSource} type="button">
+            Download PDF source
+          </button>
+          <button className="secondary-button" onClick={downloadOpenDentalPreview} type="button">
+            Open Dental preview
+          </button>
+        </div>
+      </article>
     </section>
   );
+}
+
+function downloadPayload(input: { fileName?: string; mimeType?: string; payload: string }) {
+  const blob = new Blob([input.payload], { type: input.mimeType || "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = input.fileName || "clearpath-package.txt";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function safeFileName(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "clearpath-package";
 }
