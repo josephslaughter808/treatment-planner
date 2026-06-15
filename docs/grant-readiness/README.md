@@ -6,6 +6,7 @@ This folder collects the technical foundation for positioning ClearPath as a pat
 
 - [Canonical Health Record Model](./canonical-health-record-model.md)
 - [Consent Package Spec](./consent-package-spec.md)
+- [Patient Health Information Software Market Map](./patient-health-information-software-map.md)
 
 ## Immediate Build Priorities
 
@@ -14,4 +15,4 @@ This folder collects the technical foundation for positioning ClearPath as a pat
 3. Add audit events around profile edits, package creation, provider views, and provider review acknowledgement.
 4. Generate provider check-in snapshots from consent packages.
 5. Compare repeat-patient snapshots and display grouped change alerts.
-
+6. Use the software market map to choose the first connector targets after the pilot workflow is stable.
