@@ -2,775 +2,613 @@
 
 ## Purpose
 
-This document lists software platforms that may store patient health information across dental, medical, specialty, emergency, behavioral health, therapy, imaging, lab, pharmacy, and long-term care settings.
+This document is a master index of software platforms that may store, route, display, import, export, or manage patient health information. The goal is not to separate ClearPath by specialty. The goal is to understand the full universe of systems ClearPath may eventually need to receive data from, send data to, or package data around.
 
-This is a planning document for ClearPath's long-term interoperability strategy. It is not a complete global database. Vendors merge, rebrand, sunset products, and specialize by region, so this should be treated as a living map.
+ClearPath should treat dental, medical, cardiology, dermatology, EMS, behavioral health, imaging, lab, pharmacy, and long-term care systems as part of the same patient-controlled data-sharing problem.
+
+## Product Principle
+
+ClearPath should work the same way regardless of the provider type:
+
+1. A patient or authorized caregiver controls the record.
+2. The patient chooses what information to share.
+3. ClearPath creates a consent-scoped package.
+4. The receiving office, provider, EMS team, or system receives the allowed information.
+5. ClearPath logs access, review, import, expiration, and revocation.
+
+The software category below is only planning metadata. It helps us research connectors, exports, imports, APIs, FHIR support, HL7 support, file upload workflows, and practice-specific constraints. It should not imply that a dental office, medical office, cardiology clinic, dermatology clinic, or EMS agency gets a different ClearPath product.
 
 ## How To Use This
 
-ClearPath does not need to integrate with every system first. We should use this map to decide:
-
-- Which systems are most common in our first target markets
-- Which systems have APIs, developer programs, or import/export options
-- Which systems are likely to require file-based, PDF, CSV, HL7, FHIR, or manual workflows
-- Which specialties have the strongest pain point around repeating medical history
-- Which integrations could become defensible grant-funded R&D
-
-## Priority Tiers For ClearPath
-
-### Tier 1: Pilot And Dental Beachhead
-
-These matter first because our first likely pilot is dental.
-
-- Open Dental
-- Dentrix
-- Dentrix Ascend
-- Eaglesoft
-- Curve Dental
-- CareStack
-- tab32
-- Planet DDS Denticon
-- Carestream Dental Sensei Cloud
-- SoftDent
-- DentiMax
-- Practice-Web
-- ClearDent
-- Tracker
-- ABELDent
-- Power Practice
-
-### Tier 2: Common Ambulatory Medical Systems
-
-These matter because they show up across many small and midsize outpatient offices.
-
-- athenaOne / athenaClinicals
-- eClinicalWorks
-- NextGen Enterprise EHR
-- NextGen Office
-- Tebra / Kareo Clinical
-- AdvancedMD
-- DrChrono
-- Practice Fusion
-- Greenway Intergy
-- Greenway Prime Suite
-- Elation Health
-- CareCloud Charts
-- Azalea Health
-- RXNT
-- ChartLogic
-- PrognoCIS
-- WRS Health
-- MDLand
-- Office Ally
-- CharmHealth
-- Amazing Charts
-- Praxis EMR
-- Sevocity
-- OpenEMR
-
-### Tier 3: Large Hospital And Health System Platforms
-
-These matter later because they are hard to sell into, but extremely important for the hub vision.
-
-- Epic
-- Oracle Health / Cerner
-- MEDITECH Expanse
-- Altera Digital Health Sunrise
-- Altera Paragon
-- Altera TouchWorks
-- Veradigm
-- CPSI / Evident Thrive
-- MEDHOST
-- Harris Healthcare
-- Netsmart
-- VA VistA / Oracle Health EHR modernization environments
-
-## General Medical / Ambulatory EHR
-
-- Epic
-- Oracle Health / Cerner
-- MEDITECH Expanse
-- athenaOne / athenaClinicals
-- eClinicalWorks
-- NextGen Enterprise EHR
-- NextGen Office
-- AdvancedMD
-- Tebra / Kareo Clinical
-- DrChrono
-- Practice Fusion
-- Greenway Intergy
-- Greenway Prime Suite
-- Elation Health
-- CareCloud Charts
-- Azalea Health
-- RXNT
-- ChartLogic
-- PrognoCIS
-- WRS Health
-- MDLand
-- Office Ally
-- CharmHealth
-- Amazing Charts
-- Praxis EMR
-- Sevocity
-- Cerbo
-- PracticeSuite
-- CompuGroup Medical CGM APRIMA
-- CompuGroup Medical eMDs
-- Aprima
-- NueMD
-- ADSC EHR
-- OpenEMR
-- OSCAR EMR
-- Juno EMR
-- QHR Accuro
-- TELUS PS Suite
-- TELUS Med Access
-- MacPractice MD
-- Healthie
-
-## Hospital / Enterprise EHR
-
-- Epic
-- Oracle Health / Cerner Millennium
-- MEDITECH Expanse
-- Altera Digital Health Sunrise
-- Altera Paragon
-- Veradigm
-- CPSI / Evident Thrive
-- MEDHOST
-- Harris Healthcare
-- Netsmart
-- WRS Health Enterprise
-- QuadraMed
-- McKesson legacy environments
-- Siemens legacy Soarian environments
-- GE Healthcare legacy Centricity environments
-- VA VistA
-- RPMS, used in some Indian Health Service environments
-
-## Dental Practice Management And Dental EHR
-
-- Open Dental
-- Dentrix
-- Dentrix Ascend
-- Eaglesoft
-- Curve Dental
-- CareStack
-- tab32
-- Planet DDS Denticon
-- Carestream Dental Sensei Cloud
-- SoftDent
-- Practice-Web
-- DentiMax
-- MacPractice DDS
-- ClearDent
-- Tracker
-- ABELDent
-- Power Practice
-- axiUm
-- Exan
-- EXACT
-- Software of Excellence
-- CS R4
-- DSN Cloud
-- WinOMS
-- Blueprint OMS
-- Ortho2 Edge
-- Cloud 9 Ortho
-- Dolphin Management
-- topsOrtho
-- Gaidge
-- Easy Dental
-- iDentalSoft
-- YAPI
-- RevenueWell
-- Weave
-- NexHealth
-
-## Dental Imaging, X-Ray, And Attachments
-
-These may not be full chart systems, but they store or manage clinically meaningful patient data.
-
-- DEXIS
-- DEXIS Imaging Suite
-- DEXIS IS ScanFlow
-- Carestream Dental Imaging
-- Sidexis
-- Planmeca Romexis
-- VixWin
-- Apteryx XVWeb
-- MiPACS
-- Eaglesoft Imaging
-- Dentrix Imaging Center
-- Clio Prime
-- Schick CDR
-- SOTA Imaging
-- PreXion
-- Invivo
-- Blue Sky Plan
-- Dolphin Imaging
-
-## Orthodontics
-
-- Cloud 9 Ortho
-- Dolphin Management
-- Dolphin Imaging
-- Ortho2 Edge
-- topsOrtho
-- Gaidge
-- OrthoTrac
-- PracticeWorks
-- Greyfinch
-- LightForce
-- uLab Systems
-- Invisalign ClinCheck
-- 3Shape Ortho System
-
-## Oral Surgery / OMS
-
-- WinOMS
-- Blueprint OMS
-- DSN Cloud
-- OMSVision
-- Carestream Dental OMS tools
-- Open Dental
-- Dentrix
-- Eaglesoft
-- PBHS SecureMail / collaboration tools
-
-## Cardiology And Cardiovascular
-
-- Epic Cupid
-- Oracle Health / Cerner cardiovascular modules
-- MEDITECH cardiology workflows
-- GE HealthCare MUSE
-- GE HealthCare Centricity Cardio Workflow
-- Philips IntelliSpace Cardiovascular
-- Merge Cardio / Merative
-- Change Healthcare Cardiology
-- LUMEDX
-- ScImage PICOM365
-- FUJIFILM Synapse Cardiology PACS
-- Sectra Cardiology
-- INFINITT Cardiology
-- Digisonics
-- CardioServer
-- Heartlab legacy systems
-- MedAxiom tools
-- Ambra Health imaging exchange
-- Agfa cardiology imaging environments
-
-## Dermatology
-
-- ModMed EMA Dermatology
-- Nextech Dermatology
-- EZDERM
-- eClinicalWorks Dermatology
-- AdvancedMD Dermatology
-- DrChrono Dermatology
-- Compulink Advantage Dermatology
-- Encite Dermatology
-- EMA Pathology module
-- Sadio dermatology workflows
-- PatientNow
-- Aesthetic Record
-- Modernizing Medicine PocketPatient
-
-## Ophthalmology And Optometry
-
-- ModMed Ophthalmology
-- Nextech Ophthalmology
-- Compulink Advantage Ophthalmology
-- EyeMD EMR
-- RevolutionEHR
-- Eyefinity EHR
-- OfficeMate / ExamWRITER
-- Crystal Practice Management
-- MaximEyes
-- Medflow
-- Integrity EMR
-- ManagementPlus
-- iMedicWare
-- EyePegasus
-- My Vision Express
-- AcuityLogic
-- Epic Kaleidoscope
-- Zeiss FORUM
-- Topcon Harmony
-- Heidelberg Heyex
-
-## Orthopedics
-
-- ModMed Orthopedics
-- Exscribe Orthopedic EHR
-- SRS Health
-- NextGen Orthopedics
-- eClinicalWorks Orthopedics
-- athenaOne
-- AdvancedMD Orthopedics
-- DrChrono Orthopedics
-- Epic Orthopedics
-- Oracle Health / Cerner Orthopedics
-- MEDITECH Orthopedics
-- Allscripts / Veradigm orthopedic environments
-
-## Gastroenterology
-
-- ModMed gGastro
-- gPM
-- Provation MD
-- EndoVault
-- EndoSoft
-- NextGen Gastroenterology
-- eClinicalWorks Gastroenterology
-- athenaOne
-- Epic Gastroenterology
-- Oracle Health / Cerner Gastroenterology
-- GIQuIC registry tools
-
-## ENT, Allergy, And Immunology
-
-- ModMed ENT
-- ModMed Allergy
-- Nextech ENT
-- Meditab AllergyEHR
-- eClinicalWorks ENT
-- NextGen ENT
-- AdvancedMD ENT
-- DrChrono ENT
-- Epic ENT
-- Oracle Health / Cerner ENT
-- Xoran Connect
-
-## OB/GYN, Fertility, And Women's Health
-
-- Epic Stork
-- Oracle Health / Cerner maternity workflows
-- MEDITECH maternity workflows
-- GE HealthCare Centricity Perinatal
-- PeriGen
-- OBIX
-- ModMed OBGYN
-- eClinicalWorks OBGYN
-- NextGen OBGYN
-- Greenway OBGYN
-- athenaOne OBGYN
-- AdvancedMD OBGYN
-- eIVF
-- nAbleIVF
-- ARTworks
-- IDEAS Fertility
-- EngagedMD
-
-## Pediatrics
-
-- PCC EHR
-- Office Practicum
-- CHADIS
-- Epic
-- Oracle Health / Cerner
-- eClinicalWorks Pediatrics
-- athenaOne Pediatrics
-- NextGen Pediatrics
-- Greenway Pediatrics
-- AdvancedMD Pediatrics
-- DrChrono Pediatrics
-- MEDITECH Pediatrics
-
-## Behavioral Health, Mental Health, And Substance Use
-
-- SimplePractice
-- TherapyNotes
-- Valant
-- Qualifacts CareLogic
-- Credible Behavioral Health
-- Netsmart myAvatar
-- Netsmart CareFabric
-- Welligent
-- TheraNest
-- ICANotes
-- BestNotes
-- Kipu
-- Alleva
-- Luminello
-- Osmind
-- AdvancedMD Behavioral Health
-- Tebra Behavioral Health
-- DrChrono Behavioral Health
-- Epic Behavioral Health
-- Oracle Health / Cerner Behavioral Health
-- Streamline SmartCare
-- Foothold AWARDS
-- Eleos documentation tools
-
-## Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab
-
-- WebPT
-- Raintree
-- Clinicient
-- Net Health Therapy
-- TheraOffice
-- Prompt EMR
-- Jane App
-- HENO
-- Practice Perfect
-- PT Everywhere
-- HelloNote
-- Fusion Web Clinic
-- SimplePractice
-- Casamba
-- FOTO
-- PointClickCare rehab modules
-- Epic Rehab
-- Oracle Health / Cerner Rehab
-
-## Chiropractic
-
-- ChiroTouch
-- ChiroSpring
-- Genesis Chiropractic Software
-- Platinum System
-- ECLIPSE
-- Jane App
-- ClinicDr
-- PayDC
-- Nookal
-- PracticeHub
-- MacPractice DC
-- Chiro8000
-- Herfert Software
-- zHealth
-
-## Urgent Care And Occupational Medicine
-
-- Experity
-- DocuTAP legacy environments
-- Practice Velocity legacy environments
-- Tebra / Kareo
-- eClinicalWorks
-- athenaOne
-- NextGen
-- AdvancedMD
-- DrChrono
-- Epic Urgent Care
-- Oracle Health / Cerner Urgent Care
-- MEDITECH Urgent Care
-- AgilityOM
-- Systoc
-- Cority
-- Enterprise Health
-
-## Emergency Medical Services, Fire, And ePCR
-
-- ESO EHR / ESO ePCR
-- ImageTrend Elite
-- ZOLL RescueNet
-- ZOLL emsCharts
-- Stryker HealthEMS
-- Traumasoft
-- First Due
-- Sansio HealthEMS
-- AIM Online EMS
-- AngelTrack
-- MedicReport
-- FireHouse legacy systems
-- Emergency Reporting legacy systems
-- NEMSIS state repositories
-
-## Emergency Department
-
-- Epic ASAP
-- Oracle Health / Cerner FirstNet
-- MEDITECH Emergency Department
-- T-System
-- Wellsoft EDIS
-- Picis ED PulseCheck
-- Altera Sunrise Emergency Care
-- Medhost Emergency Department
-- Evident Thrive ED
-
-## Radiology, PACS, And RIS
-
-- Epic Radiant
-- Oracle Health / Cerner RadNet
-- MEDITECH Radiology
-- GE HealthCare Enterprise Imaging
-- Philips IntelliSpace PACS
-- Sectra PACS
-- Agfa Enterprise Imaging
-- FUJIFILM Synapse
-- Change Healthcare Radiology
-- Intelerad IntelePACS
-- Ambra Health
-- Visage Imaging
-- RamSoft
-- Novarad
-- eRAD
-- PaxeraHealth
-- INFINITT PACS
-- Merge PACS / Merative
-- Konica Minolta Exa
-- Carestream Vue PACS
-
-## Laboratory And Pathology
-
-- Epic Beaker
-- Oracle Health / Cerner PathNet
-- MEDITECH Laboratory
-- Sunquest / Clinisys
-- Orchard Software
-- SCC SoftLab
-- NovoPath
-- CGM LABDAQ
-- LabDAQ
-- LigoLab
-- ApolloLIMS
-- XIFIN
-- Psyche Systems
-- SchuyLab
-- CrelioHealth
-- Clinisys WinPath
-- Thermo Fisher SampleManager LIMS
-
-## Oncology And Infusion
-
-- Epic Beacon
-- Oracle Health / Cerner Oncology
-- Flatiron OncoEMR
-- Varian ARIA
-- Elekta MOSAIQ
-- McKesson iKnowMed / Ontada
-- Altos Solutions legacy oncology environments
-- MEDITECH Oncology
-- RaySearch RayCare
-- Navigating Cancer
-- IntrinsiQ Specialty Solutions
-
-## Surgery, ASC, And Anesthesia
-
-- Epic OpTime
-- Epic Anesthesia
-- Oracle Health / Cerner SurgiNet
-- Oracle Health / Cerner Anesthesia
-- MEDITECH Surgical Services
-- HST Pathways
-- Surgical Information Systems / SIS Complete
-- Surgical Notes
-- Provation Apex
-- Provation MD
-- Casetabs
-- AmkaiSolutions
-- Picis
-- Plexus TG Anesthesia Touch
-- iProcedures
-- Modernizing Medicine ASC workflows
-
-## Nephrology And Dialysis
-
-- Epic Nephrology workflows
-- Oracle Health / Cerner Nephrology
-- Acumen Epic Connect
-- Fresenius Kidney Care systems
-- DaVita Falcon legacy environments
-- MEDITECH Nephrology
-- eClinicalWorks Nephrology
-- athenaOne Nephrology
-- NextGen Nephrology
-- Renesan
-- Clinical Computing systems
-
-## Urology
-
-- ModMed Urology
-- UroChartEHR
-- NextGen Urology
-- eClinicalWorks Urology
-- AdvancedMD Urology
-- athenaOne Urology
-- DrChrono Urology
-- Epic Urology
-- Oracle Health / Cerner Urology
-- MEDITECH Urology
-
-## Podiatry
-
-- ModMed Podiatry
-- SammyEHR
-- TRAKnet
-- NextGen Podiatry
-- eClinicalWorks Podiatry
-- AdvancedMD Podiatry
-- DrChrono Podiatry
-- athenaOne Podiatry
-- Compulink Podiatry
-
-## Plastic Surgery, Med Spa, And Aesthetics
-
-- PatientNow
-- Nextech
-- ModMed Plastic Surgery
-- Aesthetic Record
-- Boulevard
-- Zenoti
-- Mangomint
-- AdvancedMD
-- DrChrono
-- Symplast
-- MyMedLeads
-- TouchMD
-
-## Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care
-
-- PointClickCare
-- MatrixCare
-- Netsmart
-- WellSky Long-Term Care
-- American HealthTech
-- Aline
-- Careficient
-- Yardi Senior Living
-- Eldermark
-- ALIS
-- ECP
-- Tabula Pro
-- Caremerge
-- SimpleLTC
-
-## Home Health, Hospice, And Personal Care
-
-- Homecare Homebase
-- WellSky Home Health
-- WellSky Hospice
-- Axxess
-- MatrixCare Home Health
-- Netsmart Homecare
-- KanTime
-- Alora
-- AxisCare
-- HHAeXchange
-- AlayaCare
-- Careficient
-- Brightree Home Health
-- Cubhub
-- Rosemark
-
-## Pharmacy Systems
-
-- Epic Willow
-- Oracle Health / Cerner PharmNet
-- MEDITECH Pharmacy
-- PioneerRx
-- QS/1
-- Computer-Rx
-- Rx30
-- Liberty Software
-- BestRx
-- Micro Merchant PrimeRx
-- McKesson EnterpriseRx
-- ScriptPro
-- PDX Enterprise Pharmacy System
-- PioneerRx Delivery apps
-
-## Patient Portals And Patient Access Systems
-
-These often store patient-entered history, forms, documents, messages, or appointment data.
-
-- Epic MyChart
-- Oracle Health HealtheLife
-- MEDITECH MHealth
-- athenaPatient
-- NextGen Patient Portal
-- eClinicalWorks healow
-- FollowMyHealth
-- MyHealthRecord.com
-- Patient Fusion
-- Tebra Patient Portal
-- DrChrono OnPatient
-- Greenway Patient Portal
-- Phreesia
-- IntakeQ
-- NexHealth
-- Klara
-- Luma Health
-- Solutionreach
-- Weave
-
-## Health Information Exchange, Integration, And Interoperability Platforms
-
-These may not be EHRs, but they store, route, normalize, or broker health data.
-
-- Epic Care Everywhere
-- CommonWell Health Alliance connections
-- Carequality Framework participants
-- Oracle Health Information Exchange
-- NextGen Mirth Connect
-- Rhapsody
-- Lyniate
-- Redox
-- Health Gorilla
-- Particle Health
-- Zus Health
-- 1upHealth
-- Datavant
-- Healthjump
-- Kno2
-- Bamboo Health
-- Collective Medical
-- Audacious Inquiry
-- PointClickCare network tools
-- CRISP and other regional HIE platforms
-
-## Personal Health Records And Consumer Health Data
-
-These may become useful later for patient-mediated data access.
-
-- Apple Health Records
-- Google Health Connect
-- Microsoft HealthVault legacy records
-- CommonHealth
-- OneRecord
-- b.well Connected Health
-- PicnicHealth
-- Ciitizen
-- Backpack Health
-- Hugo Health
-
-## Key Planning Notes
-
-### Dental Is The Best First Integration Target
-
-Dental offices often have a simpler clinical dataset than large hospitals, but they still need medical history, medications, allergies, insurance, consent, and document review. That makes dental a strong beachhead for proving ClearPath.
-
-### Specialty Clinics Are The Best Second Target
-
-Dermatology, cardiology, orthopedics, ophthalmology, gastroenterology, and surgery centers all need repeat medical history but often use different specialty systems. ClearPath can become valuable by reducing repeated intake and making changes obvious.
-
-### Hospitals Are Important But Slow
-
-Epic, Oracle Health, and MEDITECH are critical long-term, but they are not ideal first sales targets. They require formal security review, interface contracts, procurement cycles, and high implementation maturity.
-
-### EMS Is Strategically Interesting
-
-EMS systems need fast emergency information, caregiver permissions, medications, allergies, and medical conditions. This could support a strong social-impact story, but city or county pilots will require procurement, liability planning, and strong security.
-
-### Imaging And Lab Systems Matter Later
-
-Many patient facts live outside the main EHR. Imaging, lab, and document systems can become future sources for a richer ClearPath record, but the first launch should focus on patient-controlled history and office-reviewed check-in snapshots.
-
-## Early Connector Strategy
-
-Recommended order:
+Use this list to decide:
+
+- Which systems are most common in pilot offices
+- Which systems have APIs or developer programs
+- Which systems may support FHIR, HL7, CSV, PDF, or database export/import
+- Which systems need manual review workflows first
+- Which systems are worth targeting for grant-funded interoperability research
+
+## Master Unique Software Index
+
+Current unique entries: 548
+
+| Software / Platform | Common setting or connector research area |
+| --- | --- |
+| 1upHealth | Health Information Exchange, Integration, And Interoperability Platforms |
+| 3Shape Ortho System | Orthodontics |
+| ABELDent | Dental Practice Management And Dental EHR |
+| Acteon AIS | Dental Imaging, X-Ray, And Attachments |
+| AcuityLogic | Ophthalmology And Optometry |
+| Acumen Epic Connect | Nephrology And Dialysis |
+| ADSC EHR | General Medical / Ambulatory EHR |
+| AdvancedMD | General Medical / Ambulatory EHR |
+| AdvancedMD Behavioral Health | Behavioral Health, Mental Health, And Substance Use |
+| AdvancedMD Dermatology | Dermatology |
+| AdvancedMD ENT | ENT, Allergy, And Immunology |
+| AdvancedMD OBGYN | OB/GYN, Fertility, And Women's Health |
+| AdvancedMD Orthopedics | Orthopedics |
+| AdvancedMD Pediatrics | Pediatrics |
+| AdvancedMD Podiatry | Podiatry |
+| AdvancedMD Urology | Urology |
+| Aesthetic Record | Plastic Surgery, Med Spa, And Aesthetics |
+| Agfa cardiology imaging environments | Cardiology And Cardiovascular |
+| Agfa Enterprise Imaging | Radiology, PACS, And RIS |
+| AgilityOM | Urgent Care And Occupational Medicine |
+| AIM Online EMS | Emergency Medical Services, Fire, And ePCR |
+| AlayaCare | Home Health, Hospice, And Personal Care |
+| Aline | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| ALIS | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Alleva | Behavioral Health, Mental Health, And Substance Use |
+| Allscripts / Veradigm orthopedic environments | Orthopedics |
+| Alora | Home Health, Hospice, And Personal Care |
+| Altera Digital Health Sunrise | Hospital / Enterprise EHR |
+| Altera Paragon | Hospital / Enterprise EHR |
+| Altera Sunrise Emergency Care | Emergency Department |
+| Altos Solutions legacy oncology environments | Oncology And Infusion |
+| Amazing Charts | General Medical / Ambulatory EHR |
+| Ambra Health | Radiology, PACS, And RIS |
+| Ambra Health imaging exchange | Cardiology And Cardiovascular |
+| American HealthTech | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| AmkaiSolutions | Surgery, ASC, And Anesthesia |
+| AngelTrack | Emergency Medical Services, Fire, And ePCR |
+| ApolloLIMS | Laboratory And Pathology |
+| Apple Health Records | Personal Health Records And Consumer Health Data |
+| Aprima | General Medical / Ambulatory EHR |
+| Apteryx XVWeb | Dental Imaging, X-Ray, And Attachments |
+| ARTworks | OB/GYN, Fertility, And Women's Health |
+| Ascend Academic | Dental Practice Management And Dental EHR |
+| Athenahealth Gastroenterology | Gastroenterology |
+| Athenahealth Orthopedics | Orthopedics |
+| athenaOne | Urgent Care And Occupational Medicine |
+| athenaOne / athenaClinicals | General Medical / Ambulatory EHR |
+| athenaOne Nephrology | Nephrology And Dialysis |
+| athenaOne OBGYN | OB/GYN, Fertility, And Women's Health |
+| athenaOne Pediatrics | Pediatrics |
+| athenaOne Podiatry | Podiatry |
+| athenaOne Urology | Urology |
+| athenaPatient | Patient Portals And Patient Access Systems |
+| Audacious Inquiry | Health Information Exchange, Integration, And Interoperability Platforms |
+| AxisCare | Home Health, Hospice, And Personal Care |
+| axiUm | Dental Practice Management And Dental EHR |
+| Axxess | Home Health, Hospice, And Personal Care |
+| Azalea Health | General Medical / Ambulatory EHR |
+| b.well Connected Health | Personal Health Records And Consumer Health Data |
+| Backpack Health | Personal Health Records And Consumer Health Data |
+| Bamboo Health | Health Information Exchange, Integration, And Interoperability Platforms |
+| BestNotes | Behavioral Health, Mental Health, And Substance Use |
+| BestRx | Pharmacy Systems |
+| Blue Sky Plan | Dental Imaging, X-Ray, And Attachments |
+| Blueprint OMS | Oral Surgery / OMS |
+| Boulevard | Plastic Surgery, Med Spa, And Aesthetics |
+| Brightree Home Health | Home Health, Hospice, And Personal Care |
+| Calysta EMR | Urgent Care And Occupational Medicine |
+| Canvas Medical | General Medical / Ambulatory EHR |
+| CardioServer | Cardiology And Cardiovascular |
+| CareCloud Charts | General Medical / Ambulatory EHR |
+| Careficient | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Caremerge | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Carequality Framework participants | Health Information Exchange, Integration, And Interoperability Platforms |
+| CareStack | Dental Practice Management And Dental EHR |
+| Carestream Dental Imaging | Dental Imaging, X-Ray, And Attachments |
+| Carestream Dental Sensei Cloud | Dental Practice Management And Dental EHR |
+| Carestream Vue PACS | Radiology, PACS, And RIS |
+| Casamba | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Casetabs | Surgery, ASC, And Anesthesia |
+| Cerbo | General Medical / Ambulatory EHR |
+| CGM LABDAQ | Laboratory And Pathology |
+| CHADIS | Pediatrics |
+| Change Healthcare Cardiology | Cardiology And Cardiovascular |
+| Change Healthcare Radiology | Radiology, PACS, And RIS |
+| CharmHealth | General Medical / Ambulatory EHR |
+| ChartAccess Pediatrics | Pediatrics |
+| ChartLogic | General Medical / Ambulatory EHR |
+| Chiro8000 | Chiropractic |
+| ChiroFusion | Chiropractic |
+| ChiroSpring | Chiropractic |
+| ChiroTouch | Chiropractic |
+| Ciitizen | Personal Health Records And Consumer Health Data |
+| ClearDent | Dental Practice Management And Dental EHR |
+| Clinical Computing systems | Nephrology And Dialysis |
+| ClinicDr | Chiropractic |
+| Clinicient | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Clinisys WinPath | Laboratory And Pathology |
+| Clio Prime | Dental Imaging, X-Ray, And Attachments |
+| Clockwise.MD | Urgent Care And Occupational Medicine |
+| Cloud 9 Ortho | Orthodontics |
+| Collective Medical | Health Information Exchange, Integration, And Interoperability Platforms |
+| CommonHealth | Personal Health Records And Consumer Health Data |
+| CommonWell Health Alliance connections | Health Information Exchange, Integration, And Interoperability Platforms |
+| CompuGroup Medical CGM APRIMA | General Medical / Ambulatory EHR |
+| CompuGroup Medical eMDs | General Medical / Ambulatory EHR |
+| Compulink Advantage Dermatology | Dermatology |
+| Compulink Advantage Ophthalmology | Ophthalmology And Optometry |
+| Compulink Podiatry | Podiatry |
+| Computer-Rx | Pharmacy Systems |
+| Cority | Urgent Care And Occupational Medicine |
+| CPSI / Evident Thrive | Hospital / Enterprise EHR |
+| Credible Behavioral Health | Behavioral Health, Mental Health, And Substance Use |
+| CrelioHealth | Laboratory And Pathology |
+| CRISP and other regional HIE platforms | Health Information Exchange, Integration, And Interoperability Platforms |
+| Crystal Practice Management | Ophthalmology And Optometry |
+| CS R4 | Dental Practice Management And Dental EHR |
+| Cubhub | Home Health, Hospice, And Personal Care |
+| CureMD | General Medical / Ambulatory EHR |
+| Curve Dental | Dental Practice Management And Dental EHR |
+| Datavant | Health Information Exchange, Integration, And Interoperability Platforms |
+| DaVita Falcon legacy environments | Nephrology And Dialysis |
+| Dental Intelligence | Dental Practice Management And Dental EHR |
+| Dental Symphony | Dental Practice Management And Dental EHR |
+| DentalWriter | Dental Practice Management And Dental EHR |
+| DentalXChange | Dental Practice Management And Dental EHR |
+| DentiMax | Dental Practice Management And Dental EHR |
+| Dentrix | Dental Practice Management And Dental EHR |
+| Dentrix Ascend | Dental Practice Management And Dental EHR |
+| Dentrix Imaging Center | Dental Imaging, X-Ray, And Attachments |
+| DermEngine | Dermatology |
+| DEXIS | Dental Imaging, X-Ray, And Attachments |
+| DEXIS Imaging Suite | Dental Imaging, X-Ray, And Attachments |
+| DEXIS IS ScanFlow | Dental Imaging, X-Ray, And Attachments |
+| Digisonics | Cardiology And Cardiovascular |
+| DocuTAP legacy environments | Urgent Care And Occupational Medicine |
+| DocVilla Urgent Care | Urgent Care And Occupational Medicine |
+| Dolphin Imaging | Orthodontics |
+| Dolphin Management | Orthodontics |
+| DrChrono | General Medical / Ambulatory EHR |
+| DrChrono Behavioral Health | Behavioral Health, Mental Health, And Substance Use |
+| DrChrono Dermatology | Dermatology |
+| DrChrono ENT | ENT, Allergy, And Immunology |
+| DrChrono OnPatient | Patient Portals And Patient Access Systems |
+| DrChrono Orthopedics | Orthopedics |
+| DrChrono Pediatrics | Pediatrics |
+| DrChrono Podiatry | Podiatry |
+| DrChrono Urology | Urology |
+| DSN Cloud | Oral Surgery / OMS |
+| DSN Oral Surgery | Oral Surgery / OMS |
+| Eaglesoft | Dental Practice Management And Dental EHR |
+| Eaglesoft Imaging | Dental Imaging, X-Ray, And Attachments |
+| Easy Dental | Dental Practice Management And Dental EHR |
+| eClinicalWorks | General Medical / Ambulatory EHR |
+| eClinicalWorks Dermatology | Dermatology |
+| eClinicalWorks ENT | ENT, Allergy, And Immunology |
+| eClinicalWorks Gastroenterology | Gastroenterology |
+| eClinicalWorks healow | Patient Portals And Patient Access Systems |
+| eClinicalWorks Nephrology | Nephrology And Dialysis |
+| eClinicalWorks OBGYN | OB/GYN, Fertility, And Women's Health |
+| eClinicalWorks Orthopedics | Orthopedics |
+| eClinicalWorks Pediatrics | Pediatrics |
+| eClinicalWorks Podiatry | Podiatry |
+| eClinicalWorks Urology | Urology |
+| ECLIPSE | Chiropractic |
+| ECP | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| eIVF | OB/GYN, Fertility, And Women's Health |
+| Elation Health | General Medical / Ambulatory EHR |
+| Eldermark | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Elekta MOSAIQ | Oncology And Infusion |
+| Eleos documentation tools | Behavioral Health, Mental Health, And Substance Use |
+| EMA Pathology module | Dermatology |
+| Emergency Reporting legacy systems | Emergency Medical Services, Fire, And ePCR |
+| Encite Dermatology | Dermatology |
+| EndoSoft | Gastroenterology |
+| EndoVault | Gastroenterology |
+| EngagedMD | OB/GYN, Fertility, And Women's Health |
+| Enterprise Health | Urgent Care And Occupational Medicine |
+| Epic | Hospital / Enterprise EHR |
+| Epic Anesthesia | Surgery, ASC, And Anesthesia |
+| Epic ASAP | Emergency Department |
+| Epic Beacon | Oncology And Infusion |
+| Epic Beaker | Laboratory And Pathology |
+| Epic Behavioral Health | Behavioral Health, Mental Health, And Substance Use |
+| Epic Care Everywhere | Health Information Exchange, Integration, And Interoperability Platforms |
+| Epic Cupid | Cardiology And Cardiovascular |
+| Epic ENT | ENT, Allergy, And Immunology |
+| Epic Gastroenterology | Gastroenterology |
+| Epic Kaleidoscope | Ophthalmology And Optometry |
+| Epic MyChart | Patient Portals And Patient Access Systems |
+| Epic Nephrology workflows | Nephrology And Dialysis |
+| Epic OpTime | Surgery, ASC, And Anesthesia |
+| Epic Orthopedics | Orthopedics |
+| Epic Radiant | Radiology, PACS, And RIS |
+| Epic Rehab | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Epic Stork | OB/GYN, Fertility, And Women's Health |
+| Epic Urgent Care | Urgent Care And Occupational Medicine |
+| Epic Urology | Urology |
+| Epic Willow | Pharmacy Systems |
+| eRAD | Radiology, PACS, And RIS |
+| ESO EHR / ESO ePCR | Emergency Medical Services, Fire, And ePCR |
+| Evident Thrive ED | Emergency Department |
+| EXACT | Dental Practice Management And Dental EHR |
+| Exan | Dental Practice Management And Dental EHR |
+| Experity | Urgent Care And Occupational Medicine |
+| Exscribe Orthopedic EHR | Orthopedics |
+| Eyefinity EHR | Ophthalmology And Optometry |
+| EyeMD EMR | Ophthalmology And Optometry |
+| EyePegasus | Ophthalmology And Optometry |
+| EZDERM | Dermatology |
+| FireHouse legacy systems | Emergency Medical Services, Fire, And ePCR |
+| First Due | Emergency Medical Services, Fire, And ePCR |
+| Flatiron OncoEMR | Oncology And Infusion |
+| FollowMyHealth | Patient Portals And Patient Access Systems |
+| Foothold AWARDS | Behavioral Health, Mental Health, And Substance Use |
+| Forcura | Home Health, Hospice, And Personal Care |
+| FOTO | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Fresenius Kidney Care systems | Nephrology And Dialysis |
+| FUJIFILM Synapse | Radiology, PACS, And RIS |
+| FUJIFILM Synapse Cardiology PACS | Cardiology And Cardiovascular |
+| Fusion Web Clinic | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Gaidge | Orthodontics |
+| GE HealthCare Centricity Cardio Workflow | Cardiology And Cardiovascular |
+| GE HealthCare Centricity Perinatal | OB/GYN, Fertility, And Women's Health |
+| GE HealthCare Enterprise Imaging | Radiology, PACS, And RIS |
+| GE Healthcare legacy Centricity environments | Hospital / Enterprise EHR |
+| GE HealthCare MUSE | Cardiology And Cardiovascular |
+| Genesis Chiropractic Software | Chiropractic |
+| GIQuIC registry tools | Gastroenterology |
+| Google Health Connect | Personal Health Records And Consumer Health Data |
+| gPM | Gastroenterology |
+| Greenway Intergy | General Medical / Ambulatory EHR |
+| Greenway OBGYN | OB/GYN, Fertility, And Women's Health |
+| Greenway Patient Portal | Patient Portals And Patient Access Systems |
+| Greenway Pediatrics | Pediatrics |
+| Greenway Prime Suite | General Medical / Ambulatory EHR |
+| Greyfinch | Orthodontics |
+| Harris Healthcare | Hospital / Enterprise EHR |
+| Health Gorilla | Health Information Exchange, Integration, And Interoperability Platforms |
+| Healthie | General Medical / Ambulatory EHR |
+| Healthjump | Health Information Exchange, Integration, And Interoperability Platforms |
+| Heartlab legacy systems | Cardiology And Cardiovascular |
+| Heidelberg Heyex | Ophthalmology And Optometry |
+| HelloNote | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| HENO | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Herfert Software | Chiropractic |
+| HHAeXchange | Home Health, Hospice, And Personal Care |
+| Homecare Homebase | Home Health, Hospice, And Personal Care |
+| HST Pathways | Surgery, ASC, And Anesthesia |
+| Hugo Health | Personal Health Records And Consumer Health Data |
+| i-CAT Tx STUDIO | Oral Surgery / OMS |
+| ICANotes | Behavioral Health, Mental Health, And Substance Use |
+| IDEAS Fertility | OB/GYN, Fertility, And Women's Health |
+| iDentalSoft | Dental Practice Management And Dental EHR |
+| ImageTrend Elite | Emergency Medical Services, Fire, And ePCR |
+| iMedicWare | Ophthalmology And Optometry |
+| INFINITT Cardiology | Cardiology And Cardiovascular |
+| INFINITT PACS | Radiology, PACS, And RIS |
+| IntakeQ | Patient Portals And Patient Access Systems |
+| Integrity EMR | Ophthalmology And Optometry |
+| Intelerad IntelePACS | Radiology, PACS, And RIS |
+| IntrinsiQ Specialty Solutions | Oncology And Infusion |
+| Invisalign ClinCheck | Orthodontics |
+| Invivo | Dental Imaging, X-Ray, And Attachments |
+| iPatientCare | General Medical / Ambulatory EHR |
+| iProcedures | Surgery, ASC, And Anesthesia |
+| Jane App | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Juno EMR | General Medical / Ambulatory EHR |
+| KanTime | Home Health, Hospice, And Personal Care |
+| Kipu | Behavioral Health, Mental Health, And Substance Use |
+| Klara | Patient Portals And Patient Access Systems |
+| Kno2 | Health Information Exchange, Integration, And Interoperability Platforms |
+| Konica Minolta Exa | Radiology, PACS, And RIS |
+| LabDAQ | Laboratory And Pathology |
+| Liberty Software | Pharmacy Systems |
+| LightForce | Orthodontics |
+| Lighthouse 360 | Dental Practice Management And Dental EHR |
+| LigoLab | Laboratory And Pathology |
+| Luma Health | Patient Portals And Patient Access Systems |
+| LUMEDX | Cardiology And Cardiovascular |
+| Luminello | Behavioral Health, Mental Health, And Substance Use |
+| Lyniate | Health Information Exchange, Integration, And Interoperability Platforms |
+| MacPractice DC | Chiropractic |
+| MacPractice DDS | Dental Practice Management And Dental EHR |
+| MacPractice MD | General Medical / Ambulatory EHR |
+| ManagementPlus | Ophthalmology And Optometry |
+| Mangomint | Plastic Surgery, Med Spa, And Aesthetics |
+| MatrixCare | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| MatrixCare Home Health | Home Health, Hospice, And Personal Care |
+| Maxident | Dental Practice Management And Dental EHR |
+| MaximEyes | Ophthalmology And Optometry |
+| McKesson EnterpriseRx | Pharmacy Systems |
+| McKesson iKnowMed / Ontada | Oncology And Infusion |
+| McKesson legacy environments | Hospital / Enterprise EHR |
+| MDLand | General Medical / Ambulatory EHR |
+| MedAxiom tools | Cardiology And Cardiovascular |
+| Medflow | Ophthalmology And Optometry |
+| MEDHOST | Hospital / Enterprise EHR |
+| Medhost Emergency Department | Emergency Department |
+| MedicReport | Emergency Medical Services, Fire, And ePCR |
+| MedicsCloud EHR | General Medical / Ambulatory EHR |
+| Meditab AllergyEHR | ENT, Allergy, And Immunology |
+| Meditab IMS | General Medical / Ambulatory EHR |
+| MEDITECH cardiology workflows | Cardiology And Cardiovascular |
+| MEDITECH Emergency Department | Emergency Department |
+| MEDITECH Expanse | Hospital / Enterprise EHR |
+| MEDITECH Laboratory | Laboratory And Pathology |
+| MEDITECH maternity workflows | OB/GYN, Fertility, And Women's Health |
+| MEDITECH MHealth | Patient Portals And Patient Access Systems |
+| MEDITECH Nephrology | Nephrology And Dialysis |
+| MEDITECH Oncology | Oncology And Infusion |
+| MEDITECH Orthopedics | Orthopedics |
+| MEDITECH Pediatrics | Pediatrics |
+| MEDITECH Pharmacy | Pharmacy Systems |
+| MEDITECH Radiology | Radiology, PACS, And RIS |
+| MEDITECH Surgical Services | Surgery, ASC, And Anesthesia |
+| MEDITECH Urgent Care | Urgent Care And Occupational Medicine |
+| MEDITECH Urology | Urology |
+| Medusind OMS | Oral Surgery / OMS |
+| Merge Cardio / Merative | Cardiology And Cardiovascular |
+| Merge PACS / Merative | Radiology, PACS, And RIS |
+| Micro Merchant PrimeRx | Pharmacy Systems |
+| MicroMD | General Medical / Ambulatory EHR |
+| Microsoft HealthVault legacy records | Personal Health Records And Consumer Health Data |
+| MiPACS | Dental Imaging, X-Ray, And Attachments |
+| Modento | Dental Practice Management And Dental EHR |
+| Modernizing Medicine ASC workflows | Surgery, ASC, And Anesthesia |
+| Modernizing Medicine PocketPatient | Dermatology |
+| ModMed Allergy | ENT, Allergy, And Immunology |
+| ModMed EMA Dermatology | Dermatology |
+| ModMed ENT | ENT, Allergy, And Immunology |
+| ModMed gGastro | Gastroenterology |
+| ModMed OBGYN | OB/GYN, Fertility, And Women's Health |
+| ModMed Ophthalmology | Ophthalmology And Optometry |
+| ModMed Orthopedics | Orthopedics |
+| ModMed Plastic Surgery | Plastic Surgery, Med Spa, And Aesthetics |
+| ModMed Podiatry | Podiatry |
+| ModMed Urology | Urology |
+| MOGO Cloud | Dental Practice Management And Dental EHR |
+| My Vision Express | Ophthalmology And Optometry |
+| MyHealthRecord.com | Patient Portals And Patient Access Systems |
+| MyMedLeads | Plastic Surgery, Med Spa, And Aesthetics |
+| nAbleIVF | OB/GYN, Fertility, And Women's Health |
+| Navigating Cancer | Oncology And Infusion |
+| NEMSIS state repositories | Emergency Medical Services, Fire, And ePCR |
+| Net Health Therapy | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Netsmart CareFabric | Behavioral Health, Mental Health, And Substance Use |
+| Netsmart Homecare | Home Health, Hospice, And Personal Care |
+| Netsmart myAvatar | Behavioral Health, Mental Health, And Substance Use |
+| Netsmart myUnity | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Nextech | Plastic Surgery, Med Spa, And Aesthetics |
+| Nextech Dermatology | Dermatology |
+| Nextech ENT | ENT, Allergy, And Immunology |
+| Nextech Ophthalmology | Ophthalmology And Optometry |
+| NextGen | Urgent Care And Occupational Medicine |
+| NextGen ENT | ENT, Allergy, And Immunology |
+| NextGen Enterprise EHR | General Medical / Ambulatory EHR |
+| NextGen Gastroenterology | Gastroenterology |
+| NextGen Mirth Connect | Health Information Exchange, Integration, And Interoperability Platforms |
+| NextGen Nephrology | Nephrology And Dialysis |
+| NextGen OBGYN | OB/GYN, Fertility, And Women's Health |
+| NextGen Office | General Medical / Ambulatory EHR |
+| NextGen Orthopedics | Orthopedics |
+| NextGen Patient Portal | Patient Portals And Patient Access Systems |
+| NextGen Pediatrics | Pediatrics |
+| NextGen Podiatry | Podiatry |
+| NextGen Urology | Urology |
+| Nookal | Chiropractic |
+| Novarad | Radiology, PACS, And RIS |
+| NovoPath | Laboratory And Pathology |
+| NueMD | General Medical / Ambulatory EHR |
+| OBIX | OB/GYN, Fertility, And Women's Health |
+| Office Ally | General Medical / Ambulatory EHR |
+| Office Practicum | Pediatrics |
+| OfficeMate / ExamWRITER | Ophthalmology And Optometry |
+| OMS Anywhere | Oral Surgery / OMS |
+| OMS Planner | Oral Surgery / OMS |
+| OMSVision | Oral Surgery / OMS |
+| OneRecord | Personal Health Records And Consumer Health Data |
+| Open Dental | Dental Practice Management And Dental EHR |
+| OpenEMR | General Medical / Ambulatory EHR |
+| Oracle Health / Cerner Anesthesia | Surgery, ASC, And Anesthesia |
+| Oracle Health / Cerner Behavioral Health | Behavioral Health, Mental Health, And Substance Use |
+| Oracle Health / Cerner cardiovascular modules | Cardiology And Cardiovascular |
+| Oracle Health / Cerner ENT | ENT, Allergy, And Immunology |
+| Oracle Health / Cerner FirstNet | Emergency Department |
+| Oracle Health / Cerner Gastroenterology | Gastroenterology |
+| Oracle Health / Cerner maternity workflows | OB/GYN, Fertility, And Women's Health |
+| Oracle Health / Cerner Millennium | Hospital / Enterprise EHR |
+| Oracle Health / Cerner Nephrology | Nephrology And Dialysis |
+| Oracle Health / Cerner Oncology | Oncology And Infusion |
+| Oracle Health / Cerner Orthopedics | Orthopedics |
+| Oracle Health / Cerner PathNet | Laboratory And Pathology |
+| Oracle Health / Cerner PharmNet | Pharmacy Systems |
+| Oracle Health / Cerner RadNet | Radiology, PACS, And RIS |
+| Oracle Health / Cerner Rehab | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Oracle Health / Cerner SurgiNet | Surgery, ASC, And Anesthesia |
+| Oracle Health / Cerner Urgent Care | Urgent Care And Occupational Medicine |
+| Oracle Health / Cerner Urology | Urology |
+| Oracle Health CommunityWorks | Hospital / Enterprise EHR |
+| Oracle Health HealtheLife | Patient Portals And Patient Access Systems |
+| Oracle Health Information Exchange | Health Information Exchange, Integration, And Interoperability Platforms |
+| Orchard Software | Laboratory And Pathology |
+| Ortho2 Edge | Orthodontics |
+| OrthoTrac | Orthodontics |
+| OSCAR EMR | General Medical / Ambulatory EHR |
+| Osmind | Behavioral Health, Mental Health, And Substance Use |
+| Particle Health | Health Information Exchange, Integration, And Interoperability Platforms |
+| Patient Fusion | Patient Portals And Patient Access Systems |
+| PatientNow | Plastic Surgery, Med Spa, And Aesthetics |
+| PaxeraHealth | Radiology, PACS, And RIS |
+| PayDC | Chiropractic |
+| PBHS SecureMail / collaboration tools | Oral Surgery / OMS |
+| PCC EHR | Pediatrics |
+| PDX Enterprise Pharmacy System | Pharmacy Systems |
+| PediatricXpress | Pediatrics |
+| PeriGen | OB/GYN, Fertility, And Women's Health |
+| Philips IntelliSpace Cardiovascular | Cardiology And Cardiovascular |
+| Philips IntelliSpace PACS | Radiology, PACS, And RIS |
+| Phreesia | Patient Portals And Patient Access Systems |
+| Picis | Surgery, ASC, And Anesthesia |
+| Picis ED PulseCheck | Emergency Department |
+| PicnicHealth | Personal Health Records And Consumer Health Data |
+| PioneerRx | Pharmacy Systems |
+| PioneerRx Delivery apps | Pharmacy Systems |
+| Planet DDS Denticon | Dental Practice Management And Dental EHR |
+| Planmeca Romexis | Dental Imaging, X-Ray, And Attachments |
+| Platinum System | Chiropractic |
+| Plexus TG Anesthesia Touch | Surgery, ASC, And Anesthesia |
+| PointClickCare | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| PointClickCare network tools | Health Information Exchange, Integration, And Interoperability Platforms |
+| PointClickCare rehab modules | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Power Practice | Dental Practice Management And Dental EHR |
+| Practice by Numbers | Dental Practice Management And Dental EHR |
+| Practice Fusion | General Medical / Ambulatory EHR |
+| Practice Perfect | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Practice Velocity legacy environments | Urgent Care And Occupational Medicine |
+| Practice-Web | Dental Practice Management And Dental EHR |
+| PracticeHub | Chiropractic |
+| PracticeSuite | General Medical / Ambulatory EHR |
+| PracticeWorks | Orthodontics |
+| Praxis EMR | General Medical / Ambulatory EHR |
+| PreXion | Dental Imaging, X-Ray, And Attachments |
+| PrognoCIS | General Medical / Ambulatory EHR |
+| Prompt EMR | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Provation Apex | Surgery, ASC, And Anesthesia |
+| Provation MD | Gastroenterology |
+| Psyche Systems | Laboratory And Pathology |
+| PT Everywhere | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| QHR Accuro | General Medical / Ambulatory EHR |
+| QS/1 | Pharmacy Systems |
+| QuadraMed | Hospital / Enterprise EHR |
+| Qualifacts CareLogic | Behavioral Health, Mental Health, And Substance Use |
+| Raintree | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| RamSoft | Radiology, PACS, And RIS |
+| RaySearch RayCare | Oncology And Infusion |
+| Redox | Health Information Exchange, Integration, And Interoperability Platforms |
+| Remedly | Plastic Surgery, Med Spa, And Aesthetics |
+| Renesan | Nephrology And Dialysis |
+| RepeatMD | Plastic Surgery, Med Spa, And Aesthetics |
+| RevenueWell | Dental Practice Management And Dental EHR |
+| RevolutionEHR | Ophthalmology And Optometry |
+| Rhapsody | Health Information Exchange, Integration, And Interoperability Platforms |
+| Rosemark | Home Health, Hospice, And Personal Care |
+| RPMS, used in some Indian Health Service environments | Hospital / Enterprise EHR |
+| Rx30 | Pharmacy Systems |
+| RXNT | General Medical / Ambulatory EHR |
+| Sadio dermatology workflows | Dermatology |
+| SammyEHR | Podiatry |
+| Sansio HealthEMS | Emergency Medical Services, Fire, And ePCR |
+| SCC SoftLab | Laboratory And Pathology |
+| Schick CDR | Dental Imaging, X-Ray, And Attachments |
+| SchuyLab | Laboratory And Pathology |
+| ScImage PICOM365 | Cardiology And Cardiovascular |
+| ScriptPro | Pharmacy Systems |
+| Sectra Cardiology | Cardiology And Cardiovascular |
+| Sectra PACS | Radiology, PACS, And RIS |
+| Sevocity | General Medical / Ambulatory EHR |
+| Sidexis | Dental Imaging, X-Ray, And Attachments |
+| Siemens legacy Soarian environments | Hospital / Enterprise EHR |
+| SimpleLTC | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| SimplePractice | Behavioral Health, Mental Health, And Substance Use |
+| SoftDent | Dental Practice Management And Dental EHR |
+| Software of Excellence | Dental Practice Management And Dental EHR |
+| Solutionreach | Patient Portals And Patient Access Systems |
+| Solv Health | Urgent Care And Occupational Medicine |
+| SOTA Imaging | Dental Imaging, X-Ray, And Attachments |
+| SRS Health | Orthopedics |
+| Streamline SmartCare | Behavioral Health, Mental Health, And Substance Use |
+| Stryker HealthEMS | Emergency Medical Services, Fire, And ePCR |
+| Sunquest / Clinisys | Laboratory And Pathology |
+| Surgical Information Systems / SIS Complete | Surgery, ASC, And Anesthesia |
+| Surgical Notes | Surgery, ASC, And Anesthesia |
+| Surgimate | Surgery, ASC, And Anesthesia |
+| Symplast | Plastic Surgery, Med Spa, And Aesthetics |
+| Systoc | Urgent Care And Occupational Medicine |
+| T-System | Emergency Department |
+| tab32 | Dental Practice Management And Dental EHR |
+| Tabula Pro | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Tebra / Kareo | Urgent Care And Occupational Medicine |
+| Tebra / Kareo Clinical | General Medical / Ambulatory EHR |
+| Tebra Behavioral Health | Behavioral Health, Mental Health, And Substance Use |
+| Tebra Patient Portal | Patient Portals And Patient Access Systems |
+| TELUS Med Access | General Medical / Ambulatory EHR |
+| TELUS PS Suite | General Medical / Ambulatory EHR |
+| TheraNest | Behavioral Health, Mental Health, And Substance Use |
+| TheraOffice | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| TheraPlatform | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| TherapyNotes | Behavioral Health, Mental Health, And Substance Use |
+| Thermo Fisher SampleManager LIMS | Laboratory And Pathology |
+| Tonic Health | Patient Portals And Patient Access Systems |
+| Topcon Harmony | Ophthalmology And Optometry |
+| topsOrtho | Orthodontics |
+| TouchMD | Plastic Surgery, Med Spa, And Aesthetics |
+| Tracker | Dental Practice Management And Dental EHR |
+| TRAKnet | Podiatry |
+| Traumasoft | Emergency Medical Services, Fire, And ePCR |
+| uLab Systems | Orthodontics |
+| Updox | Patient Portals And Patient Access Systems |
+| UroChartEHR | Urology |
+| VA VistA | Hospital / Enterprise EHR |
+| Valant | Behavioral Health, Mental Health, And Substance Use |
+| Varian ARIA | Oncology And Infusion |
+| VelociDoc | Urgent Care And Occupational Medicine |
+| Veradigm | Hospital / Enterprise EHR |
+| Visage Imaging | Radiology, PACS, And RIS |
+| VisualDx | Dermatology |
+| VixWin | Dental Imaging, X-Ray, And Attachments |
+| WebPT | Physical Therapy, Occupational Therapy, Speech Therapy, And Rehab |
+| Welligent | Behavioral Health, Mental Health, And Substance Use |
+| WellSky Home Health | Home Health, Hospice, And Personal Care |
+| WellSky Hospice | Home Health, Hospice, And Personal Care |
+| WellSky Long-Term Care | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Wellsoft EDIS | Emergency Department |
+| WinOMS | Oral Surgery / OMS |
+| WRS Health | General Medical / Ambulatory EHR |
+| WRS Health Enterprise | Hospital / Enterprise EHR |
+| XIFIN | Laboratory And Pathology |
+| Xoran Connect | ENT, Allergy, And Immunology |
+| Xpress Technologies | Urgent Care And Occupational Medicine |
+| YAPI | Dental Practice Management And Dental EHR |
+| Yardi Senior Living | Long-Term Care, Skilled Nursing, Assisted Living, And Senior Care |
+| Zeiss FORUM | Ophthalmology And Optometry |
+| Zenoti | Plastic Surgery, Med Spa, And Aesthetics |
+| zHealth | Chiropractic |
+| ZOLL emsCharts | Emergency Medical Services, Fire, And ePCR |
+| ZOLL RescueNet | Emergency Medical Services, Fire, And ePCR |
+| Zus Health | Health Information Exchange, Integration, And Interoperability Platforms |
+
+## Connector Strategy
+
+ClearPath should not start by building hundreds of one-off integrations. The better path is to build one patient-controlled hub model and then support multiple connector methods.
+
+Recommended sequence:
 
 1. Human-readable PDF export
 2. Structured ClearPath JSON export
-3. Open Dental-oriented mapping
-4. Dentrix/Dentrix Ascend mapping research
-5. Eaglesoft mapping research
-6. Common ambulatory EHR mapping research
+3. Consent package and audit trail
+4. Open Dental-oriented pilot mapping
+5. Dental PMS connector research
+6. Common ambulatory EHR connector research
 7. FHIR Bundle prototype
-8. HIE/FHIR network research
+8. HL7/import-file prototype
 9. EMS emergency package prototype
+10. Health information exchange and FHIR network research
+
+## Planning Notes
+
+Dental is still a strong beachhead because dental offices repeatedly ask for medical history, medications, allergies, insurance, and documents, but they often operate outside hospital EHR networks.
+
+Specialty clinics are strong second targets because cardiology, dermatology, orthopedics, ophthalmology, gastroenterology, surgery centers, and urgent care offices all need updated history but often use different specialty systems.
+
+Hospitals matter long term, but large enterprise systems require security review, procurement, interface contracts, and implementation maturity.
+
+EMS is strategically important because emergency teams need fast access to medications, allergies, conditions, emergency contacts, caregiver permissions, and identity-safe emergency summaries.
 
 ## Sources Used For This Initial Map
 
@@ -779,4 +617,3 @@ Recommended order:
 - ONC/CHPL-style certified EHR market knowledge
 - Public descriptions of Epic, athenahealth, NextGen, DrChrono, Dentrix, Open Dental, and ModMed
 - Specialty EHR market lists from current software directories and buyer guides
-
