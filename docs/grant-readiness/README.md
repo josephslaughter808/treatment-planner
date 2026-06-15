@@ -9,6 +9,9 @@ This folder collects the technical foundation for positioning ClearPath as a pat
 - [Patient Health Information Software Market Map](./patient-health-information-software-map.md)
 - [Patient Health Information Software Exchange Matrix](./patient-health-information-software-exchange-matrix.md)
 - [Day One Translator Hub Architecture](../hub-architecture/day-one-translator-architecture.md)
+- [ClearPath Package JSON Schema](../hub-architecture/clearpath-package.schema.json)
+- [Sample ClearPath Package](../hub-architecture/sample-clearpath-package.json)
+- [Package API Smoke Tests](../hub-architecture/package-api-smoke-tests.md)
 
 ## Immediate Build Priorities
 

@@ -32,6 +32,13 @@ export type ClearPathConsentSectionKey =
   | "medical-conditions"
   | "medications"
   | "allergies"
+  | "surgeries-hospitalizations"
+  | "pregnancy-nursing"
+  | "procedure-concerns"
+  | "bleeding-healing"
+  | "current-symptoms"
+  | "care-team"
+  | "accessibility-needs"
   | "insurance"
   | "emergency-contact"
   | "documents"
@@ -87,6 +94,19 @@ export type ClearPathClinicalItem<T> = {
   provenance: ClearPathProvenance;
 };
 
+export type ClearPathNarrativeSection = {
+  sectionKey:
+    | "surgeries-hospitalizations"
+    | "pregnancy-nursing"
+    | "procedure-concerns"
+    | "bleeding-healing"
+    | "current-symptoms"
+    | "care-team"
+    | "accessibility-needs";
+  value: string;
+  provenance: ClearPathProvenance;
+};
+
 export type ClearPathPackage = {
   packageId: string;
   packageVersion: typeof clearPathPackageVersion;
@@ -102,6 +122,7 @@ export type ClearPathPackage = {
     insurance: ClearPathClinicalItem<InsuranceEntry>[];
     emergencyContact: ClearPathClinicalItem<EmergencyContact>[];
     documents: ClearPathClinicalItem<ClearanceDocument>[];
+    additionalHistory: ClearPathNarrativeSection[];
   };
   relationships: {
     dependents: {
@@ -121,6 +142,7 @@ export type ClearPathPackage = {
 };
 
 export type ClearPathTranslatorTarget =
+  | "clearpath-json"
   | "pdf"
   | "csv"
   | "open-dental"
@@ -183,7 +205,8 @@ export function buildClearPathPackage(input: BuildClearPathPackageInput): ClearP
       allergies: input.vault.allergies.map((item) => wrapClinicalItem(item.id, item, provenance)),
       insurance: [wrapClinicalItem("insurance-primary", input.vault.insurance, provenance)],
       emergencyContact: [wrapClinicalItem("emergency-contact-primary", input.vault.emergencyContact, provenance)],
-      documents: input.vault.clearanceDocuments.map((item) => wrapClinicalItem(item.id, item, provenance))
+      documents: input.vault.clearanceDocuments.map((item) => wrapClinicalItem(item.id, item, provenance)),
+      additionalHistory: buildAdditionalHistorySections(provenance)
     },
     relationships: {
       dependents: (input.vault.familyAccess?.dependents || []).map((dependent) => ({
@@ -209,6 +232,13 @@ export function buildDefaultConsentSections(): ClearPathConsentSection[] {
     "medical-conditions",
     "medications",
     "allergies",
+    "surgeries-hospitalizations",
+    "pregnancy-nursing",
+    "procedure-concerns",
+    "bleeding-healing",
+    "current-symptoms",
+    "care-team",
+    "accessibility-needs",
     "insurance",
     "emergency-contact",
     "documents",
@@ -266,12 +296,31 @@ export function validateClearPathPackage(pkg: ClearPathPackage): ClearPathPackag
   if (!pkg.healthProfile.insurance.some((item) => item.value.providerName || item.value.memberId)) {
     warnings.push("No insurance details are present in this package.");
   }
+  if (!pkg.healthProfile.additionalHistory.length) {
+    warnings.push("Additional guided history sections are present in the schema but not populated yet.");
+  }
 
   return {
     valid: errors.length === 0,
     errors,
     warnings
   };
+}
+
+function buildAdditionalHistorySections(provenance: ClearPathProvenance): ClearPathNarrativeSection[] {
+  return [
+    "surgeries-hospitalizations",
+    "pregnancy-nursing",
+    "procedure-concerns",
+    "bleeding-healing",
+    "current-symptoms",
+    "care-team",
+    "accessibility-needs"
+  ].map((sectionKey) => ({
+    sectionKey: sectionKey as ClearPathNarrativeSection["sectionKey"],
+    value: "",
+    provenance
+  }));
 }
 
 function buildConsentScope(

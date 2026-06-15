@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clearpath.care/schemas/clearpath-package-1.0.0.json",
+  "title": "ClearPath Package",
+  "description": "Versioned ClearPath patient-controlled health data package.",
+  "type": "object",
+  "required": [
+    "packageId",
+    "packageVersion",
+    "format",
+    "generatedAt",
+    "profileVersionId",
+    "person",
+    "consent",
+    "healthProfile",
+    "relationships",
+    "auditContext"
+  ],
+  "properties": {
+    "packageId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "packageVersion": {
+      "const": "1.0.0"
+    },
+    "format": {
+      "const": "clearpath-json"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "profileVersionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "person": {
+      "type": "object",
+      "required": [
+        "personId",
+        "displayName",
+        "email",
+        "phone",
+        "dateOfBirth",
+        "memberId",
+        "walletCode",
+        "relationshipToAccount"
+      ],
+      "properties": {
+        "personId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "dateOfBirth": { "type": "string" },
+        "memberId": { "type": "string" },
+        "walletCode": { "type": "string" },
+        "relationshipToAccount": {
+          "enum": ["self", "child", "legal-dependent", "spouse", "adult-care-recipient", "other"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "consent": {
+      "type": "object",
+      "required": [
+        "consentPackageId",
+        "packageType",
+        "recipientType",
+        "recipientId",
+        "recipientName",
+        "purposeOfUse",
+        "createdAt",
+        "expiresAt",
+        "sections"
+      ],
+      "properties": {
+        "consentPackageId": { "type": "string" },
+        "packageType": {
+          "enum": ["check-in", "new-patient-intake", "emergency-release", "caregiver-access", "record-request"]
+        },
+        "recipientType": {
+          "enum": ["practice", "provider", "caregiver", "emergency-contact", "external-system"]
+        },
+        "recipientId": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "purposeOfUse": {
+          "enum": ["treatment", "payment", "operations", "emergency", "caregiving", "patient-request"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/consentSection" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "healthProfile": {
+      "type": "object",
+      "required": [
+        "medicalConditions",
+        "medications",
+        "allergies",
+        "insurance",
+        "emergencyContact",
+        "documents",
+        "additionalHistory"
+      ],
+      "properties": {
+        "medicalConditions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clinicalItem" }
+        },
+        "medications": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clinicalItem" }
+        },
+        "allergies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clinicalItem" }
+        },
+        "insurance": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clinicalItem" }
+        },
+        "emergencyContact": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clinicalItem" }
+        },
+        "documents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/clinicalItem" }
+        },
+        "additionalHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["sectionKey", "value", "provenance"],
+            "properties": {
+              "sectionKey": {
+                "enum": [
+                  "surgeries-hospitalizations",
+                  "pregnancy-nursing",
+                  "procedure-concerns",
+                  "bleeding-healing",
+                  "current-symptoms",
+                  "care-team",
+                  "accessibility-needs"
+                ]
+              },
+              "value": { "type": "string" },
+              "provenance": { "$ref": "#/$defs/provenance" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "relationships": {
+      "type": "object",
+      "required": ["dependents"],
+      "properties": {
+        "dependents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["personId", "displayName", "relationship", "legalAuthority", "memberId", "walletCode"],
+            "properties": {
+              "personId": { "type": "string" },
+              "displayName": { "type": "string" },
+              "relationship": { "type": "string" },
+              "legalAuthority": { "type": "string" },
+              "memberId": { "type": "string" },
+              "walletCode": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "auditContext": {
+      "type": "object",
+      "required": ["sourceVaultUpdatedAt"],
+      "properties": {
+        "generatedByAccountId": { "type": "string" },
+        "generatedByRole": {
+          "enum": ["patient", "provider", "admin", "system"]
+        },
+        "sourceVaultUpdatedAt": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "consentSection": {
+      "type": "object",
+      "required": ["sectionKey", "accessLevel", "includedItemIds", "excludedItemIds", "redactionNotes"],
+      "properties": {
+        "sectionKey": {
+          "enum": [
+            "demographics",
+            "medical-conditions",
+            "medications",
+            "allergies",
+            "surgeries-hospitalizations",
+            "pregnancy-nursing",
+            "procedure-concerns",
+            "bleeding-healing",
+            "current-symptoms",
+            "care-team",
+            "accessibility-needs",
+            "insurance",
+            "emergency-contact",
+            "documents",
+            "dependents",
+            "office-connections"
+          ]
+        },
+        "accessLevel": {
+          "enum": ["hidden", "view", "download", "import"]
+        },
+        "includedItemIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "excludedItemIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "redactionNotes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "clinicalItem": {
+      "type": "object",
+      "required": ["id", "value", "provenance"],
+      "properties": {
+        "id": { "type": "string" },
+        "value": { "type": "object" },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "enteredAt"],
+      "properties": {
+        "source": {
+          "enum": [
+            "patient-entered",
+            "caregiver-entered",
+            "provider-reviewed",
+            "provider-entered",
+            "imported",
+            "system-generated"
+          ]
+        },
+        "sourceOrganizationId": { "type": "string" },
+        "sourceOrganizationName": { "type": "string" },
+        "sourceSystem": { "type": "string" },
+        "sourceRecordId": { "type": "string" },
+        "enteredAt": { "type": "string" },
+        "verifiedAt": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

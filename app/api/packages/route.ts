@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "crypto";
 import {
   buildClearPathPackage,
   validateClearPathPackage,
-  type ClearPathPackageFormat
+  type ClearPathPackageFormat,
+  type ClearPathTranslatorResult
 } from "@/lib/clearpath-package";
-import { getPatientVaultRecord, logAuditEvent } from "@/lib/persistence";
+import {
+  getPatientVaultRecord,
+  logAuditEvent,
+  revokeClearPathPackageRecord,
+  saveClearPathPackageRecord
+} from "@/lib/persistence";
 import {
   getRequestActor,
   isSameEmailActor,
@@ -74,6 +81,16 @@ export async function GET(request: NextRequest) {
   }
 
   const translated = translatePackage(pkg, requestedFormat);
+  const checksumSha256 = createPackageChecksum(pkg, translated.payload);
+  const storedPackage = await saveClearPathPackageRecord(
+    {
+      pkg,
+      translated,
+      validation,
+      checksumSha256
+    },
+    actor
+  );
 
   await logAuditEvent({
     actor,
@@ -84,6 +101,7 @@ export async function GET(request: NextRequest) {
     metadata: {
       format: requestedFormat,
       packageVersion: pkg.packageVersion,
+      checksumSha256,
       validationWarnings: validation.warnings
     }
   });
@@ -93,8 +111,46 @@ export async function GET(request: NextRequest) {
     format: requestedFormat,
     package: requestedFormat === "clearpath-json" ? pkg : undefined,
     translated,
-    validation
+    validation,
+    checksumSha256,
+    storedPackage
   });
+}
+
+export async function PATCH(request: NextRequest) {
+  if (shouldRequireSupabase() && !isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Supabase auth is required before package revocation is available." },
+      { status: 503 }
+    );
+  }
+
+  const body = (await request.json()) as {
+    packageId?: string;
+    reason?: string;
+  };
+
+  if (!body.packageId) {
+    return NextResponse.json({ error: "Package ID is required." }, { status: 400 });
+  }
+
+  const actor = await getRequestActor(request);
+  if (isSupabaseConfigured() && !actor) {
+    return NextResponse.json({ error: "Authentication is required." }, { status: 401 });
+  }
+
+  try {
+    const result = await revokeClearPathPackageRecord(
+      body.packageId,
+      body.reason || "Revoked by authorized user.",
+      actor
+    );
+    return NextResponse.json(result);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to revoke this package.";
+    const status = message.includes("access") ? 403 : message.includes("not found") ? 404 : 400;
+    return NextResponse.json({ error: message }, { status });
+  }
 }
 
 function normalizePackageFormat(format: string | null): PackageResponseFormat {
@@ -104,7 +160,10 @@ function normalizePackageFormat(format: string | null): PackageResponseFormat {
   return "clearpath-json";
 }
 
-function translatePackage(pkg: ReturnType<typeof buildClearPathPackage>, format: PackageResponseFormat) {
+function translatePackage(
+  pkg: ReturnType<typeof buildClearPathPackage>,
+  format: PackageResponseFormat
+): ClearPathTranslatorResult {
   if (format === "csv") {
     return translateClearPathPackageToCsv(pkg);
   }
@@ -124,4 +183,12 @@ function translatePackage(pkg: ReturnType<typeof buildClearPathPackage>, format:
     payload: JSON.stringify(pkg, null, 2),
     warnings: []
   };
+}
+
+function createPackageChecksum(pkg: ReturnType<typeof buildClearPathPackage>, payload: string) {
+  return createHash("sha256")
+    .update(JSON.stringify(pkg))
+    .update("\n")
+    .update(payload)
+    .digest("hex");
 }

@@ -1,4 +1,9 @@
 import { randomUUID } from "crypto";
+import type {
+  ClearPathPackage,
+  ClearPathPackageValidationResult,
+  ClearPathTranslatorResult
+} from "@/lib/clearpath-package";
 import {
   conditionsById,
   getPracticeOverride,
@@ -28,6 +33,7 @@ export type SaveResult = {
   vaultId?: string;
   checkInId?: string;
   shareLinkId?: string;
+  packageId?: string;
 };
 
 export async function saveCaseRecord(
@@ -1484,6 +1490,152 @@ export async function logAuditEvent(input: {
     resource_id: input.resourceId ?? null,
     metadata: input.metadata ?? {}
   });
+}
+
+export async function saveClearPathPackageRecord(
+  input: {
+    pkg: ClearPathPackage;
+    translated: ClearPathTranslatorResult;
+    validation: ClearPathPackageValidationResult;
+    checksumSha256: string;
+  },
+  actor?: RequestActor | null
+): Promise<SaveResult> {
+  const supabase = createAdminSupabaseClient();
+  if (!supabase) {
+    return {
+      mode: "mock",
+      packageId: input.pkg.packageId,
+      message: "Package generated locally. Supabase is not configured, so no package record was stored."
+    };
+  }
+
+  const { error } = await supabase.from("clearpath_packages").upsert(
+    {
+      package_id: input.pkg.packageId,
+      patient_identity_id: input.pkg.person.personId,
+      practice_id: actor?.practiceId ?? null,
+      created_by_auth_user_id: actor?.authUserId ?? null,
+      created_by_app_user_id: actor?.appUserId ?? null,
+      package_version: input.pkg.packageVersion,
+      package_format: input.pkg.format,
+      output_format: input.translated.format,
+      purpose_of_use: input.pkg.consent.purposeOfUse,
+      recipient_type: input.pkg.consent.recipientType,
+      recipient_id: input.pkg.consent.recipientId,
+      recipient_name: input.pkg.consent.recipientName,
+      status: getPackageStatus(input.pkg.consent.expiresAt),
+      checksum_sha256: input.checksumSha256,
+      package_snapshot: encryptJsonField(input.pkg),
+      translated_snapshot: encryptJsonField(input.translated),
+      validation_snapshot: input.validation,
+      expires_at: input.pkg.consent.expiresAt || null
+    },
+    { onConflict: "package_id" }
+  );
+
+  if (error) {
+    if (isMissingTableError(error.message)) {
+      return {
+        mode: "supabase",
+        packageId: input.pkg.packageId,
+        message:
+          "Package generated and audited, but the clearpath_packages table has not been applied in Supabase yet."
+      };
+    }
+    throw new Error(error.message);
+  }
+
+  return {
+    mode: "supabase",
+    packageId: input.pkg.packageId,
+    message: "ClearPath package stored."
+  };
+}
+
+export async function revokeClearPathPackageRecord(
+  packageId: string,
+  reason: string,
+  actor?: RequestActor | null
+): Promise<SaveResult> {
+  const supabase = createAdminSupabaseClient();
+  if (!supabase) {
+    return {
+      mode: "mock",
+      packageId,
+      message: "Package revocation was recorded locally only because Supabase is not configured."
+    };
+  }
+
+  const { data: packageRow, error: packageError } = await supabase
+    .from("clearpath_packages")
+    .select("package_id, patient_identity_id, practice_id, created_by_auth_user_id, patient_identities(email)")
+    .eq("package_id", packageId)
+    .maybeSingle();
+
+  if (packageError) {
+    if (isMissingTableError(packageError.message)) {
+      return {
+        mode: "supabase",
+        packageId,
+        message: "The clearpath_packages table has not been applied in Supabase yet."
+      };
+    }
+    throw new Error(packageError.message);
+  }
+
+  if (!packageRow) {
+    throw new Error("ClearPath package was not found.");
+  }
+
+  const patientEmail = ((packageRow.patient_identities as { email?: string } | null)?.email || "").toLowerCase();
+  const samePatient = Boolean(actor?.email && patientEmail && actor.email.toLowerCase() === patientEmail);
+  const samePractice = Boolean(actor?.practiceId && packageRow.practice_id && actor.practiceId === packageRow.practice_id);
+  const originalCreator = Boolean(actor?.authUserId && actor.authUserId === packageRow.created_by_auth_user_id);
+
+  if (!samePatient && !samePractice && !originalCreator) {
+    throw new Error("You do not have access to revoke this package.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("clearpath_packages")
+    .update({
+      status: "revoked",
+      revoked_at: new Date().toISOString(),
+      revoked_by_auth_user_id: actor?.authUserId ?? null,
+      revocation_reason: reason
+    })
+    .eq("package_id", packageId);
+
+  if (updateError) {
+    throw new Error(updateError.message);
+  }
+
+  await logAuditEvent({
+    actor,
+    action: "clearpath_package_revoked",
+    resourceType: "clearpath_package",
+    resourceId: packageId,
+    patientIdentityId: packageRow.patient_identity_id as string,
+    practiceId: (packageRow.practice_id as string | null) ?? null,
+    metadata: { reason }
+  });
+
+  return {
+    mode: "supabase",
+    packageId,
+    message: "ClearPath package revoked."
+  };
+}
+
+function getPackageStatus(expiresAt: string) {
+  const expires = new Date(expiresAt);
+  return !Number.isNaN(expires.getTime()) && expires.getTime() < Date.now() ? "expired" : "active";
+}
+
+function isMissingTableError(message: string) {
+  const normalized = message.toLowerCase();
+  return normalized.includes("clearpath_packages") && normalized.includes("does not exist");
 }
 
 function buildPatientVaultFromRows(

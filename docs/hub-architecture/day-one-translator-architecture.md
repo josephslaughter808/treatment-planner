@@ -35,6 +35,13 @@ The version is defined in:
 lib/clearpath-package.ts
 ```
 
+Formal schema and sample package:
+
+```text
+docs/hub-architecture/clearpath-package.schema.json
+docs/hub-architecture/sample-clearpath-package.json
+```
+
 ## Initial Translator Targets
 
 Phase-one translator targets:
@@ -80,3 +87,10 @@ Reasons:
 
 Day two can now build on this by wiring the current patient profile into `buildClearPathPackage()` and exposing a provider-side package preview/download flow.
 
+## Day Two Completion Notes
+
+Day two adds `/api/packages`, package validation, SHA-256 checksums, Supabase package storage, package revocation support, and smoke-test steps in:
+
+```text
+docs/hub-architecture/package-api-smoke-tests.md
+```

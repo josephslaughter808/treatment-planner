@@ -1,0 +1,159 @@
+{
+  "packageId": "pkg-demo-001",
+  "packageVersion": "1.0.0",
+  "format": "clearpath-json",
+  "generatedAt": "2026-06-14T18:00:00.000Z",
+  "profileVersionId": "person-demo-001:2026-06-14T17:55:00.000Z",
+  "person": {
+    "personId": "person-demo-001",
+    "displayName": "Jordan Example",
+    "email": "jordan@example.com",
+    "phone": "555-0100",
+    "dateOfBirth": "1988-04-22",
+    "memberId": "CP-DEMO01",
+    "walletCode": "WAL-DEMO1",
+    "relationshipToAccount": "self"
+  },
+  "consent": {
+    "consentPackageId": "consent-demo-001",
+    "packageType": "check-in",
+    "recipientType": "practice",
+    "recipientId": "demo-dental",
+    "recipientName": "Demo Dental",
+    "purposeOfUse": "treatment",
+    "createdAt": "2026-06-14T18:00:00.000Z",
+    "expiresAt": "2026-07-14T18:00:00.000Z",
+    "sections": [
+      {
+        "sectionKey": "demographics",
+        "accessLevel": "view",
+        "includedItemIds": [],
+        "excludedItemIds": [],
+        "redactionNotes": ""
+      },
+      {
+        "sectionKey": "medical-conditions",
+        "accessLevel": "view",
+        "includedItemIds": [],
+        "excludedItemIds": [],
+        "redactionNotes": ""
+      },
+      {
+        "sectionKey": "medications",
+        "accessLevel": "view",
+        "includedItemIds": [],
+        "excludedItemIds": [],
+        "redactionNotes": ""
+      },
+      {
+        "sectionKey": "allergies",
+        "accessLevel": "view",
+        "includedItemIds": [],
+        "excludedItemIds": [],
+        "redactionNotes": ""
+      },
+      {
+        "sectionKey": "insurance",
+        "accessLevel": "view",
+        "includedItemIds": [],
+        "excludedItemIds": [],
+        "redactionNotes": ""
+      }
+    ]
+  },
+  "healthProfile": {
+    "medicalConditions": [
+      {
+        "id": "condition-001",
+        "value": {
+          "id": "condition-001",
+          "name": "High blood pressure",
+          "notes": "Controlled with medication."
+        },
+        "provenance": {
+          "source": "patient-entered",
+          "enteredAt": "2026-06-14T18:00:00.000Z"
+        }
+      }
+    ],
+    "medications": [
+      {
+        "id": "medication-001",
+        "value": {
+          "id": "medication-001",
+          "name": "Lisinopril",
+          "dose": "10 mg",
+          "frequency": "Daily"
+        },
+        "provenance": {
+          "source": "patient-entered",
+          "enteredAt": "2026-06-14T18:00:00.000Z"
+        }
+      }
+    ],
+    "allergies": [
+      {
+        "id": "allergy-001",
+        "value": {
+          "id": "allergy-001",
+          "allergen": "Penicillin",
+          "reaction": "Rash",
+          "severity": "moderate"
+        },
+        "provenance": {
+          "source": "patient-entered",
+          "enteredAt": "2026-06-14T18:00:00.000Z"
+        }
+      }
+    ],
+    "insurance": [
+      {
+        "id": "insurance-primary",
+        "value": {
+          "providerName": "Demo Insurance",
+          "memberId": "DEMO-123",
+          "groupNumber": "GROUP-1",
+          "subscriberName": "Jordan Example"
+        },
+        "provenance": {
+          "source": "patient-entered",
+          "enteredAt": "2026-06-14T18:00:00.000Z"
+        }
+      }
+    ],
+    "emergencyContact": [
+      {
+        "id": "emergency-contact-primary",
+        "value": {
+          "name": "Taylor Example",
+          "relationship": "Spouse",
+          "phone": "555-0101"
+        },
+        "provenance": {
+          "source": "patient-entered",
+          "enteredAt": "2026-06-14T18:00:00.000Z"
+        }
+      }
+    ],
+    "documents": [],
+    "additionalHistory": [
+      {
+        "sectionKey": "surgeries-hospitalizations",
+        "value": "Appendectomy in 2018.",
+        "provenance": {
+          "source": "patient-entered",
+          "enteredAt": "2026-06-14T18:00:00.000Z"
+        }
+      }
+    ]
+  },
+  "relationships": {
+    "dependents": []
+  },
+  "auditContext": {
+    "generatedByAccountId": "account-demo-001",
+    "generatedByRole": "patient",
+    "sourceVaultUpdatedAt": "2026-06-14T17:55:00.000Z"
+  }
+}
+
