@@ -588,6 +588,93 @@ Start by confirming exact export/import mechanics for these systems:
 14. Redox
 15. Health Gorilla
 
+## ClearPath Translation Roadmap
+
+ClearPath should use a canonical internal health model with ClearPath JSON as the primary package language. The database can remain relational where appropriate, but every input and output translator should map through the same internal model.
+
+Recommended translation flow:
+
+```text
+Outside system -> input translator -> ClearPath canonical model -> consent package -> output translator -> receiving system
+```
+
+### Internal Language
+
+| Language / Format | Direction | Priority | Why It Matters |
+| --- | --- | --- | --- |
+| ClearPath JSON | Internal, input, output | Phase 1 | Main patient-controlled package format for consent, snapshots, versioning, audit references, and future APIs. |
+| Relational database records | Internal storage | Phase 1 | Best for accounts, practices, permissions, audit events, consent packages, and searchable metadata. |
+| Encrypted JSONB snapshots | Internal storage | Phase 1 | Useful for freezing check-in snapshots, consent payloads, and medical-history versions. |
+
+### Phase 1 Practical Translators
+
+| Language / Format | Direction | Priority | Why It Matters |
+| --- | --- | --- | --- |
+| Human-readable PDF | Output, input by upload | Phase 1 | Easiest office-facing format and safest early export before direct chart writes. |
+| CSV / spreadsheet | Input, output | Phase 1 | Common for reports, patient lists, simple imports, exports, and early connector testing. |
+| Plain documents | Input, output | Phase 1 | Covers uploaded medical records, release forms, insurance cards, IDs, referrals, and office review packets. |
+| JPEG / PNG images | Input, output | Phase 1 | Needed for driver's license, insurance card, document photos, and some dental/medical attachments. |
+| Open Dental mapping | Output, later input | Phase 1 pilot research | First likely dental pilot mapping target. Use reviewed import first, not silent automatic chart writes. |
+
+### Phase 2 Clinical Standards Translators
+
+| Language / Format | Direction | Priority | Why It Matters |
+| --- | --- | --- | --- |
+| HL7 FHIR JSON | Input, output | Phase 2 | Main modern healthcare API standard and strongest bridge to patient-mediated access. |
+| FHIR Bulk Data / NDJSON | Input, output | Phase 2 | Large-scale FHIR export format for population, payer, or institution-level data movement. |
+| HL7 v2 | Input, output | Phase 2 | Still extremely common for labs, admissions, demographics, scheduling, results, and interfaces. |
+| C-CDA / CCD / CDA | Input, output | Phase 2 | Common clinical document summary format used in record exchange and patient downloads. |
+| Direct Secure Messaging | Input, output | Phase 2 | Secure clinical document messaging used by many healthcare organizations. |
+| SFTP file drops | Input, output | Phase 2 | Practical transport layer for older healthcare integrations and batch exchange. |
+| Webhooks / event feeds | Input, output | Phase 2 | Modern way to know when data changes without repeated polling. |
+
+### Phase 3 Specialty And Administrative Translators
+
+| Language / Format | Direction | Priority | Why It Matters |
+| --- | --- | --- | --- |
+| X12 EDI 270/271 | Input, output | Phase 3 | Insurance eligibility request and response. |
+| X12 EDI 837 | Output | Phase 3 | Claims submission path if ClearPath ever supports billing-adjacent workflows. |
+| X12 EDI 835 | Input | Phase 3 | Remittance/payment response path if billing workflows are added. |
+| NCPDP SCRIPT | Input, output | Phase 3 | Pharmacy and e-prescribing transaction standard. |
+| NEMSIS XML | Input, output | Phase 3 | EMS/ePCR standard and important for emergency-care expansion. |
+| DICOM | Input, output | Phase 3 | Imaging standard for radiology, dental imaging, cardiology imaging, and image archives. |
+| DICOMweb | Input, output | Phase 3 | Modern web API pattern for DICOM imaging exchange. |
+| DICOM SR | Input, output | Phase 3 | Structured imaging reports. |
+| OASIS | Input, output | Phase 3 | Home health assessment data. |
+| MDS | Input, output | Phase 3 | Skilled nursing and long-term care assessment data. |
+| QRDA | Input, output | Phase 3 | Quality reporting document format. |
+
+### Phase 4 Advanced, Research, And Vendor-Specific Translators
+
+| Language / Format | Direction | Priority | Why It Matters |
+| --- | --- | --- | --- |
+| IHE XDS.b | Input, output | Phase 4 | Document registry/repository exchange used by some HIE and enterprise environments. |
+| HL7 v3 | Input, output | Phase 4 | Less common than HL7 v2 and FHIR, but still present in some legacy environments. |
+| FHIR XML | Input, output | Phase 4 | FHIR can be represented as XML, even if JSON should be ClearPath's main implementation path. |
+| FHIR RDF | Input, output | Phase 4 | Semantic-web representation of FHIR; likely research-only early on. |
+| openEHR archetypes | Input, output | Phase 4 | More common internationally; relevant to grant-level interoperability research. |
+| OMOP Common Data Model | Output, later input | Phase 4 | Research and population-health data model. |
+| ODBC / JDBC / SQL exports | Input, output | Phase 4 | Useful for local-server systems, reporting databases, and controlled extraction workflows. |
+| Proprietary vendor SDKs | Input, output | Phase 4 | Needed when a vendor exposes a closed integration kit instead of open standards. |
+| Proprietary flat files | Input, output | Phase 4 | Many older systems use custom delimited, fixed-width, XML, or zip-package formats. |
+
+### Translation Strategy
+
+ClearPath should not build one-off business logic for every vendor. Each vendor connector should be a thin adapter that maps into or out of the canonical ClearPath model.
+
+Recommended build order:
+
+1. ClearPath JSON package schema
+2. PDF export
+3. CSV export/import
+4. Document and image upload package
+5. Open Dental reviewed-import mapping
+6. FHIR JSON prototype
+7. HL7 v2 prototype
+8. C-CDA import/export
+9. X12, NEMSIS, DICOM, and NCPDP specialty translators
+10. HIE, Direct, SFTP, and proprietary connector adapters
+
 ## Sources And Verification Notes
 
 This first matrix combines vendor/category research with known healthcare interoperability standards. Before building or selling a connector, each row should be upgraded with vendor-specific evidence: documentation URL, API scope, authentication model, pricing/partner requirements, test sandbox availability, supported write-back resources, and customer sponsorship requirements.
