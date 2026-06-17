@@ -5,13 +5,10 @@ This folder collects ClearPath grant strategy, budgets, staffing plans, and Phas
 ## Documents
 
 - [Phase I Budget Proposal](./phase-one-budget-proposal.md)
-
-## Planning Areas To Build Out
-
-- Phase I scope and milestones
-- Phase II scope and commercialization path
-- Staffing plan and role descriptions
-- Grant manager questions
-- Compliance and security roadmap
-- Pilot and user discovery plan
-- Commercialization and sustainability plan
+- [Phase I Scope And Milestones](./phase-one-scope-and-milestones.md)
+- [Phase II Roadmap](./phase-two-roadmap.md)
+- [Staffing Plan](./staffing-plan.md)
+- [Grant Manager Questions](./grant-manager-questions.md)
+- [Compliance And Security Roadmap](./compliance-and-security-roadmap.md)
+- [Pilot And User Discovery Plan](./pilot-and-user-discovery-plan.md)
+- [Commercialization Plan](./commercialization-plan.md)
