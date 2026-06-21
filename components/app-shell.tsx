@@ -3,13 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import clearPathLogo from "@/ClearPath-Care-logo.png";
 import { AvatarBadge } from "@/components/avatar-badge";
 import { useAuth } from "@/components/auth-provider";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
 
-type NavIconName = "patients" | "health" | "family" | "documents" | "share" | "scan" | "account";
+type NavIconName = "patients" | "body" | "health" | "family" | "documents" | "share" | "scan" | "account";
 
 type NavItem = {
   href: string;
@@ -25,12 +25,15 @@ const providerNavItems: NavItem[] = [
 ];
 
 const patientNavItems: NavItem[] = [
-  { href: "/vault", label: "Health Profile", mobileLabel: "Health", icon: "health" },
+  { href: "/health-map", label: "Health Map", mobileLabel: "Map", icon: "body" },
+  { href: "/vault", label: "Health Profile", mobileLabel: "Profile", icon: "health" },
   { href: "/family", label: "Family", icon: "family" },
   { href: "/documents", label: "Documents", mobileLabel: "Docs", icon: "documents" },
   { href: "/share", label: "Share", icon: "share" },
   { href: "/profile", label: "Account", icon: "account" }
 ];
+
+const subscribeToHydration = () => () => {};
 
 type AppShellProps = {
   pageLabel: string;
@@ -52,6 +55,7 @@ export function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser, isReady } = useAuth();
+  const hasMounted = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(true);
 
   useEffect(() => {
@@ -92,7 +96,7 @@ export function AppShell({
     return () => window.removeEventListener("resize", syncViewport);
   }, []);
 
-  if (!isReady && audience !== "public") {
+  if ((!hasMounted || !isReady) && audience !== "public") {
     return <main className="shell loading-shell"><section className="panel">Loading ClearPath Care...</section></main>;
   }
 
@@ -291,6 +295,16 @@ function NavIcon({ name }: { name: NavIconName }) {
       <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
         <path d="M12 21s-8-4.7-8-11a4.8 4.8 0 0 1 8-3.6A4.8 4.8 0 0 1 20 10c0 6.3-8 11-8 11Z" />
         <path d="M8 12h2.5l1.2-3 2.1 6 1.2-3H17" />
+      </svg>
+    );
+  }
+
+  if (name === "body") {
+    return (
+      <svg aria-hidden="true" className="nav-icon" fill="none" viewBox="0 0 24 24">
+        <circle cx="12" cy="4.5" r="2.5" />
+        <path d="M8.5 10c0-1.7 1.6-3 3.5-3s3.5 1.3 3.5 3v4l2.5 3M8.5 14 6 17" />
+        <path d="M10 13v8M14 13v8" />
       </svg>
     );
   }
