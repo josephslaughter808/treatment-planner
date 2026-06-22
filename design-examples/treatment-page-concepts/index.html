@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearPath Treatment Concepts</title>
+    <style>
+      :root {
+        --bg: #f6f1e8;
+        --panel: rgba(255, 252, 247, 0.92);
+        --text: #2e261f;
+        --muted: #6b5d51;
+        --line: rgba(92, 71, 48, 0.16);
+        --accent: #0f6b67;
+        --accent-soft: rgba(15, 107, 103, 0.1);
+        --gold: #b18242;
+        --shadow: 0 24px 60px rgba(76, 53, 31, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.75), transparent 32%),
+          linear-gradient(180deg, #f7f1e8 0%, #efe5d7 100%);
+        padding: 48px 24px 72px;
+      }
+
+      .shell {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        font: 700 0.78rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.4rem, 5vw, 4.5rem);
+        line-height: 0.98;
+      }
+
+      .intro {
+        max-width: 760px;
+        margin-top: 16px;
+        color: var(--muted);
+        font: 500 1.1rem/1.75 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .grid {
+        display: grid;
+        gap: 22px;
+        margin-top: 38px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+        padding: 28px;
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.9rem;
+      }
+
+      .card p {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font: 500 1rem/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .traits {
+        display: grid;
+        gap: 10px;
+        margin: 18px 0 0;
+      }
+
+      .traits span {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font: 700 0.84rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      a {
+        display: inline-block;
+        margin-top: 20px;
+        color: var(--text);
+        text-decoration: none;
+        font: 700 0.95rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      a:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <p class="eyebrow">Treatment Page Concepts</p>
+      <h1>Three different ways the page can feel calm, premium, and patient-first.</h1>
+      <p class="intro">
+        These are not meant to be exact copies of the app. They are quick visual directions so we can choose the right emotional tone for treatment education before we keep redesigning the real product.
+      </p>
+
+      <section class="grid">
+        <article class="card">
+          <p class="eyebrow">Concept 1</p>
+          <h2>Clinical Calm</h2>
+          <p>This one feels most like a refined patient handout: structured, grounded, and medically reassuring.</p>
+          <div class="traits">
+            <span>clean clinical hierarchy</span>
+            <span>low-anxiety tone</span>
+            <span>premium handout feel</span>
+          </div>
+          <a href="./concept-clinical-calm.html">Open concept</a>
+        </article>
+
+        <article class="card">
+          <p class="eyebrow">Concept 2</p>
+          <h2>Warm Guided Care</h2>
+          <p>This one feels softer and more personal, like a luxury office that still explains treatment very clearly.</p>
+          <div class="traits">
+            <span>warmer palette</span>
+            <span>gentle explanation flow</span>
+            <span>high-end office energy</span>
+          </div>
+          <a href="./concept-warm-guided-care.html">Open concept</a>
+        </article>
+
+        <article class="card">
+          <p class="eyebrow">Concept 3</p>
+          <h2>Modern Evidence</h2>
+          <p>This one leans slightly more modern and visual while still feeling patient-safe and professional.</p>
+          <div class="traits">
+            <span>stronger media framing</span>
+            <span>clear step-by-step flow</span>
+            <span>modern but not flashy</span>
+          </div>
+          <a href="./concept-modern-evidence.html">Open concept</a>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

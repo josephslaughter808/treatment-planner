@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearPath Change Alert Popup Concepts</title>
+  <style>
+    :root {
+      --bg: #eef3f8;
+      --surface: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #dbe3ec;
+      --blue: #2563eb;
+      --red: #dc2626;
+      --red-soft: #fff1f2;
+      --red-line: #fca5a5;
+      --green: #15803d;
+      --amber: #b45309;
+      --shadow: 0 28px 90px rgba(15, 23, 42, 0.16);
+      --font: "Avenir Next", "Segoe UI", sans-serif;
+      --heading: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 28%),
+        linear-gradient(135deg, #f8fbff, var(--bg));
+      font-family: var(--font);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--heading);
+      letter-spacing: -0.055em;
+    }
+
+    .page {
+      width: min(1440px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 42px 0 70px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(320px, 0.45fr);
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .hero-card,
+    .note-card {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: 0 18px 70px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-card {
+      padding: clamp(26px, 4vw, 48px);
+    }
+
+    .note-card {
+      padding: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      max-width: 900px;
+      margin-bottom: 18px;
+      font-size: clamp(3rem, 6vw, 6.6rem);
+      line-height: 0.9;
+    }
+
+    .hero p,
+    .note-card p,
+    .option-copy p,
+    .change-line p,
+    .microcopy {
+      color: var(--muted);
+      line-height: 1.62;
+    }
+
+    .note-card strong {
+      display: block;
+      margin-bottom: 10px;
+      font-family: var(--heading);
+      font-size: 1.35rem;
+      letter-spacing: -0.04em;
+    }
+
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .concept {
+      min-height: 660px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      background: #f8fafc;
+      box-shadow: 0 20px 70px rgba(15, 23, 42, 0.08);
+    }
+
+    .option-copy {
+      padding: 26px 28px 0;
+    }
+
+    .option-copy h2 {
+      margin-bottom: 8px;
+      font-size: 1.75rem;
+    }
+
+    .mock-screen {
+      position: relative;
+      margin: 22px;
+      overflow: hidden;
+      border: 1px solid #dbe3ec;
+      border-radius: 24px;
+      background: #eef3f8;
+    }
+
+    .provider-shell {
+      min-height: 500px;
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      background: #f4f7fb;
+    }
+
+    .side-rail {
+      padding: 18px 12px;
+      border-right: 1px solid #dbe3ec;
+      background: #ffffff;
+    }
+
+    .logo-dot {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 28px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2563eb, #0f172a);
+    }
+
+    .rail-pill {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      border-radius: 16px;
+      background: #e9eef5;
+    }
+
+    .work-area {
+      padding: 24px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .patient-title h3 {
+      margin-bottom: 6px;
+      font-size: 2rem;
+    }
+
+    .patient-title span,
+    .chip,
+    .tiny-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid #dbe3ec;
+      border-radius: 999px;
+      background: #ffffff;
+    }
+
+    .history-card {
+      min-height: 330px;
+      padding: 22px;
+      border: 1px solid #dbe3ec;
+      border-radius: 22px;
+      background: #ffffff;
+    }
+
+    .history-card h3 {
+      margin-bottom: 16px;
+      font-size: 1.3rem;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      background: #f8fafc;
+    }
+
+    .history-row strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .history-row span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .screen-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.36);
+      backdrop-filter: blur(5px);
+    }
+
+    .alert-modal {
+      width: min(560px, 100%);
+      border: 3px solid var(--red);
+      border-radius: 26px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .alert-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--red-line);
+      border-radius: 22px 22px 0 0;
+      background: linear-gradient(135deg, #fff1f2, #ffffff);
+    }
+
+    .alert-header h3 {
+      margin-bottom: 4px;
+      font-size: 1.65rem;
+      color: #991b1b;
+    }
+
+    .alert-badge {
+      height: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--red);
+      font-size: 0.78rem;
+      font-weight: 950;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .alert-body {
+      padding: 20px 24px 24px;
+    }
+
+    .change-list {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .change-line {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #fecaca;
+      border-radius: 16px;
+      background: #fff7f7;
+    }
+
+    .change-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--red);
+      font-weight: 950;
+    }
+
+    .change-line strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .change-line p {
+      margin: 0;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      padding-top: 6px;
+    }
+
+    .primary,
+    .secondary,
+    .danger {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      padding: 10px 15px;
+      border: 1px solid transparent;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .primary {
+      color: #ffffff;
+      background: var(--blue);
+    }
+
+    .danger {
+      color: #ffffff;
+      background: var(--red);
+    }
+
+    .secondary {
+      color: var(--ink);
+      border-color: var(--line);
+      background: #ffffff;
+    }
+
+    .floating-alert {
+      position: absolute;
+      inset: 24px 24px auto auto;
+      width: min(500px, calc(100% - 48px));
+      border: 3px solid var(--red);
+      border-radius: 22px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .floating-alert .alert-header,
+    .side-panel-alert .alert-header,
+    .receipt-alert .alert-header {
+      padding: 18px 20px;
+    }
+
+    .floating-alert .alert-body {
+      padding: 16px 20px 20px;
+    }
+
+    .side-panel-alert {
+      position: absolute;
+      inset: 0 0 0 auto;
+      width: min(430px, 86%);
+      border-left: 4px solid var(--red);
+      background: #ffffff;
+      box-shadow: -24px 0 80px rgba(15, 23, 42, 0.18);
+    }
+
+    .side-panel-alert .alert-body {
+      padding: 18px 20px 24px;
+    }
+
+    .timeline-alert {
+      position: absolute;
+      inset: 24px;
+      border: 3px solid var(--red);
+      border-radius: 26px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .timeline-alert-grid {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      min-height: 100%;
+    }
+
+    .timeline-alert-rail {
+      padding: 22px;
+      color: #ffffff;
+      background: linear-gradient(180deg, #991b1b, #dc2626);
+    }
+
+    .timeline-alert-rail h3 {
+      font-size: 1.75rem;
+    }
+
+    .timeline-alert-rail p {
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.55;
+    }
+
+    .timeline-alert-content {
+      padding: 24px;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .compare-card {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .compare-card.new {
+      border-color: #fecaca;
+      background: #fff1f2;
+    }
+
+    .compare-card span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 950;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .compare-card strong {
+      display: block;
+    }
+
+    .receipt-alert {
+      width: min(520px, 100%);
+      border: 3px solid var(--red);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .receipt-alert .alert-header {
+      border-bottom: 2px dashed var(--red-line);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .receipt-list {
+      display: grid;
+      gap: 0;
+      margin-bottom: 18px;
+      border: 1px solid #fee2e2;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .receipt-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 14px;
+      padding: 13px 14px;
+      background: #ffffff;
+    }
+
+    .receipt-item + .receipt-item {
+      border-top: 1px solid #fee2e2;
+    }
+
+    .receipt-item span {
+      color: #991b1b;
+      font-weight: 950;
+    }
+
+    .receipt-item strong {
+      color: var(--ink);
+    }
+
+    .status-strip {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px;
+      border: 3px solid var(--red);
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 20px 64px rgba(15, 23, 42, 0.16);
+    }
+
+    .status-dot {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--red);
+      font-weight: 950;
+    }
+
+    .status-strip strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .status-strip p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1080px) {
+      .hero,
+      .concept-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100% - 24px, 1440px);
+        padding-top: 20px;
+      }
+
+      .hero-card,
+      .note-card {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      .concept {
+        min-height: auto;
+      }
+
+      .provider-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .side-rail {
+        display: none;
+      }
+
+      .work-area {
+        padding: 16px;
+      }
+
+      .screen-overlay,
+      .mock-screen {
+        padding: 14px;
+      }
+
+      .floating-alert,
+      .side-panel-alert,
+      .timeline-alert,
+      .status-strip {
+        position: static;
+        width: auto;
+        margin: 16px;
+      }
+
+      .timeline-alert-grid,
+      .compare-row,
+      .receipt-item {
+        grid-template-columns: 1fr;
+      }
+
+      .status-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-card">
+        <p class="eyebrow">Provider check-in alert concepts</p>
+        <h1>Make patient changes impossible to miss.</h1>
+        <p>
+          These are six possible directions for showing new medical history changes after a patient scans or enters
+          their ClearPath code. The goal is clear, urgent, and professional without feeling scary or chaotic.
+        </p>
+      </div>
+      <aside class="note-card">
+        <p class="eyebrow">Design goal</p>
+        <strong>Red outline. Clear list. Required acknowledgement.</strong>
+        <p>
+          My vote is option 1 or option 4 for the first production version. Option 1 is the safest and most direct.
+          Option 4 gives the office the clearest before/after comparison.
+        </p>
+      </aside>
+    </section>
+
+    <section class="concept-grid">
+      <article class="concept">
+        <div class="option-copy">
+          <p class="eyebrow">Option 1</p>
+          <h2>Centered Critical Popup</h2>
+          <p>Classic modal. The office cannot miss it and must acknowledge changes before continuing.</p>
+        </div>
+        <div class="mock-screen">
+          <div class="provider-shell">
+            <aside class="side-rail">
+              <div class="logo-dot"></div>
+              <div class="rail-pill"></div>
+              <div class="rail-pill"></div>
+            </aside>
+            <section class="work-area">
+              <div class="top-row">
+                <div class="patient-title">
+                  <h3>Michael Slaughter</h3>
+                  <span>DOB 1988-03-14 • Last check-in 42 days ago</span>
+                </div>
+                <span class="chip">Sync: Live</span>
+              </div>
+              <div class="history-card">
+                <h3>Medical history</h3>
+                <div class="history-list">
+                  <div class="history-row"><div><strong>Conditions</strong><span>High blood pressure, asthma</span></div><span>2</span></div>
+                  <div class="history-row"><div><strong>Medications</strong><span>Lisinopril</span></div><span>1</span></div>
+                  <div class="history-row"><div><strong>Allergies</strong><span>Penicillin, latex</span></div><span>2</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="screen-overlay">
+            <section class="alert-modal">
+              <div class="alert-header">
+                <div>
+                  <h3>Medical history changed</h3>
+                  <p class="microcopy">Review before seating or treating this patient.</p>
+                </div>
+                <span class="alert-badge">3 changes</span>
+              </div>
+              <div class="alert-body">
+                <div class="change-list">
+                  <div class="change-line"><span class="change-icon">!</span><div><strong>New medication added</strong><p>Metformin 500mg • twice daily</p></div></div>
+                  <div class="change-line"><span class="change-icon">!</span><div><strong>New condition added</strong><p>Type 2 diabetes</p></div></div>
+                  <div class="change-line"><span class="change-icon">!</span><div><strong>Insurance updated</strong><p>New member ID entered today</p></div></div>
+                </div>
+                <div class="action-row">
+                  <button class="secondary">Print summary</button>
+                  <button class="danger">Acknowledge changes</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+
+      <article class="concept">
+        <div class="option-copy">
+          <p class="eyebrow">Option 2</p>
+          <h2>Top-Right Clinical Alert</h2>
+          <p>Less disruptive. The chart stays visible while the alert floats above it.</p>
+        </div>
+        <div class="mock-screen">
+          <div class="provider-shell">
+            <aside class="side-rail">
+              <div class="logo-dot"></div>
+              <div class="rail-pill"></div>
+              <div class="rail-pill"></div>
+            </aside>
+            <section class="work-area">
+              <div class="top-row">
+                <div class="patient-title">
+                  <h3>Sarah Chen</h3>
+                  <span>DOB 1992-11-02 • Returning patient</span>
+                </div>
+                <span class="chip">Checked in now</span>
+              </div>
+              <div class="history-card">
+                <h3>Medical history</h3>
+                <div class="history-list">
+                  <div class="history-row"><div><strong>Conditions</strong><span>Pregnancy status changed</span></div><span>Review</span></div>
+                  <div class="history-row"><div><strong>Emergency contact</strong><span>Phone updated</span></div><span>New</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <section class="floating-alert">
+            <div class="alert-header">
+              <div>
+                <h3>Review new answers</h3>
+                <p class="microcopy">Patient updated history today.</p>
+              </div>
+              <span class="alert-badge">New</span>
+            </div>
+            <div class="alert-body">
+              <div class="change-list">
+                <div class="change-line"><span class="change-icon">1</span><div><strong>Pregnancy / nursing</strong><p>Changed from “Not applicable” to “Pregnant.”</p></div></div>
+                <div class="change-line"><span class="change-icon">2</span><div><strong>Emergency contact</strong><p>New phone number added.</p></div></div>
+              </div>
+              <div class="action-row">
+                <button class="danger">Mark reviewed</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <article class="concept">
+        <div class="option-copy">
+          <p class="eyebrow">Option 3</p>
+          <h2>Right-Side Review Drawer</h2>
+          <p>Feels like professional charting software. Good if we expect longer change lists.</p>
+        </div>
+        <div class="mock-screen">
+          <div class="provider-shell">
+            <aside class="side-rail">
+              <div class="logo-dot"></div>
+              <div class="rail-pill"></div>
+              <div class="rail-pill"></div>
+            </aside>
+            <section class="work-area">
+              <div class="top-row">
+                <div class="patient-title">
+                  <h3>Elias Thorne</h3>
+                  <span>Medical history loaded from ClearPath pass</span>
+                </div>
+              </div>
+              <div class="history-card">
+                <h3>Current chart summary</h3>
+                <div class="history-list">
+                  <div class="history-row"><div><strong>Allergies</strong><span>Penicillin, latex, codeine</span></div><span>3</span></div>
+                  <div class="history-row"><div><strong>Documents</strong><span>Insurance card uploaded</span></div><span>1</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <aside class="side-panel-alert">
+            <div class="alert-header">
+              <div>
+                <h3>Changes since last visit</h3>
+                <p class="microcopy">Review each item before continuing.</p>
+              </div>
+            </div>
+            <div class="alert-body">
+              <div class="change-list">
+                <div class="change-line"><span class="change-icon">!</span><div><strong>Allergy added</strong><p>Codeine • nausea and rash</p></div></div>
+                <div class="change-line"><span class="change-icon">!</span><div><strong>Document added</strong><p>New insurance card image uploaded</p></div></div>
+                <div class="change-line"><span class="change-icon">!</span><div><strong>Medication removed</strong><p>Patient no longer takes ibuprofen daily</p></div></div>
+              </div>
+              <div class="action-row">
+                <button class="secondary">Open full chart</button>
+                <button class="danger">Reviewed</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </article>
+
+      <article class="concept">
+        <div class="option-copy">
+          <p class="eyebrow">Option 4</p>
+          <h2>Before / After Comparison</h2>
+          <p>The clearest for staff. Shows exactly what was different from the last check-in.</p>
+        </div>
+        <div class="mock-screen">
+          <div class="provider-shell">
+            <aside class="side-rail">
+              <div class="logo-dot"></div>
+              <div class="rail-pill"></div>
+              <div class="rail-pill"></div>
+            </aside>
+            <section class="work-area">
+              <div class="top-row">
+                <div class="patient-title">
+                  <h3>Marco Rodriguez</h3>
+                  <span>Annual update received</span>
+                </div>
+              </div>
+              <div class="history-card"></div>
+            </section>
+          </div>
+          <section class="timeline-alert">
+            <div class="timeline-alert-grid">
+              <aside class="timeline-alert-rail">
+                <h3>Changed today</h3>
+                <p>Compare this visit to the patient’s previous verified check-in.</p>
+              </aside>
+              <div class="timeline-alert-content">
+                <div class="compare-row">
+                  <div class="compare-card"><span>Last visit</span><strong>No diabetes listed</strong></div>
+                  <div class="compare-card new"><span>Today</span><strong>Type 2 diabetes added</strong></div>
+                </div>
+                <div class="compare-row">
+                  <div class="compare-card"><span>Last visit</span><strong>No daily medications</strong></div>
+                  <div class="compare-card new"><span>Today</span><strong>Metformin 500mg added</strong></div>
+                </div>
+                <div class="compare-row">
+                  <div class="compare-card"><span>Last visit</span><strong>Delta Dental member ID 8842</strong></div>
+                  <div class="compare-card new"><span>Today</span><strong>New member ID 1190</strong></div>
+                </div>
+                <div class="action-row">
+                  <button class="secondary">Copy to note</button>
+                  <button class="danger">Confirm reviewed</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <article class="concept">
+        <div class="option-copy">
+          <p class="eyebrow">Option 5</p>
+          <h2>Receipt-Style Change Slip</h2>
+          <p>Compact and printable. Feels like a check-in receipt the front desk can hand to clinical staff.</p>
+        </div>
+        <div class="mock-screen">
+          <div class="provider-shell">
+            <aside class="side-rail">
+              <div class="logo-dot"></div>
+              <div class="rail-pill"></div>
+              <div class="rail-pill"></div>
+            </aside>
+            <section class="work-area">
+              <div class="top-row">
+                <div class="patient-title">
+                  <h3>Anna Patel</h3>
+                  <span>Check-in completed 9:04 AM</span>
+                </div>
+              </div>
+              <div class="history-card"></div>
+            </section>
+          </div>
+          <div class="screen-overlay">
+            <section class="receipt-alert">
+              <div class="alert-header">
+                <div>
+                  <h3>Change slip</h3>
+                  <p class="microcopy">Attach to today’s review if needed.</p>
+                </div>
+                <span class="alert-badge">Print</span>
+              </div>
+              <div class="alert-body">
+                <div class="receipt-list">
+                  <div class="receipt-item"><span>Medication</span><strong>Eliquis added</strong></div>
+                  <div class="receipt-item"><span>Concern</span><strong>Bleeding / healing concern noted</strong></div>
+                  <div class="receipt-item"><span>Doctor</span><strong>Cardiologist added: Dr. Mendez</strong></div>
+                  <div class="receipt-item"><span>Insurance</span><strong>Subscriber changed to self</strong></div>
+                </div>
+                <div class="action-row">
+                  <button class="secondary">Print</button>
+                  <button class="danger">Reviewed</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </article>
+
+      <article class="concept">
+        <div class="option-copy">
+          <p class="eyebrow">Option 6</p>
+          <h2>Persistent Red Status Strip</h2>
+          <p>Less modal-heavy. Keeps changes visible at the bottom until someone marks them reviewed.</p>
+        </div>
+        <div class="mock-screen">
+          <div class="provider-shell">
+            <aside class="side-rail">
+              <div class="logo-dot"></div>
+              <div class="rail-pill"></div>
+              <div class="rail-pill"></div>
+            </aside>
+            <section class="work-area">
+              <div class="top-row">
+                <div class="patient-title">
+                  <h3>Jordan Miles</h3>
+                  <span>Current medical history visible below</span>
+                </div>
+              </div>
+              <div class="history-card">
+                <h3>Medical history</h3>
+                <div class="history-list">
+                  <div class="history-row"><div><strong>Conditions</strong><span>Sleep apnea added today</span></div><span>New</span></div>
+                  <div class="history-row"><div><strong>Documents</strong><span>Driver license uploaded</span></div><span>New</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <div class="status-strip">
+            <span class="status-dot">!</span>
+            <div>
+              <strong>2 medical history changes need review</strong>
+              <p>Sleep apnea was added. Driver license document was uploaded.</p>
+            </div>
+            <button class="danger">Review changes</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

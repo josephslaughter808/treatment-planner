@@ -43,7 +43,15 @@ export type ClearPathConsentSectionKey =
   | "emergency-contact"
   | "documents"
   | "dependents"
-  | "office-connections";
+  | "office-connections"
+  | "laboratory-results"
+  | "imaging-reports"
+  | "treatment-notes"
+  | "provider-notes"
+  | "discharge-summaries"
+  | "care-plans"
+  | "immunizations"
+  | "procedures";
 
 export type ClearPathAccessLevel = "hidden" | "view" | "download" | "import";
 
@@ -243,7 +251,15 @@ export function buildDefaultConsentSections(): ClearPathConsentSection[] {
     "emergency-contact",
     "documents",
     "dependents",
-    "office-connections"
+    "office-connections",
+    "laboratory-results",
+    "imaging-reports",
+    "treatment-notes",
+    "provider-notes",
+    "discharge-summaries",
+    "care-plans",
+    "immunizations",
+    "procedures"
   ].map((sectionKey) => ({
     sectionKey: sectionKey as ClearPathConsentSectionKey,
     accessLevel: "view",

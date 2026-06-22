@@ -3311,3 +3311,335 @@ select:focus {
     padding-right: 16px !important;
   }
 }
+
+/* Three-dimensional anatomical explorer */
+.health-map-page .body-map-panel {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.health-map-page .body-map-panel-header {
+  padding: 4px 2px 10px;
+}
+
+.health-map-page .body-map-canvas {
+  min-height: 620px;
+  padding: 0;
+}
+
+.anatomy-explorer {
+  position: relative;
+  width: 100%;
+  min-height: 620px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.anatomy-control-bar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #dbe3ec;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.anatomy-region-select {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  color: #526174;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.anatomy-region-select select {
+  width: min(220px, 42vw);
+  min-height: 36px;
+  padding: 6px 30px 6px 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.94);
+  color: #24364f;
+  font-size: 0.76rem;
+}
+
+.anatomy-canvas-wrap,
+.anatomy-canvas-wrap > div,
+.anatomy-canvas-wrap canvas {
+  width: 100% !important;
+  min-height: 560px !important;
+}
+
+.anatomy-canvas-wrap canvas {
+  display: block;
+  touch-action: none;
+}
+
+.anatomy-orientation {
+  position: absolute;
+  z-index: 2;
+  right: 18px;
+  bottom: 14px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.anatomy-orientation strong {
+  padding: 5px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #1558b0;
+  font-size: 0.68rem;
+}
+
+.anatomy-loading {
+  min-height: 620px;
+  display: grid;
+  place-items: center;
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.anatomy-attribution {
+  margin: 10px 2px 0;
+  color: #64748b;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.anatomy-attribution a {
+  color: #1558b0;
+  font-weight: 750;
+}
+
+@media (max-width: 720px) {
+  .health-map-page .body-map-canvas,
+  .anatomy-explorer,
+  .anatomy-loading {
+    min-height: 560px !important;
+  }
+
+  .anatomy-canvas-wrap,
+  .anatomy-canvas-wrap > div,
+  .anatomy-canvas-wrap canvas {
+    min-height: 490px !important;
+  }
+
+  .anatomy-control-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .anatomy-region-select select {
+    width: 100%;
+  }
+}
+
+/* Structured medical questionnaire details */
+.questionnaire-detail-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.questionnaire-detail-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #0e7490;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.questionnaire-detail-heading,
+.condition-detail-editor-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.questionnaire-detail-heading h3,
+.questionnaire-detail-heading p,
+.condition-detail-editor-title strong {
+  margin: 0;
+  letter-spacing: 0 !important;
+}
+
+.questionnaire-detail-heading h3 {
+  margin: 3px 0 4px;
+  font-size: 1.02rem;
+}
+
+.questionnaire-detail-heading > div > p:last-child {
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.condition-detail-editor-list {
+  display: grid;
+  gap: 14px;
+}
+
+.condition-detail-editor {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #d5dee9;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.condition-detail-editor-title {
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.condition-detail-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.condition-detail-name-field,
+.condition-detail-wide-field {
+  grid-column: 1 / -1;
+}
+
+.condition-detail-form-grid label,
+.condition-detail-notes-field,
+.condition-medication-links legend {
+  color: #26364d;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.condition-detail-form-grid input,
+.condition-detail-form-grid select,
+.condition-detail-form-grid textarea,
+.condition-detail-notes-field textarea {
+  margin-top: 6px;
+}
+
+.condition-detail-form-grid textarea,
+.condition-detail-notes-field textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.condition-medication-links {
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+}
+
+.condition-medication-links legend {
+  padding: 0 6px;
+}
+
+.condition-medication-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.condition-medication-grid label {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.condition-medication-grid input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin-top: 1px;
+}
+
+.condition-medication-grid span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.condition-medication-grid strong,
+.condition-medication-grid small {
+  overflow-wrap: anywhere;
+}
+
+.condition-medication-grid small {
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+.condition-detail-prompt {
+  display: grid;
+  justify-items: start;
+  gap: 7px;
+  padding: 16px;
+  border: 1px dashed #94a3b8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.condition-detail-prompt p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+@media (max-width: 720px) {
+  .questionnaire-detail-heading,
+  .condition-detail-editor-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .questionnaire-detail-heading .secondary-button,
+  .condition-detail-prompt .primary-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .questionnaire-detail-panel,
+  .condition-detail-editor {
+    padding: 14px;
+  }
+
+  .condition-detail-form-grid,
+  .condition-medication-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .condition-detail-name-field,
+  .condition-detail-wide-field {
+    grid-column: auto;
+  }
+}

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearPath Care Redesign Showcase</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #efe9df;
+        color: #241d18;
+      }
+
+      .page {
+        max-width: 1380px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
+      }
+
+      .hero {
+        padding: 36px;
+        border-radius: 32px;
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.82), transparent 30%),
+          linear-gradient(135deg, #f7f1e9, #eadfce);
+        border: 1px solid rgba(91, 70, 47, 0.12);
+        box-shadow: 0 24px 70px rgba(74, 52, 31, 0.1);
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #186964;
+      }
+
+      h1 {
+        margin: 0;
+        font: 400 clamp(2.5rem, 5vw, 5rem)/0.95 Georgia, "Times New Roman", serif;
+      }
+
+      .hero p {
+        max-width: 880px;
+        margin: 16px 0 0;
+        font-size: 1.06rem;
+        line-height: 1.75;
+        color: #65584d;
+      }
+
+      .grid {
+        display: grid;
+        gap: 26px;
+        margin-top: 30px;
+      }
+
+      .theme-card {
+        border-radius: 34px;
+        overflow: hidden;
+        box-shadow: 0 28px 80px rgba(53, 36, 24, 0.12);
+        border: 1px solid rgba(64, 46, 30, 0.08);
+      }
+
+      .theme-header {
+        padding: 30px 30px 22px;
+      }
+
+      .theme-header h2 {
+        margin: 6px 0 10px;
+        font: 400 clamp(1.8rem, 3vw, 3rem)/1.02 Georgia, "Times New Roman", serif;
+      }
+
+      .theme-header p {
+        max-width: 760px;
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .tags {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      .tag {
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+
+      .theme-body {
+        display: grid;
+        gap: 18px;
+        padding: 0 24px 24px;
+      }
+
+      .preview-row {
+        display: grid;
+        grid-template-columns: 1.3fr 0.85fr;
+        gap: 18px;
+      }
+
+      .provider,
+      .patient {
+        border-radius: 28px;
+        overflow: hidden;
+        min-height: 430px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .window-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        font-size: 0.84rem;
+        font-weight: 700;
+      }
+
+      .window-dots {
+        display: flex;
+        gap: 7px;
+      }
+
+      .window-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.35;
+      }
+
+      .provider-layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 380px;
+      }
+
+      .sidebar {
+        padding: 18px;
+        border-right: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .sidebar h3,
+      .main h3,
+      .patient-main h3 {
+        margin: 0 0 14px;
+        font: 700 0.92rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .nav-list,
+      .card-stack,
+      .mini-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .nav-item,
+      .card,
+      .mini-card {
+        border-radius: 20px;
+        padding: 14px;
+      }
+
+      .nav-item strong,
+      .card strong,
+      .mini-card strong {
+        display: block;
+      }
+
+      .nav-item span,
+      .card span,
+      .mini-card span,
+      .metric p {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+
+      .main {
+        padding: 18px;
+      }
+
+      .panel-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .metric {
+        border-radius: 22px;
+        padding: 16px;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 1.6rem;
+      }
+
+      .hero-panel {
+        margin-top: 14px;
+        border-radius: 26px;
+        padding: 22px;
+      }
+
+      .hero-panel h4 {
+        margin: 0 0 8px;
+        font: 400 2rem/1.02 Georgia, "Times New Roman", serif;
+      }
+
+      .hero-panel p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .patient-shell {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-height: 430px;
+      }
+
+      .patient-main {
+        padding: 18px;
+      }
+
+      .patient-card {
+        border-radius: 24px;
+        padding: 18px;
+      }
+
+      .patient-card h4 {
+        margin: 0 0 8px;
+        font: 400 1.65rem/1.05 Georgia, "Times New Roman", serif;
+      }
+
+      .patient-card p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.65;
+      }
+
+      .patient-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .patient-pill {
+        border-radius: 16px;
+        padding: 12px;
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+
+      .notes {
+        padding: 20px 24px 26px;
+      }
+
+      .notes ul {
+        margin: 12px 0 0;
+        padding-left: 18px;
+      }
+
+      .notes li {
+        margin: 6px 0;
+        line-height: 1.55;
+      }
+
+      .theme-1 {
+        background: #f7f1e8;
+      }
+      .theme-1 .theme-header { background: linear-gradient(135deg, #f8f1e9, #ece0cf); }
+      .theme-1 .tag { background: rgba(18, 104, 98, 0.1); color: #186862; }
+      .theme-1 .provider, .theme-1 .patient { background: #fdf9f4; color: #2a221c; }
+      .theme-1 .window-bar { background: rgba(255,255,255,0.78); color: #6e6256; }
+      .theme-1 .sidebar { background: #f3ece2; }
+      .theme-1 .nav-item, .theme-1 .card, .theme-1 .mini-card, .theme-1 .metric, .theme-1 .patient-card, .theme-1 .patient-pill { background: rgba(255,255,255,0.82); }
+      .theme-1 .hero-panel { background: linear-gradient(135deg, #e8dfd1, #f7f2ea); }
+
+      .theme-2 {
+        background: #f3ece5;
+      }
+      .theme-2 .theme-header { background: linear-gradient(135deg, #f1e4da, #e7d5c9); }
+      .theme-2 .tag { background: rgba(163, 101, 85, 0.12); color: #9f5b4b; }
+      .theme-2 .provider, .theme-2 .patient { background: #fff8f3; color: #30221e; }
+      .theme-2 .window-bar { background: rgba(255,245,239,0.9); color: #7e685e; }
+      .theme-2 .sidebar { background: #f6ebe3; }
+      .theme-2 .nav-item, .theme-2 .card, .theme-2 .mini-card, .theme-2 .metric, .theme-2 .patient-card, .theme-2 .patient-pill { background: rgba(255,255,255,0.82); }
+      .theme-2 .hero-panel { background: linear-gradient(135deg, #ead4ca, #fbf3ec); }
+
+      .theme-3 {
+        background: #edf3ef;
+      }
+      .theme-3 .theme-header { background: linear-gradient(135deg, #e7f0ea, #d5e3dc); }
+      .theme-3 .tag { background: rgba(39, 97, 81, 0.12); color: #245c4f; }
+      .theme-3 .provider, .theme-3 .patient { background: #fbfefd; color: #21302b; }
+      .theme-3 .window-bar { background: rgba(249,252,251,0.88); color: #61706a; }
+      .theme-3 .sidebar { background: #edf4f0; }
+      .theme-3 .nav-item, .theme-3 .card, .theme-3 .mini-card, .theme-3 .metric, .theme-3 .patient-card, .theme-3 .patient-pill { background: rgba(255,255,255,0.84); }
+      .theme-3 .hero-panel { background: linear-gradient(135deg, #d7e4de, #f4f9f6); }
+
+      .theme-4 {
+        background: #1a2023;
+        color: #edf0ea;
+      }
+      .theme-4 .theme-header { background: linear-gradient(135deg, #20292d, #111618); color: #edf0ea; }
+      .theme-4 .theme-header p { color: #bdc4bd; }
+      .theme-4 .tag { background: rgba(195, 177, 129, 0.14); color: #d8c493; }
+      .theme-4 .provider, .theme-4 .patient { background: #141a1c; color: #e8ece7; }
+      .theme-4 .window-bar { background: rgba(28,35,38,0.98); color: #b8c2bb; }
+      .theme-4 .sidebar { background: #182022; }
+      .theme-4 .nav-item, .theme-4 .card, .theme-4 .mini-card, .theme-4 .metric, .theme-4 .patient-card, .theme-4 .patient-pill { background: rgba(255,255,255,0.04); }
+      .theme-4 .hero-panel { background: linear-gradient(135deg, #203038, #182125); }
+      .theme-4 .notes { color: #dbe2db; }
+      .theme-4 .notes li { color: #b9c1ba; }
+
+      .theme-5 {
+        background: #f1efe9;
+      }
+      .theme-5 .theme-header { background: linear-gradient(135deg, #efede7, #e0ddd3); }
+      .theme-5 .tag { background: rgba(50, 50, 50, 0.08); color: #3b3b39; }
+      .theme-5 .provider, .theme-5 .patient { background: #fafaf7; color: #232321; }
+      .theme-5 .window-bar { background: rgba(255,255,255,0.88); color: #77756d; }
+      .theme-5 .sidebar { background: #f2f1eb; }
+      .theme-5 .nav-item, .theme-5 .card, .theme-5 .mini-card, .theme-5 .metric, .theme-5 .patient-card, .theme-5 .patient-pill { background: rgba(255,255,255,0.86); }
+      .theme-5 .hero-panel { background: linear-gradient(135deg, #e6e4dc, #f8f8f4); }
+
+      .theme-6 {
+        background: #f6eadb;
+      }
+      .theme-6 .theme-header { background: linear-gradient(135deg, #f6e2cf, #ecd1b5); }
+      .theme-6 .tag { background: rgba(173, 101, 38, 0.12); color: #a45c1f; }
+      .theme-6 .provider, .theme-6 .patient { background: #fff9f2; color: #2f2319; }
+      .theme-6 .window-bar { background: rgba(255,248,238,0.95); color: #816858; }
+      .theme-6 .sidebar { background: #f7e8d8; }
+      .theme-6 .nav-item, .theme-6 .card, .theme-6 .mini-card, .theme-6 .metric, .theme-6 .patient-card, .theme-6 .patient-pill { background: rgba(255,255,255,0.84); }
+      .theme-6 .hero-panel { background: linear-gradient(135deg, #edd5bf, #fff4e8); }
+
+      @media (max-width: 980px) {
+        .preview-row,
+        .provider-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .panel-grid,
+        .patient-strip {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Program Redesign Directions</p>
+        <h1>Same structure. Completely different personality.</h1>
+        <p>
+          These are six visual directions for the product overall, not just one page. Each one includes a provider-side desktop feel and a patient-side mobile feel so we can choose a true system direction for the whole program.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="theme-card theme-1">
+          <div class="theme-header">
+            <p class="eyebrow">Theme 1</p>
+            <h2>Clinical Calm</h2>
+            <p>A refined medical-education feel. Warm neutrals, elegant serif headlines, and very controlled hierarchy. This is the safest premium direction.</p>
+            <div class="tags"><span class="tag">provider trust</span><span class="tag">patient clarity</span><span class="tag">premium handout energy</span></div>
+          </div>
+          <div class="theme-body">
+            <div class="preview-row">
+              <section class="provider">
+                <div class="window-bar"><div class="window-dots"><span></span><span></span><span></span></div><div>Provider Desktop</div></div>
+                <div class="provider-layout">
+                  <aside class="sidebar">
+                    <h3>Patient Database</h3>
+                    <div class="nav-list">
+                      <div class="nav-item"><strong>Sarah Mitchell</strong><span>Cracked tooth • treatment planning</span></div>
+                      <div class="nav-item"><strong>Jason Lee</strong><span>Apical abscess • urgent review</span></div>
+                      <div class="nav-item"><strong>Angela Kim</strong><span>Root canal consult</span></div>
+                    </div>
+                  </aside>
+                  <div class="main">
+                    <h3>Office Snapshot</h3>
+                    <div class="panel-grid">
+                      <div class="metric"><strong>18</strong><p>Pages customized by your office</p></div>
+                      <div class="metric"><strong>42</strong><p>Active patient education packages</p></div>
+                      <div class="metric"><strong>94%</strong><p>Viewed before treatment</p></div>
+                    </div>
+                    <div class="hero-panel"><h4>Provider flow should feel composed and high-trust.</h4><p>Search first, chart second, patient explanation below. Calm spacing, restrained color, and strong readability.</p></div>
+                  </div>
+                </div>
+              </section>
+              <section class="patient">
+                <div class="window-bar"><div>Patient Mobile</div><div>8:41</div></div>
+                <div class="patient-shell">
+                  <div class="patient-main">
+                    <div class="patient-card"><h4>Your root canal therapy explained clearly.</h4><p>The page feels like a premium medical handout, not a marketing site. The patient should feel calmer after opening it.</p></div>
+                    <div class="patient-strip">
+                      <div class="patient-pill">What it treats</div>
+                      <div class="patient-pill">What to expect</div>
+                      <div class="patient-pill">Recovery</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div class="notes"><strong>Best for:</strong><ul><li>Serious clinical credibility</li><li>Patient education that feels expensive but grounded</li><li>A redesign that stays elegant without getting trendy</li></ul></div>
+          </div>
+        </article>
+
+        <article class="theme-card theme-2">
+          <div class="theme-header">
+            <p class="eyebrow">Theme 2</p>
+            <h2>Warm Guided Care</h2>
+            <p>More personal and boutique. Softer color, hospitality energy, and a “we’ll guide you through this” feel without losing the clinical backbone.</p>
+            <div class="tags"><span class="tag">gentle</span><span class="tag">relationship-driven</span><span class="tag">luxury office feel</span></div>
+          </div>
+          <div class="theme-body">
+            <div class="preview-row">
+              <section class="provider">
+                <div class="window-bar"><div class="window-dots"><span></span><span></span><span></span></div><div>Provider Workspace</div></div>
+                <div class="provider-layout">
+                  <aside class="sidebar">
+                    <h3>Today's Patients</h3>
+                    <div class="nav-list">
+                      <div class="nav-item"><strong>Maria West</strong><span>Reviewing diagnosis page edits</span></div>
+                      <div class="nav-item"><strong>Daniel Cruz</strong><span>Bridge vs implant discussion</span></div>
+                    </div>
+                  </aside>
+                  <div class="main">
+                    <h3>Guided Workflow</h3>
+                    <div class="card-stack">
+                      <div class="card"><strong>1. Select patient</strong><span>Start from the chart and keep the conversation personal.</span></div>
+                      <div class="card"><strong>2. Review diagnosis</strong><span>Medical history and office findings appear before education.</span></div>
+                      <div class="card"><strong>3. Present treatment</strong><span>The handout preview feels warm, clear, and reassuring.</span></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section class="patient">
+                <div class="window-bar"><div>Patient Experience</div><div>9:02</div></div>
+                <div class="patient-main">
+                  <div class="patient-card"><h4>We want this to feel calm and human.</h4><p>The patient side looks more like a guided care companion than a formal portal. Less sterile, more emotionally supportive.</p></div>
+                  <div class="mini-list" style="margin-top:12px">
+                    <div class="mini-card"><strong>Diagnosis</strong><span>What your doctor found and what it means.</span></div>
+                    <div class="mini-card"><strong>Treatment</strong><span>What happens and what recovery usually feels like.</span></div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div class="notes"><strong>Best for:</strong><ul><li>Higher-end general or specialty offices</li><li>Reducing patient anxiety through tone</li><li>A more boutique brand position</li></ul></div>
+          </div>
+        </article>
+
+        <article class="theme-card theme-3">
+          <div class="theme-header">
+            <p class="eyebrow">Theme 3</p>
+            <h2>Modern Evidence</h2>
+            <p>Clean, contemporary, and slightly more product-like. Strong media framing and clearer data surfaces, while still feeling medically responsible.</p>
+            <div class="tags"><span class="tag">modern</span><span class="tag">visual</span><span class="tag">slightly tech-forward</span></div>
+          </div>
+          <div class="theme-body">
+            <div class="preview-row">
+              <section class="provider">
+                <div class="window-bar"><div class="window-dots"><span></span><span></span><span></span></div><div>Practice Dashboard</div></div>
+                <div class="provider-layout">
+                  <aside class="sidebar">
+                    <h3>Quick Search</h3>
+                    <div class="nav-list">
+                      <div class="nav-item"><strong>Search by name</strong><span>Filter the chart list instantly</span></div>
+                      <div class="nav-item"><strong>Search by diagnosis</strong><span>Find similar treatment pages fast</span></div>
+                    </div>
+                  </aside>
+                  <div class="main">
+                    <h3>Performance</h3>
+                    <div class="panel-grid">
+                      <div class="metric"><strong>126</strong><p>Patient pages sent this month</p></div>
+                      <div class="metric"><strong>61%</strong><p>Patients watched at least one video</p></div>
+                      <div class="metric"><strong>14</strong><p>Office-customized treatments</p></div>
+                    </div>
+                    <div class="hero-panel"><h4>The product looks capable and current.</h4><p>This direction could make the software feel more like a modern healthcare platform than a handout system.</p></div>
+                  </div>
+                </div>
+              </section>
+              <section class="patient">
+                <div class="window-bar"><div>Patient Education</div><div>10:14</div></div>
+                <div class="patient-main">
+                  <div class="patient-card"><h4>Your treatment plan, step by step.</h4><p>Clear modular blocks, stronger video framing, and a more digital-native feel.</p></div>
+                  <div class="patient-strip">
+                    <div class="patient-pill">video</div>
+                    <div class="patient-pill">diagram</div>
+                    <div class="patient-pill">aftercare</div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div class="notes"><strong>Best for:</strong><ul><li>A sharper software-product identity</li><li>Heavy use of video and visual education</li><li>A cleaner, more contemporary rollout</li></ul></div>
+          </div>
+        </article>
+
+        <article class="theme-card theme-4">
+          <div class="theme-header">
+            <p class="eyebrow">Theme 4</p>
+            <h2>Dark Executive Studio</h2>
+            <p>A dramatic, desktop-heavy provider environment with a luxe patient experience. Bold, but riskier because it feels less handout-like and more software-heavy.</p>
+            <div class="tags"><span class="tag">bold</span><span class="tag">dramatic</span><span class="tag">provider-forward</span></div>
+          </div>
+          <div class="theme-body">
+            <div class="preview-row">
+              <section class="provider">
+                <div class="window-bar"><div class="window-dots"><span></span><span></span><span></span></div><div>Provider Command View</div></div>
+                <div class="provider-layout">
+                  <aside class="sidebar">
+                    <h3>Patient Charts</h3>
+                    <div class="nav-list">
+                      <div class="nav-item"><strong>Open cases</strong><span>High-contrast chart queue</span></div>
+                      <div class="nav-item"><strong>Draft pages</strong><span>Office-specific handout editor</span></div>
+                    </div>
+                  </aside>
+                  <div class="main">
+                    <h3>Chart Activity</h3>
+                    <div class="card-stack">
+                      <div class="card"><strong>Diagnosis overview</strong><span>Deep contrast and dashboard-style organization.</span></div>
+                      <div class="card"><strong>Treatment preview</strong><span>Feels premium, but much more app-like than handout-like.</span></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section class="patient">
+                <div class="window-bar"><div>Patient View</div><div>7:56</div></div>
+                <div class="patient-main">
+                  <div class="patient-card"><h4>Elegant, but a little more dramatic.</h4><p>This could be beautiful if handled carefully, but it moves away from the quiet handout feel.</p></div>
+                </div>
+              </section>
+            </div>
+            <div class="notes"><strong>Best for:</strong><ul><li>A stronger desktop software identity</li><li>Offices that want a more premium-tech brand</li><li>Not my first pick if patient calmness is the top priority</li></ul></div>
+          </div>
+        </article>
+
+        <article class="theme-card theme-5">
+          <div class="theme-header">
+            <p class="eyebrow">Theme 5</p>
+            <h2>Minimal Journal</h2>
+            <p>Quiet, understated, and editorial in a restrained way. Very light surfaces, lots of whitespace, and almost no decorative energy.</p>
+            <div class="tags"><span class="tag">minimal</span><span class="tag">quiet</span><span class="tag">timeless</span></div>
+          </div>
+          <div class="theme-body">
+            <div class="preview-row">
+              <section class="provider">
+                <div class="window-bar"><div class="window-dots"><span></span><span></span><span></span></div><div>Provider Charting</div></div>
+                <div class="provider-layout">
+                  <aside class="sidebar">
+                    <h3>Patients</h3>
+                    <div class="nav-list">
+                      <div class="nav-item"><strong>No visual clutter</strong><span>Search, select, review</span></div>
+                      <div class="nav-item"><strong>Simple chart list</strong><span>Almost paper-like restraint</span></div>
+                    </div>
+                  </aside>
+                  <div class="main">
+                    <h3>Current Patient</h3>
+                    <div class="hero-panel"><h4>Everything gets quieter.</h4><p>This direction feels mature and expensive, but it may need very strong typography to avoid feeling plain.</p></div>
+                  </div>
+                </div>
+              </section>
+              <section class="patient">
+                <div class="window-bar"><div>Patient Education</div><div>11:28</div></div>
+                <div class="patient-main">
+                  <div class="patient-card"><h4>Simple language. Simple layout.</h4><p>This direction makes the content do almost all the work. It could feel very trustworthy if the writing is excellent.</p></div>
+                </div>
+              </section>
+            </div>
+            <div class="notes"><strong>Best for:</strong><ul><li>A timeless, understated premium feel</li><li>Content-heavy patient education</li><li>Teams that want almost no visual noise</li></ul></div>
+          </div>
+        </article>
+
+        <article class="theme-card theme-6">
+          <div class="theme-header">
+            <p class="eyebrow">Theme 6</p>
+            <h2>Sunlit Studio</h2>
+            <p>Brighter, more optimistic, and more human. Still polished, but with more warmth, light, and energy than the calm clinical directions.</p>
+            <div class="tags"><span class="tag">bright</span><span class="tag">approachable</span><span class="tag">friendly premium</span></div>
+          </div>
+          <div class="theme-body">
+            <div class="preview-row">
+              <section class="provider">
+                <div class="window-bar"><div class="window-dots"><span></span><span></span><span></span></div><div>Provider Office View</div></div>
+                <div class="provider-layout">
+                  <aside class="sidebar">
+                    <h3>Office Flow</h3>
+                    <div class="nav-list">
+                      <div class="nav-item"><strong>Search charts</strong><span>Bright, welcoming, and easy to navigate</span></div>
+                      <div class="nav-item"><strong>Edit pages</strong><span>Still serious, but less heavy</span></div>
+                    </div>
+                  </aside>
+                  <div class="main">
+                    <h3>Education Packages</h3>
+                    <div class="card-stack">
+                      <div class="card"><strong>Diagnosis pages</strong><span>Feels optimistic and patient-friendly.</span></div>
+                      <div class="card"><strong>Treatment pages</strong><span>Better if the brand wants to feel more uplifting.</span></div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section class="patient">
+                <div class="window-bar"><div>Patient Mobile</div><div>2:13</div></div>
+                <div class="patient-main">
+                  <div class="patient-card"><h4>Friendly, warm, and easy to enter.</h4><p>This could be great if you want the patient experience to feel less heavy and more welcoming from the first screen.</p></div>
+                  <div class="patient-strip">
+                    <div class="patient-pill">understand</div>
+                    <div class="patient-pill">decide</div>
+                    <div class="patient-pill">prepare</div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div class="notes"><strong>Best for:</strong><ul><li>A brighter brand personality</li><li>General dentistry or family-friendly practices</li><li>A softer emotional first impression</li></ul></div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

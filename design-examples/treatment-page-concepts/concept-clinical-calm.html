@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Concept 1 - Clinical Calm</title>
+    <style>
+      :root {
+        --paper: #fbf8f3;
+        --ink: #2e2923;
+        --muted: #6a6157;
+        --line: rgba(85, 68, 49, 0.16);
+        --teal: #145f5b;
+        --teal-soft: rgba(20, 95, 91, 0.1);
+        --sand: #ebe0d0;
+        --shadow: 0 30px 80px rgba(75, 56, 36, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0)) 0 0/100% 240px no-repeat,
+          #efe6d8;
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+        padding: 32px 18px 80px;
+      }
+
+      .page {
+        max-width: 980px;
+        margin: 0 auto;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 34px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 28px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.74);
+        font: 700 0.8rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.2fr 0.85fr;
+        gap: 28px;
+        padding: 38px 32px 30px;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--teal);
+        font: 700 0.82rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.4rem, 5vw, 4.2rem);
+        line-height: 0.98;
+      }
+
+      .lead,
+      .section p,
+      .callout p,
+      .faq p,
+      .timeline p,
+      li {
+        font: 500 1rem/1.78 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--muted);
+      }
+
+      .lead {
+        margin-top: 16px;
+      }
+
+      .hero-visual {
+        border-radius: 30px;
+        min-height: 320px;
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.18)),
+          radial-gradient(circle at top right, rgba(20,95,91,0.15), transparent 34%),
+          linear-gradient(135deg, #e7ddcf, #d8cab7);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .visual-box {
+        border-radius: 22px;
+        min-height: 180px;
+        border: 1px dashed rgba(85,68,49,0.22);
+        display: grid;
+        place-items: center;
+        color: #655a50;
+        font: 700 0.94rem/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .why {
+        border-radius: 22px;
+        padding: 18px;
+        background: rgba(255,255,255,0.66);
+        border: 1px solid rgba(85,68,49,0.12);
+      }
+
+      .why strong {
+        display: block;
+        margin-bottom: 8px;
+        font: 700 0.86rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .ribbon {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        padding: 0 32px 30px;
+      }
+
+      .ribbon article,
+      .section,
+      .callout,
+      .faq article,
+      .timeline-step {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: rgba(255,255,255,0.76);
+      }
+
+      .ribbon article {
+        padding: 18px;
+      }
+
+      .ribbon strong,
+      h2 {
+        color: var(--ink);
+      }
+
+      .ribbon p {
+        margin: 8px 0 0;
+        font: 500 0.95rem/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--muted);
+      }
+
+      .content {
+        padding: 0 32px 34px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .section {
+        padding: 26px;
+      }
+
+      h2 {
+        margin: 4px 0 12px;
+        font-size: 2rem;
+      }
+
+      .split {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: 1.15fr 0.85fr;
+      }
+
+      .media-card {
+        border-radius: 24px;
+        min-height: 260px;
+        background: linear-gradient(135deg, #e9dfd1, #d9ccba);
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 20px;
+        color: #665a4e;
+        font: 700 0.95rem/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      ul {
+        padding-left: 20px;
+      }
+
+      .timeline {
+        padding: 26px;
+        border-radius: 30px;
+        background: #f4ede3;
+        border: 1px solid var(--line);
+      }
+
+      .timeline-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .timeline-step {
+        padding: 18px;
+      }
+
+      .timeline-step span {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--teal-soft);
+        color: var(--teal);
+        font: 700 0.76rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .faq {
+        display: grid;
+        gap: 12px;
+      }
+
+      .faq article {
+        padding: 18px 20px;
+      }
+
+      .faq h3 {
+        margin: 0 0 8px;
+        font-size: 1.14rem;
+      }
+
+      .closing {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: 0.9fr 1.1fr;
+        padding: 30px 32px 36px;
+        border-top: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(233,224,208,0.35), rgba(255,255,255,0.7));
+      }
+
+      @media (max-width: 820px) {
+        .hero,
+        .split,
+        .closing,
+        .timeline-grid,
+        .ribbon {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <div class="topbar">
+        <span>ClearPath Care</span>
+        <span>Root Canal Therapy</span>
+      </div>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Treatment Information</p>
+          <h1>Root canal therapy should feel understandable before it feels intimidating.</h1>
+          <p class="lead">
+            This page is designed to feel calm, clear, and trustworthy. It gives the patient enough detail to understand why the treatment is being recommended, what happens during the procedure, and what recovery is usually like.
+          </p>
+        </div>
+
+        <div class="hero-visual">
+          <div class="visual-box">Large x-ray, diagram, or short explainer video goes here.</div>
+          <div class="why">
+            <strong>Why this works</strong>
+            <p>This visual area supports the explanation without turning the page into a marketing landing page.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="ribbon">
+        <article>
+          <strong>What it does</strong>
+          <p>Explains the purpose of the treatment in one calm, plain-language statement.</p>
+        </article>
+        <article>
+          <strong>What to expect</strong>
+          <p>Sets expectations for visits, numbness, soreness, and follow-up in a way that lowers anxiety.</p>
+        </article>
+        <article>
+          <strong>Why it is recommended</strong>
+          <p>Connects the treatment directly to the diagnosis so the recommendation feels logical.</p>
+        </article>
+      </section>
+
+      <section class="content">
+        <article class="section split">
+          <div>
+            <p class="eyebrow">How It Helps</p>
+            <h2>A patient should quickly understand what the procedure is trying to save or fix.</h2>
+            <p>
+              This section should explain the purpose of treatment in direct, patient-safe language. It should avoid sounding too technical, but it also should not feel watered down.
+            </p>
+            <ul>
+              <li>What problem is being treated</li>
+              <li>Why the nerve space is involved</li>
+              <li>How treatment helps stop pain or infection</li>
+            </ul>
+          </div>
+          <div class="media-card">Focused support visual or labeled diagram</div>
+        </article>
+
+        <article class="section">
+          <p class="eyebrow">Visit Flow</p>
+          <h2>The sequence should feel guided and predictable.</h2>
+          <p>
+            One of the most reassuring things for a patient is understanding what happens first, what happens during treatment, and what happens after they leave the office.
+          </p>
+        </article>
+
+        <section class="timeline">
+          <p class="eyebrow">Step By Step</p>
+          <h2>Break the treatment into clear phases.</h2>
+          <p>Each step should feel short, practical, and easy to picture.</p>
+          <div class="timeline-grid">
+            <article class="timeline-step">
+              <span>Step 1</span>
+              <h3>Evaluation and comfort</h3>
+              <p>Explain anesthesia, imaging, and how the area is prepared before treatment begins.</p>
+            </article>
+            <article class="timeline-step">
+              <span>Step 2</span>
+              <h3>Cleaning and sealing</h3>
+              <p>Describe the main treatment phase in simple terms without making it feel dramatic.</p>
+            </article>
+            <article class="timeline-step">
+              <span>Step 3</span>
+              <h3>Recovery and restoration</h3>
+              <p>Show what healing is like and explain the role of the final restoration or crown.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="faq">
+          <p class="eyebrow">Common Questions</p>
+          <h2>Answers should feel calm, direct, and practical.</h2>
+          <article>
+            <h3>Will it hurt?</h3>
+            <p>The answer should be reassuring without sounding dismissive. It should explain comfort expectations during and after treatment.</p>
+          </article>
+          <article>
+            <h3>How long does it take?</h3>
+            <p>This answer should set expectations for the number of visits and where variation can happen.</p>
+          </article>
+          <article>
+            <h3>What is recovery like?</h3>
+            <p>The recovery explanation should feel practical, normalizing, and easy to follow.</p>
+          </article>
+        </section>
+      </section>
+
+      <section class="closing">
+        <div>
+          <p class="eyebrow">Tone Goal</p>
+          <h2>Clinical, premium, and emotionally steady.</h2>
+        </div>
+        <div class="callout">
+          <p>
+            This concept is probably the closest match if you want the page to feel like a refined patient handout from a very good office. It is not flashy. It is not bloggy. It feels like trustworthy treatment education.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

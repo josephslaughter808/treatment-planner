@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Bold Directions</title>
+    <style>
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 24%),
+          linear-gradient(180deg, #f2eadf 0%, #e7dbca 100%);
+        color: #2b221d;
+      }
+
+      .page {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 36px 20px 88px;
+      }
+
+      .hero {
+        padding: 38px;
+        border-radius: 42px;
+        background:
+          radial-gradient(circle at top left, rgba(255,255,255,0.86), transparent 30%),
+          linear-gradient(135deg, #f8f1e9, #eadbc6);
+        border: 1px solid rgba(107, 81, 52, 0.12);
+        box-shadow: 0 24px 90px rgba(74, 52, 31, 0.12);
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: #196d67;
+        font-size: .78rem;
+        font-weight: 800;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+      }
+
+      h1,h2,h3,h4 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 400;
+      }
+
+      h1 {
+        font-size: clamp(2.9rem, 5vw, 5.2rem);
+        line-height: .92;
+      }
+
+      .hero p,
+      .section-head p,
+      .note,
+      .screen p,
+      .screen li {
+        color: #67584d;
+        line-height: 1.74;
+      }
+
+      .hero p {
+        max-width: 940px;
+        margin: 16px 0 0;
+        font-size: 1.05rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 26px;
+        margin-top: 28px;
+      }
+
+      .section {
+        border-radius: 42px;
+        overflow: hidden;
+        background: rgba(255, 250, 244, 0.92);
+        border: 1px solid rgba(107, 81, 52, 0.12);
+        box-shadow: 0 24px 90px rgba(74, 52, 31, 0.12);
+      }
+
+      .section-head {
+        padding: 28px;
+        border-bottom: 1px solid rgba(107, 81, 52, 0.1);
+        background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(245,236,226,0.86));
+      }
+
+      .section-head h2 {
+        font-size: clamp(2rem, 3vw, 3.1rem);
+        line-height: 1;
+      }
+
+      .section-head p {
+        max-width: 880px;
+        margin: 12px 0 0;
+      }
+
+      .chips {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      .chip {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(25,109,103,0.12);
+        background: rgba(25,109,103,0.08);
+        color: #165f5a;
+        font-size: .82rem;
+        font-weight: 700;
+      }
+
+      .section-body {
+        padding: 22px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .mobile-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+      }
+
+      .frame {
+        min-height: 860px;
+        border-radius: 38px;
+        overflow: hidden;
+        background: #fffaf4;
+        border: 1px solid rgba(107, 81, 52, 0.12);
+        box-shadow: 0 20px 50px rgba(74, 52, 31, 0.12);
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        background: rgba(255,255,255,0.86);
+        border-bottom: 1px solid rgba(107, 81, 52, 0.08);
+        color: #7b6c60;
+        font-size: .8rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+
+      .body-pad {
+        padding: 16px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .hero-card,
+      .card,
+      .faq,
+      .timeline,
+      .media,
+      .strip {
+        border: 1px solid rgba(107, 81, 52, 0.1);
+      }
+
+      .hero-card,
+      .card,
+      .faq,
+      .timeline,
+      .media,
+      .strip {
+        padding: 16px;
+      }
+
+      .round-xl { border-radius: 36px; }
+      .round-lg { border-radius: 24px; }
+      .organic { border-radius: 38px 26px 34px 22px; }
+      .wave { border-radius: 26px 26px 46px 18px; }
+
+      .hero-card {
+        min-height: 230px;
+        position: relative;
+        overflow: hidden;
+        color: #fff8f1;
+      }
+
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: .94;
+      }
+
+      .hero-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero-card h3 {
+        max-width: 260px;
+        font-size: 1.92rem;
+        line-height: 1.02;
+      }
+
+      .hero-card p {
+        color: rgba(255,248,241,0.88);
+      }
+
+      .scene-a::before {
+        background:
+          linear-gradient(135deg, rgba(19, 39, 47, 0.18), rgba(19, 39, 47, 0.66)),
+          radial-gradient(circle at top left, rgba(126, 215, 223, 0.28), transparent 30%),
+          url("https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1000&q=80") center/cover;
+      }
+
+      .scene-b::before {
+        background:
+          linear-gradient(135deg, rgba(69, 46, 35, 0.16), rgba(69, 46, 35, 0.58)),
+          radial-gradient(circle at top left, rgba(255, 221, 178, 0.3), transparent 30%),
+          url("https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?auto=format&fit=crop&w=1000&q=80") center/cover;
+      }
+
+      .scene-c::before {
+        background:
+          linear-gradient(135deg, rgba(24, 49, 59, 0.18), rgba(24, 49, 59, 0.64)),
+          radial-gradient(circle at top left, rgba(88, 199, 169, 0.25), transparent 30%),
+          url("https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1000&q=80") center/cover;
+      }
+
+      .scene-d::before {
+        background:
+          linear-gradient(135deg, rgba(45, 38, 31, 0.14), rgba(45, 38, 31, 0.58)),
+          radial-gradient(circle at top left, rgba(255, 240, 221, 0.34), transparent 30%),
+          url("https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1000&q=80") center/cover;
+      }
+
+      .strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        background: rgba(255,255,255,0.78);
+      }
+
+      .strip div {
+        padding: 10px 8px;
+        text-align: center;
+        font-size: .82rem;
+        font-weight: 700;
+        color: #6c5c50;
+      }
+
+      .card {
+        background: rgba(255,255,255,0.78);
+      }
+
+      .card strong,
+      .faq strong,
+      .timeline strong {
+        display: block;
+      }
+
+      .media {
+        min-height: 150px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        color: #72655b;
+        background:
+          linear-gradient(135deg, rgba(150,220,214,0.16), rgba(255,255,255,0.4)),
+          #f2ebe3;
+      }
+
+      .faq-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .faq {
+        background: rgba(255,255,255,0.76);
+      }
+
+      .timeline {
+        background: linear-gradient(180deg, rgba(241,248,245,0.95), rgba(255,255,255,0.82));
+      }
+
+      .timeline-step {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(107, 81, 52, 0.08);
+      }
+
+      .timeline-step:first-of-type {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+      }
+
+      .note {
+        padding: 0 4px 6px;
+      }
+
+      @media (max-width: 1240px) {
+        .mobile-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 760px) {
+        .mobile-grid,
+        .strip {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Patient Side, Pushed Harder</p>
+        <h1>Less basic. Less sterile. Much more designed.</h1>
+        <p>
+          This round is intentionally bolder. The goal is not just to make the patient side “nice.” It is to make it feel memorable, warm, inviting, and genuinely premium. These are much more personality-driven than the last set.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="section">
+          <div class="section-head">
+            <p class="eyebrow">Patient Mobile Finals</p>
+            <h2>Four stronger, more alive patient directions</h2>
+            <p>If the earlier concepts still felt like business UI, these are the correction. They use stronger image atmosphere, more expressive shapes, and richer composition so the patient actually feels welcomed into something designed for them.</p>
+            <div class="chips">
+              <span class="chip">more personality</span>
+              <span class="chip">more warmth</span>
+              <span class="chip">less sterile</span>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="mobile-grid">
+              <section class="frame">
+                <div class="topbar"><div>Direction A</div><div>8:41</div></div>
+                <div class="body-pad">
+                  <div class="hero-card scene-a organic">
+                    <p class="eyebrow">Calm Story</p>
+                    <h3>Your care should feel more understandable than overwhelming.</h3>
+                    <p>This feels quiet, beautiful, and thoughtful instead of corporate.</p>
+                  </div>
+                  <div class="strip round-lg">
+                    <div>what this means</div>
+                    <div>what happens next</div>
+                    <div>how recovery feels</div>
+                  </div>
+                  <div class="card round-lg">
+                    <strong>Why it feels different</strong>
+                    <p>The imagery and typography make it feel like a designed care experience, not a generic patient portal.</p>
+                  </div>
+                  <div class="media wave">diagram, explainer video, or annotated image block</div>
+                  <div class="faq-list">
+                    <div class="faq round-lg"><strong>Will it hurt?</strong><p>A calmer, more human answer than what a business interface would give.</p></div>
+                    <div class="faq round-lg"><strong>How long does it take?</strong><p>Expectation-setting that feels kind and direct.</p></div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="frame">
+                <div class="topbar"><div>Direction B</div><div>8:41</div></div>
+                <div class="body-pad">
+                  <div class="hero-card scene-b wave">
+                    <p class="eyebrow">Warm Companion</p>
+                    <h3>This feels like a high-end care guide living on your phone.</h3>
+                    <p>More emotional, more boutique, and more inviting.</p>
+                  </div>
+                  <div class="timeline organic">
+                    <strong>Your path today</strong>
+                    <div class="timeline-step"><strong>Understand the problem</strong><p>What your doctor found and why it matters.</p></div>
+                    <div class="timeline-step"><strong>Review the treatment</strong><p>What the procedure is trying to do for you.</p></div>
+                    <div class="timeline-step"><strong>Prepare for healing</strong><p>What recovery usually feels like afterward.</p></div>
+                  </div>
+                  <div class="card round-lg">
+                    <strong>Why it works</strong>
+                    <p>This direction feels much more like a supportive guide than an information sheet.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="frame">
+                <div class="topbar"><div>Direction C</div><div>8:41</div></div>
+                <div class="body-pad">
+                  <div class="hero-card scene-c round-xl">
+                    <p class="eyebrow">Modern Warmth</p>
+                    <h3>This one feels current, premium, and a little more cinematic.</h3>
+                    <p>Still calm, but clearly more designed and media-forward.</p>
+                  </div>
+                  <div class="strip round-lg">
+                    <div>video</div>
+                    <div>diagram</div>
+                    <div>aftercare</div>
+                  </div>
+                  <div class="media organic">hero media and teaching visuals become a major part of the page</div>
+                  <div class="card round-lg">
+                    <strong>Best fit</strong>
+                    <p>If you want the patient side to feel like a premium healthcare experience with stronger visual identity.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="frame">
+                <div class="topbar"><div>Direction D</div><div>8:41</div></div>
+                <div class="body-pad">
+                  <div class="hero-card scene-d organic">
+                    <p class="eyebrow">Human Handout</p>
+                    <h3>This is the most intimate and personal of the four.</h3>
+                    <p>It feels almost like a beautifully made care booklet translated into mobile.</p>
+                  </div>
+                  <div class="card wave">
+                    <strong>What makes it special</strong>
+                    <p>The page feels less like software and more like a carefully prepared experience for one person.</p>
+                  </div>
+                  <div class="faq-list">
+                    <div class="faq organic"><strong>What is this treatment for?</strong><p>Explained in a way that feels warm, specific, and non-intimidating.</p></div>
+                    <div class="faq organic"><strong>What should I expect after?</strong><p>Recovery guidance that feels thoughtful, not clinical and distant.</p></div>
+                  </div>
+                  <div class="media round-lg">photo-led explanation or real office care image</div>
+                </div>
+              </section>
+            </div>
+            <div class="note">My read now: `Direction A` is the cleanest version of “inviting and premium,” `B` is the warmest and most emotionally guided, `C` is the most polished and modern, and `D` is the most personal and memorable.</div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

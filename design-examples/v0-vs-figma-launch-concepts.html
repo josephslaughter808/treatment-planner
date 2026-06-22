@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearPath Care: v0 vs Figma Launch Concepts</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --ink: #17201c;
+        --muted: #5e6864;
+        --line: rgba(24, 32, 28, 0.14);
+        --paper: #f7f5ee;
+        --mint: #a9dccb;
+        --teal: #0f766e;
+        --blue: #2f66d0;
+        --coral: #ee8067;
+        --gold: #d3a83f;
+      }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(120deg, rgba(169, 220, 203, 0.28), transparent 34%),
+          linear-gradient(240deg, rgba(238, 128, 103, 0.2), transparent 32%),
+          #f1f3ef;
+        color: var(--ink);
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+      }
+
+      .page {
+        width: min(1520px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 38px 0 72px;
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 34px;
+        align-items: end;
+        padding: 34px 0 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .kicker {
+        margin: 0 0 10px;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 820px;
+        font: 650 clamp(42px, 6vw, 86px) / 0.95 "Avenir Next", "Segoe UI", sans-serif;
+      }
+
+      .intro-copy {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.7;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 30px;
+        margin-top: 34px;
+      }
+
+      .concept {
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(23, 32, 28, 0.11);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 24px 64px rgba(29, 41, 36, 0.1);
+      }
+
+      .concept-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 22px;
+        padding: 24px 24px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .concept-header h2 {
+        font-size: 26px;
+        letter-spacing: 0;
+      }
+
+      .concept-header p {
+        max-width: 540px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .tag {
+        align-self: flex-start;
+        white-space: nowrap;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #20302b;
+        font-size: 12px;
+        font-weight: 800;
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .mockups {
+        display: grid;
+        gap: 26px;
+        padding: 24px;
+      }
+
+      .desktop-frame {
+        min-height: 520px;
+        border: 1px solid rgba(17, 24, 39, 0.16);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .mobile-frame {
+        width: min(380px, 100%);
+        min-height: 690px;
+        margin: 0 auto;
+        border: 10px solid #17201c;
+        border-radius: 34px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 30px 70px rgba(23, 32, 28, 0.22);
+      }
+
+      .v0-desktop {
+        display: grid;
+        grid-template-columns: 82px 1fr 360px;
+        background: #101b18;
+        color: #effaf5;
+      }
+
+      .v0-rail {
+        padding: 22px 14px;
+        background: #07110f;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .dot {
+        width: 38px;
+        height: 38px;
+        margin: 0 auto 18px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--mint), #fff2a8);
+      }
+
+      .rail-icon {
+        width: 38px;
+        height: 38px;
+        margin: 10px auto;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: #d9fff3;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .v0-main {
+        padding: 28px;
+      }
+
+      .v0-topline,
+      .figma-topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .v0-search {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+      }
+
+      .search-box {
+        padding: 16px 18px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .button {
+        border: 0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-weight: 800;
+        color: #06100d;
+        background: var(--mint);
+      }
+
+      .metric-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 24px 0;
+      }
+
+      .metric {
+        min-height: 106px;
+        padding: 16px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.11);
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 14px;
+        font-size: 34px;
+      }
+
+      .bar-board {
+        padding: 18px;
+        border-radius: 12px;
+        background: #f7faf6;
+        color: #17201c;
+      }
+
+      .bars {
+        height: 180px;
+        display: flex;
+        align-items: end;
+        gap: 12px;
+        padding-top: 18px;
+      }
+
+      .bars span {
+        flex: 1;
+        min-width: 14px;
+        border-radius: 7px 7px 0 0;
+        background: linear-gradient(180deg, var(--coral), var(--teal));
+      }
+
+      .v0-side {
+        padding: 28px 22px;
+        background:
+          linear-gradient(rgba(11, 25, 21, 0.68), rgba(11, 25, 21, 0.92)),
+          url("https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=900&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .patient-row {
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+      }
+
+      .patient-row strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .v0-mobile {
+        background:
+          linear-gradient(180deg, rgba(14, 118, 110, 0.18), transparent 34%),
+          #fbfcf8;
+        color: #18211d;
+      }
+
+      .phone-pad {
+        padding: 24px 20px;
+      }
+
+      .phone-hero {
+        min-height: 240px;
+        padding: 22px;
+        border-radius: 16px;
+        color: #fff;
+        background:
+          linear-gradient(rgba(6, 32, 28, 0.1), rgba(6, 32, 28, 0.78)),
+          url("https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=800&q=80");
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+      }
+
+      .phone-hero h3 {
+        font-size: 31px;
+        line-height: 1;
+      }
+
+      .field-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .field {
+        padding: 15px;
+        border: 1px solid rgba(23, 32, 28, 0.1);
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      .figma-desktop {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        background: #f8f8f3;
+      }
+
+      .figma-sidebar {
+        padding: 24px 20px;
+        border-right: 1px solid var(--line);
+        background: #ffffff;
+      }
+
+      .brand-block {
+        display: grid;
+        gap: 7px;
+        margin-bottom: 28px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        background: conic-gradient(from 30deg, var(--teal), var(--mint), var(--gold), var(--coral), var(--teal));
+      }
+
+      .side-link {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(23, 32, 28, 0.08);
+        color: #34423c;
+        font-weight: 700;
+      }
+
+      .figma-main {
+        padding: 30px 34px;
+      }
+
+      .figma-main h3 {
+        font-size: 38px;
+        line-height: 1.05;
+      }
+
+      .figma-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 22px;
+        margin-top: 26px;
+      }
+
+      .table-panel {
+        border-top: 3px solid #17201c;
+        background: #fff;
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: 1fr 110px 80px;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(23, 32, 28, 0.1);
+        align-items: center;
+      }
+
+      .status {
+        width: fit-content;
+        padding: 5px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 800;
+        background: #e3f5ee;
+        color: #0f766e;
+      }
+
+      .figma-card {
+        padding: 18px;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+
+      .figma-swatch-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .swatch {
+        height: 42px;
+        border-radius: 7px;
+      }
+
+      .figma-mobile {
+        background: #f9f7ef;
+      }
+
+      .figma-phone-head {
+        padding: 28px 22px 18px;
+        background: #17201c;
+        color: #fff;
+      }
+
+      .figma-phone-head h3 {
+        margin-top: 40px;
+        font-size: 34px;
+        line-height: 1;
+      }
+
+      .stepper {
+        display: flex;
+        gap: 7px;
+        margin-top: 18px;
+      }
+
+      .stepper span {
+        height: 5px;
+        flex: 1;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.28);
+      }
+
+      .stepper span:first-child,
+      .stepper span:nth-child(2) {
+        background: var(--mint);
+      }
+
+      .figma-form {
+        padding: 18px 18px 26px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .wide-field {
+        padding: 18px;
+        border-left: 4px solid var(--teal);
+        background: #fff;
+        box-shadow: 0 8px 18px rgba(23, 32, 28, 0.06);
+      }
+
+      .comparison {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+      }
+
+      .note {
+        border-top: 1px solid var(--line);
+        padding: 22px 0 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      @media (max-width: 1100px) {
+        .intro,
+        .split,
+        .comparison {
+          grid-template-columns: 1fr;
+        }
+
+        .v0-desktop,
+        .figma-desktop {
+          grid-template-columns: 1fr;
+        }
+
+        .v0-rail,
+        .figma-sidebar {
+          display: none;
+        }
+
+        .v0-side {
+          min-height: 260px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="intro">
+        <div>
+          <p class="kicker">ClearPath Care launch redesign comparison</p>
+          <h1>What v0 versus Figma would probably give us.</h1>
+        </div>
+        <p class="intro-copy">
+          These are not final screens. They are visual direction samples for the first launch version:
+          medical history, medication, allergy, and insurance check-in. v0 tends to move fast into usable
+          React screens. Figma tends to create a more deliberate brand system before code.
+        </p>
+      </section>
+
+      <section class="split">
+        <article class="concept">
+          <div class="concept-header">
+            <div>
+              <p class="kicker">Option 1</p>
+              <h2>v0-style product redesign</h2>
+              <p>
+                Fast, sleek, dashboard-forward. It would likely give us a polished modern SaaS interface
+                quickly, then we would refine the brand details directly in code.
+              </p>
+            </div>
+            <span class="tag">Fastest path</span>
+          </div>
+          <div class="mockups">
+            <section class="desktop-frame v0-desktop">
+              <aside class="v0-rail">
+                <div class="dot"></div>
+                <div class="rail-icon">⌕</div>
+                <div class="rail-icon">✓</div>
+                <div class="rail-icon">◎</div>
+              </aside>
+              <section class="v0-main">
+                <div class="v0-topline">
+                  <div>
+                    <p class="kicker">Provider check-in</p>
+                    <h3>Today&apos;s patient flow</h3>
+                  </div>
+                  <button class="button">New invite</button>
+                </div>
+                <div class="v0-search">
+                  <div class="search-box">Search patient, phone, insurance, member ID</div>
+                  <button class="button">Open</button>
+                </div>
+                <div class="metric-strip">
+                  <div class="metric"><p>Ready</p><strong>18</strong></div>
+                  <div class="metric"><p>Updated</p><strong>7</strong></div>
+                  <div class="metric"><p>Needs review</p><strong>4</strong></div>
+                </div>
+                <div class="bar-board">
+                  <p class="kicker">Hourly confirmations</p>
+                  <div class="bars">
+                    <span style="height: 42%"></span>
+                    <span style="height: 64%"></span>
+                    <span style="height: 49%"></span>
+                    <span style="height: 78%"></span>
+                    <span style="height: 58%"></span>
+                    <span style="height: 92%"></span>
+                    <span style="height: 70%"></span>
+                  </div>
+                </div>
+              </section>
+              <aside class="v0-side">
+                <p class="kicker">Live queue</p>
+                <div class="patient-row"><strong>Maria L.</strong><span>Insurance updated</span></div>
+                <div class="patient-row"><strong>Devon C.</strong><span>Medications confirmed</span></div>
+                <div class="patient-row"><strong>Priya S.</strong><span>Allergy change flagged</span></div>
+                <div class="patient-row"><strong>Robert H.</strong><span>Needs front desk review</span></div>
+              </aside>
+            </section>
+
+            <section class="mobile-frame v0-mobile">
+              <div class="phone-pad">
+                <section class="phone-hero">
+                  <p class="kicker">Before your visit</p>
+                  <h3>Confirm your health profile.</h3>
+                </section>
+                <div class="field-list">
+                  <div class="field"><strong>Insurance</strong><p>Delta Dental • ending 9041</p></div>
+                  <div class="field"><strong>Medications</strong><p>2 active medications</p></div>
+                  <div class="field"><strong>Allergies</strong><p>Penicillin reaction on file</p></div>
+                  <button class="button">Everything is current</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-header">
+            <div>
+              <p class="kicker">Option 2</p>
+              <h2>Figma-led design system</h2>
+              <p>
+                More intentional and ownable. It would likely start with typography, spacing, color,
+                states, components, and mobile/provider patterns before implementation.
+              </p>
+            </div>
+            <span class="tag">Best brand control</span>
+          </div>
+          <div class="mockups">
+            <section class="desktop-frame figma-desktop">
+              <aside class="figma-sidebar">
+                <div class="brand-block">
+                  <div class="brand-mark"></div>
+                  <strong>ClearPath Care</strong>
+                  <span>Medical check-in</span>
+                </div>
+                <div class="side-link">Check-in queue</div>
+                <div class="side-link">Patient lookup</div>
+                <div class="side-link">Invites</div>
+                <div class="side-link">Office settings</div>
+              </aside>
+              <section class="figma-main">
+                <div class="figma-topline">
+                  <div>
+                    <p class="kicker">May 20</p>
+                    <h3>Check-in queue</h3>
+                  </div>
+                  <button class="button">Send link</button>
+                </div>
+                <div class="figma-grid">
+                  <div class="table-panel">
+                    <div class="table-row"><strong>Patient</strong><strong>Status</strong><strong>Time</strong></div>
+                    <div class="table-row"><span>Maria Lewis</span><span class="status">Updated</span><span>8:10</span></div>
+                    <div class="table-row"><span>Devon Carter</span><span class="status">Current</span><span>8:35</span></div>
+                    <div class="table-row"><span>Priya Shah</span><span class="status">Review</span><span>9:05</span></div>
+                    <div class="table-row"><span>Robert Hill</span><span class="status">Current</span><span>9:40</span></div>
+                  </div>
+                  <aside class="figma-card">
+                    <p class="kicker">Design tokens</p>
+                    <h3>Brand system</h3>
+                    <p class="intro-copy">Cleaner forms, sharper hierarchy, fewer generic dashboard shapes.</p>
+                    <div class="figma-swatch-row">
+                      <span class="swatch" style="background:#17201c"></span>
+                      <span class="swatch" style="background:#0f766e"></span>
+                      <span class="swatch" style="background:#a9dccb"></span>
+                      <span class="swatch" style="background:#ee8067"></span>
+                      <span class="swatch" style="background:#d3a83f"></span>
+                    </div>
+                  </aside>
+                </div>
+              </section>
+            </section>
+
+            <section class="mobile-frame figma-mobile">
+              <div class="figma-phone-head">
+                <p class="kicker">ClearPath Care</p>
+                <h3>Review what changed.</h3>
+                <div class="stepper"><span></span><span></span><span></span><span></span></div>
+              </div>
+              <div class="figma-form">
+                <div class="wide-field"><strong>Medical conditions</strong><p>No changes since last visit</p></div>
+                <div class="wide-field"><strong>Medications</strong><p>Add, remove, or confirm current medication list</p></div>
+                <div class="wide-field"><strong>Allergies</strong><p>Review reactions and severity</p></div>
+                <div class="wide-field"><strong>Insurance</strong><p>Confirm provider, member ID, and subscriber</p></div>
+                <button class="button">Submit update</button>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section class="comparison">
+        <p class="note">
+          <strong>v0 path:</strong> faster to generate a working Next.js interface. Best if we want speed,
+          rapid iteration, and code-first progress. It may need manual cleanup so it does not feel generic.
+        </p>
+        <p class="note">
+          <strong>Figma path:</strong> better for building a distinctive product identity and a reusable
+          design system. Slower upfront, but stronger if ClearPath needs to look polished across every screen.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

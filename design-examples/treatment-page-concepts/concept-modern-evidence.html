@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Concept 3 - Modern Evidence</title>
+    <style>
+      :root {
+        --bg: #eef1ee;
+        --panel: rgba(255,255,255,0.9);
+        --ink: #21302b;
+        --muted: #596963;
+        --line: rgba(33, 48, 43, 0.12);
+        --green: #255e52;
+        --green-soft: rgba(37, 94, 82, 0.1);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(255,255,255,0.65), transparent 25%),
+          linear-gradient(180deg, #eff3ef 0%, #e4ebe7 100%);
+        padding: 34px 18px 80px;
+      }
+
+      .shell {
+        max-width: 1060px;
+        margin: 0 auto;
+        display: grid;
+        gap: 18px;
+      }
+
+      .hero,
+      .strip,
+      .section,
+      .faq article,
+      .closing {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: 0 20px 50px rgba(18, 38, 31, 0.08);
+      }
+
+      .hero {
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        font: 700 0.78rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--green);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.2rem, 4.8vw, 4rem);
+        line-height: 1.02;
+      }
+
+      h2 {
+        margin: 4px 0 12px;
+        font-size: 1.85rem;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+        font: 500 1rem/1.72 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .hero-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .hero-stack .box,
+      .gallery div {
+        min-height: 154px;
+        border-radius: 22px;
+        border: 1px solid var(--line);
+        background:
+          radial-gradient(circle at top right, rgba(37, 94, 82, 0.12), transparent 38%),
+          linear-gradient(135deg, #dde5e0, #cfd9d3);
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 16px;
+        color: #50625c;
+        font: 700 0.92rem/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .strip {
+        padding: 18px 22px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .strip article {
+        padding-right: 10px;
+      }
+
+      .strip strong {
+        display: block;
+        margin-bottom: 8px;
+        font: 700 0.82rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--green);
+      }
+
+      .section {
+        padding: 26px 28px;
+      }
+
+      .two-col {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .step-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .step {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 18px;
+        background: rgba(244, 248, 246, 0.8);
+      }
+
+      .step span {
+        display: inline-flex;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--green-soft);
+        color: var(--green);
+        font: 700 0.76rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .gallery {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(3, 1fr);
+        margin-top: 14px;
+      }
+
+      .faq {
+        display: grid;
+        gap: 12px;
+      }
+
+      .faq article {
+        padding: 18px 20px;
+      }
+
+      .faq h3 {
+        margin: 0 0 8px;
+        font-size: 1.08rem;
+      }
+
+      .closing {
+        padding: 26px 28px;
+      }
+
+      @media (max-width: 860px) {
+        .hero,
+        .strip,
+        .two-col,
+        .step-grid,
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Modern Evidence-Led Concept</p>
+          <h1>This version feels more modern and visual, but still clinically grounded.</h1>
+          <p>
+            If you want the page to feel slightly more current and design-forward, this direction works well. The content still needs to stay plain-language and calming.
+          </p>
+        </div>
+        <div class="hero-stack">
+          <div class="box">Hero explainer media</div>
+          <div class="box">Supporting annotated image or video thumbnail</div>
+        </div>
+      </section>
+
+      <section class="strip">
+        <article>
+          <strong>Reason</strong>
+          <p>Why the treatment is being recommended.</p>
+        </article>
+        <article>
+          <strong>Process</strong>
+          <p>How the procedure works.</p>
+        </article>
+        <article>
+          <strong>Recovery</strong>
+          <p>What healing feels like.</p>
+        </article>
+        <article>
+          <strong>Next</strong>
+          <p>What follow-up or restoration is needed.</p>
+        </article>
+      </section>
+
+      <section class="section two-col">
+        <div>
+          <p class="eyebrow">Clarity First</p>
+          <h2>It should feel informative, not overwhelming.</h2>
+          <p>
+            This direction works best if the visuals are strong and the content is broken into smaller, easier-to-scan blocks. It can feel very polished if the media is high quality.
+          </p>
+          <ul>
+            <li>strong hierarchy</li>
+            <li>clear step-by-step explanation</li>
+            <li>more visual emphasis than a traditional handout</li>
+          </ul>
+        </div>
+        <div class="box" style="min-height: 250px;">Side visual or patient explainer panel</div>
+      </section>
+
+      <section class="section">
+        <p class="eyebrow">Treatment Flow</p>
+        <h2>The steps still need to feel emotionally safe.</h2>
+        <div class="step-grid">
+          <article class="step">
+            <span>1</span>
+            <h3>Preparation</h3>
+            <p>Show comfort, imaging, and setup clearly.</p>
+          </article>
+          <article class="step">
+            <span>2</span>
+            <h3>Procedure</h3>
+            <p>Explain the main treatment phase with confidence and simplicity.</p>
+          </article>
+          <article class="step">
+            <span>3</span>
+            <h3>Healing</h3>
+            <p>Set recovery expectations with direct, practical language.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="eyebrow">Media Use</p>
+        <h2>This concept depends more on good visuals.</h2>
+        <div class="gallery">
+          <div>diagram</div>
+          <div>short video</div>
+          <div>aftercare visual</div>
+        </div>
+      </section>
+
+      <section class="faq">
+        <article>
+          <h3>Best use case</h3>
+          <p>This concept is strongest if you want the product to feel modern, polished, and slightly more digital-native.</p>
+        </article>
+        <article>
+          <h3>Main tradeoff</h3>
+          <p>If we push this too far, it can start to feel like a startup product instead of a premium clinical education page.</p>
+        </article>
+      </section>
+
+      <section class="closing">
+        <p class="eyebrow">Overall Feel</p>
+        <h2>Modern, capable, and still patient-safe.</h2>
+        <p>This is the most visual and contemporary of the three. It is good, but I think concept 1 is probably the closest to the handout feeling you described.</p>
+      </section>
+    </main>
+  </body>
+</html>

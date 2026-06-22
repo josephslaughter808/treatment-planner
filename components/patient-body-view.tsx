@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import {
@@ -19,6 +20,11 @@ import {
 type DisplayMode = "body" | "list";
 type BodySide = "front" | "back";
 
+const AnatomicalBodyView = dynamic(
+  () => import("@/components/anatomical-body-view").then((module) => module.AnatomicalBodyView),
+  { ssr: false, loading: () => <div className="anatomy-loading">Loading 3D anatomy...</div> }
+);
+
 const statusLabels: Record<DiagnosticStatus, string> = {
   active: "Active",
   managed: "Managed",
@@ -31,7 +37,6 @@ export function PatientBodyView() {
     buildDiagnosticRecords(readVaultFromStorage(), readTimelineFromStorage())
   );
   const [displayMode, setDisplayMode] = useState<DisplayMode>("body");
-  const [bodySide, setBodySide] = useState<BodySide>("front");
   const [selectedRegion, setSelectedRegion] = useState<BodyRegion>("chest");
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
 
@@ -137,35 +142,16 @@ export function PatientBodyView() {
           <div className="body-map-panel">
             <div className="body-map-panel-header">
               <div>
-                <p className="eyebrow">Explore by location</p>
-                <h2>Select a body region</h2>
-              </div>
-              <div className="segmented-control compact" aria-label="Body side">
-                <button
-                  aria-pressed={bodySide === "front"}
-                  className={bodySide === "front" ? "active" : ""}
-                  onClick={() => setBodySide("front")}
-                  type="button"
-                >
-                  Front
-                </button>
-                <button
-                  aria-pressed={bodySide === "back"}
-                  className={bodySide === "back" ? "active" : ""}
-                  onClick={() => setBodySide("back")}
-                  type="button"
-                >
-                  Back
-                </button>
+                <p className="eyebrow">Interactive anatomy</p>
+                <h2>Explore the body in 3D</h2>
               </div>
             </div>
 
             <div className="body-map-canvas">
-              <BodyMapGraphic
-                summaries={regionSummaries}
+              <AnatomicalBodyView
                 onSelect={chooseRegion}
                 selectedRegion={selectedRegion}
-                side={bodySide}
+                summaries={regionSummaries}
               />
             </div>
 
@@ -183,6 +169,9 @@ export function PatientBodyView() {
               <span><i className="legend-past" /> Past record only</span>
               <span><i className="legend-empty" /> No condition mapped</span>
             </div>
+            <p className="anatomy-attribution">
+              Anatomical surface: <a href="https://github.com/Z-Anatomy/Unity-app_Z-Anatomy" rel="noreferrer" target="_blank">Z-Anatomy</a>, licensed CC BY-SA 4.0.
+            </p>
           </div>
 
           <div className="region-records-panel">

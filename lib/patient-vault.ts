@@ -23,6 +23,21 @@ export type ConditionEntry = {
   id: string;
   name: string;
   notes: string;
+  details?: ConditionDetail[];
+};
+
+export type ConditionDetailStatus = "active" | "managed" | "resolved" | "uncertain";
+
+export type ConditionDetail = {
+  id: string;
+  name: string;
+  diagnosedAt: string;
+  status: ConditionDetailStatus;
+  diagnosedBy: string;
+  treatingProvider: string;
+  treatmentSummary: string;
+  relatedMedicationIds: string[];
+  notes: string;
 };
 
 export type InsuranceEntry = {
@@ -265,6 +280,20 @@ export const emptyVault: PatientVault = {
 
 export function createMemberId(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+}
+
+export function makeBlankConditionDetail(): ConditionDetail {
+  return {
+    id: crypto.randomUUID(),
+    name: "",
+    diagnosedAt: "",
+    status: "managed",
+    diagnosedBy: "",
+    treatingProvider: "",
+    treatmentSummary: "",
+    relatedMedicationIds: [],
+    notes: ""
+  };
 }
 
 export function readVaultFromStorage() {

@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearPath Care: 20 Desktop Design Variations</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --ink: #151b18;
+        --soft-ink: #293430;
+        --muted: #60706a;
+        --line: rgba(21, 27, 24, 0.13);
+        --paper: #f6f5ef;
+        --teal: #0d766f;
+        --mint: #9fd9c8;
+        --blue: #2f66d0;
+        --coral: #ee8067;
+        --gold: #d5a843;
+        --violet: #6557d2;
+        --rose: #d75d7b;
+      }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(140deg, rgba(159, 217, 200, 0.26), transparent 28%),
+          linear-gradient(235deg, rgba(238, 128, 103, 0.16), transparent 32%),
+          #f1f3ee;
+        color: var(--ink);
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+      }
+
+      .page {
+        width: min(1680px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 38px 0 90px;
+      }
+
+      .hero {
+        min-height: 330px;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 38px;
+        align-items: end;
+        padding: 32px 0 36px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .kicker {
+        margin: 0 0 10px;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 980px;
+        font-size: clamp(52px, 7vw, 112px);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      .hero p {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.72;
+      }
+
+      .section-title {
+        margin: 48px 0 20px;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: end;
+      }
+
+      .section-title h2 {
+        font-size: clamp(32px, 5vw, 64px);
+        line-height: 1;
+      }
+
+      .section-title p {
+        max-width: 700px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .gallery {
+        display: grid;
+        gap: 28px;
+      }
+
+      .concept {
+        overflow: hidden;
+        border: 1px solid rgba(21, 27, 24, 0.12);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 24px 72px rgba(21, 27, 24, 0.09);
+      }
+
+      .concept-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 22px 24px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .concept-head h3 {
+        margin-top: 5px;
+        font-size: 28px;
+      }
+
+      .concept-head p {
+        max-width: 860px;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .tag {
+        align-self: start;
+        white-space: nowrap;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 850;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .screen-wrap {
+        padding: 24px;
+      }
+
+      .desktop {
+        min-height: 620px;
+        overflow: hidden;
+        border: 1px solid rgba(21, 27, 24, 0.14);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .button {
+        border: 0;
+        border-radius: 8px;
+        padding: 12px 15px;
+        background: var(--mint);
+        color: #07120f;
+        font-weight: 850;
+      }
+
+      .button.dark {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .ghost {
+        border: 1px solid rgba(21, 27, 24, 0.14);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .status {
+        width: fit-content;
+        padding: 5px 8px;
+        border-radius: 6px;
+        background: #e1f5ee;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .metric {
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 34px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 13px 0;
+        border-bottom: 1px solid rgba(21, 27, 24, 0.1);
+      }
+
+      .bars {
+        display: flex;
+        gap: 9px;
+        align-items: end;
+        height: 165px;
+      }
+
+      .bars span {
+        flex: 1;
+        min-width: 9px;
+        border-radius: 5px 5px 0 0;
+        background: linear-gradient(180deg, var(--coral), var(--teal));
+      }
+
+      .v0-01 {
+        display: grid;
+        grid-template-columns: 76px 1fr 330px;
+        background: #0b1613;
+        color: #f3fff9;
+      }
+
+      .v0-rail {
+        padding: 18px 13px;
+        background: #050e0c;
+      }
+
+      .logo-dot {
+        width: 38px;
+        height: 38px;
+        margin: 0 auto 18px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--mint), #ffe7a0);
+      }
+
+      .v0-rail span {
+        display: block;
+        width: 38px;
+        height: 38px;
+        margin: 10px auto;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .v0-command-main,
+      .v0-photo-side {
+        padding: 28px;
+      }
+
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .searchband {
+        margin: 24px 0;
+        padding: 16px;
+        border-radius: 9px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .v0-photo-side {
+        background:
+          linear-gradient(rgba(7, 18, 15, 0.22), rgba(7, 18, 15, 0.86)),
+          url("https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=900&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .v0-02 {
+        padding: 30px;
+        background: #f7f8f2;
+      }
+
+      .v0-card-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr 0.8fr;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .v0-card {
+        min-height: 142px;
+        padding: 18px;
+        border-radius: 10px;
+        border: 1px solid rgba(21, 27, 24, 0.1);
+        background: #fff;
+      }
+
+      .v0-card.hero-card {
+        grid-row: span 3;
+        min-height: 464px;
+        color: white;
+        background:
+          linear-gradient(rgba(12, 23, 20, 0.05), rgba(12, 23, 20, 0.84)),
+          url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=80");
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+      }
+
+      .v0-03 {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+      }
+
+      .v0-stream-left {
+        padding: 34px;
+        color: #fff;
+        background: #1b2b27;
+      }
+
+      .v0-stream-right {
+        padding: 34px;
+        background: #fff;
+      }
+
+      .stream-card {
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .v0-04 {
+        padding: 32px;
+        color: #fff;
+        background:
+          linear-gradient(135deg, rgba(8, 16, 14, 0.84), rgba(12, 48, 43, 0.78)),
+          url("https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .glass-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 30px;
+      }
+
+      .glass-card {
+        min-height: 162px;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.13);
+      }
+
+      .v0-05 {
+        display: grid;
+        grid-template-columns: 0.72fr 1fr;
+        background: #f7f7f2;
+      }
+
+      .v0-phone-zone {
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        background:
+          linear-gradient(135deg, rgba(47, 102, 208, 0.12), transparent),
+          #ecefe8;
+      }
+
+      .phone {
+        width: 310px;
+        min-height: 500px;
+        overflow: hidden;
+        border: 8px solid #151b18;
+        border-radius: 30px;
+        background: #fff;
+      }
+
+      .phone-hero {
+        min-height: 210px;
+        padding: 20px;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        background:
+          linear-gradient(rgba(8, 26, 22, 0.05), rgba(8, 26, 22, 0.8)),
+          url("https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=800&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .phone-list {
+        display: grid;
+        gap: 10px;
+        padding: 15px;
+      }
+
+      .phone-field {
+        padding: 12px;
+        border: 1px solid rgba(21, 27, 24, 0.1);
+        border-radius: 8px;
+      }
+
+      .v0-phone-copy {
+        padding: 42px;
+      }
+
+      .v0-06 {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        color: #f5fff9;
+        background: #09120f;
+      }
+
+      .v0-leftnav {
+        padding: 26px;
+        background: #0f1f1b;
+      }
+
+      .v0-board {
+        padding: 30px;
+      }
+
+      .board-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .board-card {
+        min-height: 180px;
+        padding: 18px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+      }
+
+      .v0-07 {
+        padding: 30px;
+        background: #fff;
+      }
+
+      .v0-white-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 18px;
+        margin-top: 24px;
+      }
+
+      .white-panel {
+        min-height: 400px;
+        padding: 18px;
+        border-top: 3px solid var(--ink);
+        background: #f8f8f3;
+      }
+
+      .v0-08 {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        background: #f4f1ea;
+      }
+
+      .v0-photo-hero {
+        min-height: 620px;
+        background:
+          linear-gradient(rgba(20, 27, 24, 0.03), rgba(20, 27, 24, 0.42)),
+          url("https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?auto=format&fit=crop&w=1200&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .v0-photo-work {
+        padding: 38px;
+        display: grid;
+        align-content: center;
+        gap: 16px;
+      }
+
+      .v0-09 {
+        display: grid;
+        grid-template-columns: 330px 1fr;
+        background: #101827;
+        color: #f8fbff;
+      }
+
+      .v0-analytics-side {
+        padding: 30px;
+        background: #0b1220;
+      }
+
+      .v0-analytics-main {
+        padding: 30px;
+      }
+
+      .spark-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .spark-card {
+        min-height: 300px;
+        padding: 18px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .v0-10 {
+        padding: 32px;
+        background: #edf7f2;
+      }
+
+      .calm-shell {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+        margin-top: 24px;
+      }
+
+      .calm-main,
+      .calm-side {
+        min-height: 430px;
+        padding: 22px;
+        border: 1px solid rgba(21, 27, 24, 0.1);
+        background: #fff;
+      }
+
+      .fig-01 {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        background: #fbfaf4;
+      }
+
+      .fig-sidebar {
+        padding: 24px;
+        background: #fff;
+        border-right: 1px solid var(--line);
+      }
+
+      .brandmark {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 14px;
+        border-radius: 8px;
+        background: conic-gradient(from 45deg, var(--teal), var(--mint), var(--gold), var(--coral), var(--teal));
+      }
+
+      .navline {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(21, 27, 24, 0.09);
+        font-weight: 750;
+      }
+
+      .fig-main {
+        padding: 30px;
+      }
+
+      .fig-table {
+        margin-top: 22px;
+        border-top: 3px solid var(--ink);
+        background: #fff;
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: 1fr 120px 90px;
+        gap: 10px;
+        padding: 14px 15px;
+        border-bottom: 1px solid rgba(21, 27, 24, 0.1);
+      }
+
+      .fig-02 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: #f8f4ea;
+      }
+
+      .editorial-photo {
+        background:
+          linear-gradient(rgba(20, 27, 24, 0.04), rgba(20, 27, 24, 0.36)),
+          url("https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?auto=format&fit=crop&w=1200&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .editorial-copy {
+        padding: 42px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .editorial-copy h3 {
+        font-size: 54px;
+        line-height: 0.98;
+      }
+
+      .fig-03 {
+        padding: 30px;
+        background: #fff;
+      }
+
+      .clinic-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 0.8fr;
+        margin-top: 24px;
+        border: 1px solid var(--line);
+      }
+
+      .clinic-cell {
+        min-height: 145px;
+        padding: 17px;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .fig-04 {
+        padding: 30px;
+        background: #f9faf7;
+      }
+
+      .checklist {
+        display: grid;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .check-item {
+        display: grid;
+        grid-template-columns: 34px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 15px;
+        border-left: 4px solid var(--teal);
+        background: #fff;
+      }
+
+      .box {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border-radius: 7px;
+        background: #dff3ec;
+        color: var(--teal);
+        font-weight: 900;
+      }
+
+      .fig-05 {
+        display: grid;
+        grid-template-columns: 0.75fr 1fr;
+        gap: 28px;
+        align-items: center;
+        padding: 34px;
+        color: #fff;
+        background: #17201c;
+      }
+
+      .fig-05 .phone {
+        background: #faf8ef;
+        color: var(--ink);
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .swatch {
+        height: 42px;
+        border-radius: 7px;
+      }
+
+      .fig-06 {
+        display: grid;
+        grid-template-columns: 1fr 390px;
+        background: #f6f2ea;
+      }
+
+      .fig-doc {
+        padding: 42px;
+        background: #fff;
+      }
+
+      .fig-doc h3 {
+        font-size: 58px;
+        line-height: 1;
+      }
+
+      .fig-doc-side {
+        padding: 34px;
+        background: #e5f2ed;
+      }
+
+      .fig-07 {
+        padding: 30px;
+        background: #ffffff;
+      }
+
+      .fig-panel-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        margin-top: 24px;
+        border: 1px solid var(--line);
+      }
+
+      .fig-panel {
+        min-height: 220px;
+        padding: 20px;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .fig-08 {
+        display: grid;
+        grid-template-columns: 300px 1fr 320px;
+        background: #f8f8f3;
+      }
+
+      .queue-left,
+      .queue-right,
+      .queue-center {
+        padding: 26px;
+      }
+
+      .queue-left,
+      .queue-right {
+        background: #fff;
+      }
+
+      .fig-09 {
+        padding: 34px;
+        background: #fbf7f0;
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .calendar-cell {
+        min-height: 190px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+
+      .fig-10 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: #f4f6f2;
+      }
+
+      .fig-audit-left {
+        padding: 38px;
+        background: #151b18;
+        color: #fff;
+      }
+
+      .fig-audit-right {
+        padding: 38px;
+      }
+
+      @media (max-width: 1180px) {
+        .hero,
+        .v0-01,
+        .v0-03,
+        .v0-05,
+        .v0-06,
+        .v0-08,
+        .v0-09,
+        .calm-shell,
+        .fig-01,
+        .fig-02,
+        .fig-05,
+        .fig-06,
+        .fig-08,
+        .fig-10 {
+          grid-template-columns: 1fr;
+        }
+
+        .v0-rail,
+        .fig-sidebar {
+          display: none;
+        }
+
+        .glass-grid,
+        .v0-card-grid,
+        .spark-grid,
+        .clinic-grid,
+        .calendar-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <p class="kicker">ClearPath Care desktop direction lab</p>
+          <h1>Twenty complete desktop designs.</h1>
+        </div>
+        <p>
+          Each concept below is a full desktop interface direction for the first launch product:
+          medical history, medications, allergies, and insurance check-in. The first ten are
+          v0-style: fast, modern, app-like. The second ten are Figma-led: more systemized,
+          brandable, and intentional.
+        </p>
+      </section>
+
+      <section class="section-title">
+        <div>
+          <p class="kicker">Set one</p>
+          <h2>10 v0-style desktop variations</h2>
+        </div>
+        <p>These lean toward polished generated SaaS screens: visually punchy, fast to implement, and useful for quick iteration.</p>
+      </section>
+
+      <section class="gallery">
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 01</p><h3>Command Center</h3><p>Dark operational dashboard with search, bar graphs, live queue, and strong daily-patient energy.</p></div><span class="tag">Sleek dashboard</span></div>
+          <div class="screen-wrap"><div class="desktop v0-01"><aside class="v0-rail"><div class="logo-dot"></div><span></span><span></span><span></span></aside><section class="v0-command-main"><div class="topline"><div><p class="kicker">Provider check-in</p><h3>Today's patient flow</h3></div><button class="button">New invite</button></div><div class="searchband">Search by email, member ID, or access code</div><div class="metrics"><div class="metric"><p>Ready</p><strong>18</strong></div><div class="metric"><p>Updated</p><strong>7</strong></div><div class="metric"><p>Review</p><strong>4</strong></div></div><div class="bars"><span style="height:42%"></span><span style="height:64%"></span><span style="height:49%"></span><span style="height:78%"></span><span style="height:58%"></span><span style="height:92%"></span><span style="height:70%"></span></div></section><aside class="v0-photo-side"><p class="kicker">Live queue</p><div class="row"><strong>Maria L.</strong><span>Updated</span></div><div class="row"><strong>Devon C.</strong><span>Current</span></div><div class="row"><strong>Priya S.</strong><span>Review</span></div></aside></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 02</p><h3>Smart Cards</h3><p>Card-based control room with one hero patient, simple status modules, and quick actions.</p></div><span class="tag">Clean app</span></div>
+          <div class="screen-wrap"><div class="desktop v0-02"><div class="topline"><div><p class="kicker">Check-in workspace</p><h3>Patient updates</h3></div><button class="button dark">Send link</button></div><div class="v0-card-grid"><div class="v0-card hero-card"><p class="kicker">Next patient</p><h3>Maria Lewis</h3><p>Insurance changed and medication list confirmed.</p></div><div class="v0-card"><p>Insurance</p><h3>Needs review</h3></div><div class="v0-card"><p>Allergies</p><h3>No change</h3></div><div class="v0-card"><p>Medications</p><h3>2 active</h3></div><div class="v0-card"><p>History</p><h3>Confirmed</h3></div><div class="v0-card"><p>Pending</p><h3>4 patients</h3></div><div class="v0-card"><p>Done</p><h3>18 today</h3></div></div></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 03</p><h3>Live Stream</h3><p>Activity-feed layout for front desk staff who think in events, not tables.</p></div><span class="tag">Workflow feed</span></div>
+          <div class="screen-wrap"><div class="desktop v0-03"><section class="v0-stream-left"><p class="kicker">Live activity</p><h3>Updates arriving now</h3><div class="metric"><p>Average check-in</p><strong>2:14</strong></div><p style="margin-top:24px;color:#d6eee6">A fast stream view for practices with constant arrivals and rapid confirmation work.</p></section><section class="v0-stream-right"><div class="stream-card"><p class="kicker">9:05</p><h3>Priya Shah added an allergy note</h3></div><div class="stream-card"><p class="kicker">8:51</p><h3>Robert Hill confirmed no changes</h3></div><div class="stream-card"><p class="kicker">8:37</p><h3>Maria Lewis updated insurance</h3></div><div class="stream-card"><p class="kicker">8:22</p><h3>Devon Carter submitted medications</h3></div></section></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 04</p><h3>Glass Practice</h3><p>More visual and premium, with photography, translucent panels, and a slightly flashy finish.</p></div><span class="tag">Most visual</span></div>
+          <div class="screen-wrap"><div class="desktop v0-04"><div class="topline"><div><p class="kicker">ClearPath intake</p><h3>Front desk command</h3></div><button class="button">Invite patient</button></div><div class="glass-grid"><div class="glass-card"><p>Ready</p><h3>18</h3></div><div class="glass-card"><p>Flagged</p><h3>4</h3></div><div class="glass-card"><p>Sent</p><h3>31</h3></div><div class="glass-card"><p>Open rate</p><h3>87%</h3></div><div class="glass-card"><p>Insurance</p><h3>6 changes</h3></div><div class="glass-card"><p>Medications</p><h3>3 changes</h3></div><div class="glass-card"><p>Allergies</p><h3>1 change</h3></div><div class="glass-card"><p>History</p><h3>12 clear</h3></div></div></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 05</p><h3>Patient Mirror</h3><p>Provider desktop built around a live preview of what the patient sees on mobile.</p></div><span class="tag">Patient-first</span></div>
+          <div class="screen-wrap"><div class="desktop v0-05"><section class="v0-phone-zone"><div class="phone"><div class="phone-hero"><p class="kicker">Before your visit</p><h3>Confirm your health profile.</h3></div><div class="phone-list"><div class="phone-field"><strong>Insurance</strong><p>Delta Dental</p></div><div class="phone-field"><strong>Medications</strong><p>2 active</p></div><div class="phone-field"><strong>Allergies</strong><p>1 flagged</p></div></div></div></section><section class="v0-phone-copy"><p class="kicker">Provider view</p><h3 style="font-size:52px;line-height:1">See exactly what the patient just confirmed.</h3><div class="row"><strong>Medical history</strong><span class="status">Current</span></div><div class="row"><strong>Insurance</strong><span class="status">Changed</span></div><div class="row"><strong>Allergies</strong><span class="status">Review</span></div><button class="button dark">Approve check-in</button></section></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 06</p><h3>Dark Board</h3><p>Dense desktop board for offices that want many patients visible at once.</p></div><span class="tag">High density</span></div>
+          <div class="screen-wrap"><div class="desktop v0-06"><aside class="v0-leftnav"><div class="logo-dot"></div><h3>ClearPath</h3><div class="row"><strong>Queue</strong><span>24</span></div><div class="row"><strong>Review</strong><span>4</span></div><div class="row"><strong>Done</strong><span>18</span></div></aside><section class="v0-board"><div class="topline"><div><p class="kicker">Daily board</p><h3>All check-ins</h3></div><button class="button">Send invite</button></div><div class="board-grid"><div class="board-card"><p>Maria Lewis</p><h3>Insurance changed</h3></div><div class="board-card"><p>Devon Carter</p><h3>No changes</h3></div><div class="board-card"><p>Priya Shah</p><h3>Allergy review</h3></div><div class="board-card"><p>Robert Hill</p><h3>Medication update</h3></div></div></section></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 07</p><h3>White Ops</h3><p>Bright, clean, less moody version of the command center with distinct columns.</p></div><span class="tag">Bright SaaS</span></div>
+          <div class="screen-wrap"><div class="desktop v0-07"><div class="topline"><div><p class="kicker">Check-in operations</p><h3>Today's confirmations</h3></div><button class="button dark">Create link</button></div><div class="v0-white-grid"><section class="white-panel"><p class="kicker">Waiting</p><div class="row"><strong>Maria Lewis</strong><span>8:10</span></div><div class="row"><strong>Devon Carter</strong><span>8:35</span></div><div class="row"><strong>Priya Shah</strong><span>9:05</span></div></section><section class="white-panel"><p class="kicker">Needs review</p><div class="row"><strong>Insurance changed</strong><span>Open</span></div><div class="row"><strong>Allergy added</strong><span>Open</span></div></section><section class="white-panel"><p class="kicker">Approved</p><div class="row"><strong>Robert Hill</strong><span>Done</span></div><div class="row"><strong>Angela W.</strong><span>Done</span></div></section></div></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 08</p><h3>Editorial Ops</h3><p>A more brand-heavy desktop with a large clinical image and quiet workflow panel.</p></div><span class="tag">Soft premium</span></div>
+          <div class="screen-wrap"><div class="desktop v0-08"><div class="v0-photo-hero"></div><section class="v0-photo-work"><p class="kicker">Morning flow</p><h3 style="font-size:56px;line-height:1">Check in without the paperwork pile.</h3><p style="color:var(--muted);line-height:1.7">A calmer, more premium interface that feels less like a spreadsheet and more like a guided front desk workflow.</p><div class="row"><strong>Next review</strong><span class="status">Insurance</span></div><div class="row"><strong>Patient</strong><span>Maria Lewis</span></div><button class="button dark">Open patient</button></section></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 09</p><h3>Analytics Desk</h3><p>Stats-forward for owners and office managers who want performance visibility.</p></div><span class="tag">Manager view</span></div>
+          <div class="screen-wrap"><div class="desktop v0-09"><aside class="v0-analytics-side"><p class="kicker">Practice performance</p><h3>Check-in health</h3><div class="metric"><p>Completion</p><strong>87%</strong></div></aside><main class="v0-analytics-main"><div class="topline"><h3>Daily insight</h3><button class="button">Export</button></div><div class="spark-grid"><div class="spark-card"><p>Insurance changes</p><h3>6</h3><div class="bars"><span style="height:40%"></span><span style="height:70%"></span><span style="height:55%"></span><span style="height:90%"></span></div></div><div class="spark-card"><p>Medication changes</p><h3>3</h3><div class="bars"><span style="height:30%"></span><span style="height:45%"></span><span style="height:75%"></span><span style="height:50%"></span></div></div><div class="spark-card"><p>Allergy flags</p><h3>1</h3><div class="bars"><span style="height:20%"></span><span style="height:25%"></span><span style="height:35%"></span><span style="height:60%"></span></div></div></div></main></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">v0 10</p><h3>Calm Console</h3><p>Less flashy, still modern, more practical for daily repeated use.</p></div><span class="tag">Most balanced</span></div>
+          <div class="screen-wrap"><div class="desktop v0-10"><div class="topline"><div><p class="kicker">Front desk</p><h3>Medical check-in</h3></div><button class="button dark">Invite patient</button></div><div class="calm-shell"><section class="calm-main"><div class="row"><strong>Maria Lewis</strong><span class="status">Insurance changed</span></div><div class="row"><strong>Devon Carter</strong><span class="status">Current</span></div><div class="row"><strong>Priya Shah</strong><span class="status">Review allergy</span></div><div class="row"><strong>Robert Hill</strong><span class="status">Medication update</span></div></section><aside class="calm-side"><p class="kicker">Selected patient</p><h3>Maria Lewis</h3><p style="color:var(--muted);line-height:1.7">Insurance provider changed. Medical history confirmed. Allergy list unchanged.</p><button class="button dark">Approve</button></aside></div></div></div>
+        </article>
+      </section>
+
+      <section class="section-title">
+        <div>
+          <p class="kicker">Set two</p>
+          <h2>10 Figma-led desktop variations</h2>
+        </div>
+        <p>These are more deliberate design-system directions: stronger visual rules, clearer components, and more ownable brand behavior.</p>
+      </section>
+
+      <section class="gallery">
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 01</p><h3>Clinic System</h3><p>Crisp sidebar, table hierarchy, restrained color, and reusable status patterns.</p></div><span class="tag">Most scalable</span></div>
+          <div class="screen-wrap"><div class="desktop fig-01"><aside class="fig-sidebar"><div class="brandmark"></div><strong>ClearPath Care</strong><div class="navline">Check-in queue</div><div class="navline">Patient lookup</div><div class="navline">Invites</div><div class="navline">Settings</div></aside><main class="fig-main"><div class="topline"><div><p class="kicker">May 20</p><h3>Check-in queue</h3></div><button class="button">Send link</button></div><div class="fig-table"><div class="table-row"><strong>Patient</strong><strong>Status</strong><strong>Time</strong></div><div class="table-row"><span>Maria Lewis</span><span class="status">Updated</span><span>8:10</span></div><div class="table-row"><span>Devon Carter</span><span class="status">Current</span><span>8:35</span></div><div class="table-row"><span>Priya Shah</span><span class="status">Review</span><span>9:05</span></div></div></main></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 02</p><h3>Editorial Care</h3><p>Warmer, more emotional, and branded around a calm patient journey.</p></div><span class="tag">Most human</span></div>
+          <div class="screen-wrap"><div class="desktop fig-02"><div class="editorial-photo"></div><section class="editorial-copy"><div><p class="kicker">Before the visit</p><h3>Care starts with what changed.</h3></div><p style="color:var(--muted);line-height:1.7">Guided language, quieter screens, and a polished identity that feels less like generic software.</p><button class="button dark">Review profile</button></section></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 03</p><h3>Clinical Grid</h3><p>Structured and professional, built around clinical review instead of generic cards.</p></div><span class="tag">Most clinical</span></div>
+          <div class="screen-wrap"><div class="desktop fig-03"><div class="topline"><div><p class="kicker">Patient review</p><h3>Maria Lewis</h3></div><button class="button ghost">Approve</button></div><div class="clinic-grid"><div class="clinic-cell"><p>Medical conditions</p><h3>3</h3></div><div class="clinic-cell"><p>Medications</p><h3>2</h3></div><div class="clinic-cell"><p>Allergies</p><h3>1</h3></div><div class="clinic-cell"><p>Insurance</p><h3>Changed</h3></div><div class="clinic-cell"><p>Subscriber</p><h3>Self</h3></div><div class="clinic-cell"><p>Status</p><h3>Review</h3></div></div></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 04</p><h3>Checklist OS</h3><p>Every flow becomes a clear checklist: easy to train, easy to QA, hard to miss steps.</p></div><span class="tag">Most usable</span></div>
+          <div class="screen-wrap"><div class="desktop fig-04"><p class="kicker">Appointment prep</p><h3>Verify before seating</h3><div class="checklist"><div class="check-item"><span class="box">✓</span><strong>Insurance confirmed</strong><span>Done</span></div><div class="check-item"><span class="box">✓</span><strong>Medical history reviewed</strong><span>Done</span></div><div class="check-item"><span class="box">!</span><strong>Medication changed</strong><span>Review</span></div><div class="check-item"><span class="box">✓</span><strong>Allergy list confirmed</strong><span>Done</span></div></div></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 05</p><h3>Mobile Design Kit</h3><p>Desktop view centered around reusable mobile-first tokens and patient form behavior.</p></div><span class="tag">Best foundation</span></div>
+          <div class="screen-wrap"><div class="desktop fig-05"><div class="phone"><div class="phone-list"><p class="kicker">Step 2 of 4</p><h3>Medications</h3><div class="phone-field">Lisinopril 10mg</div><div class="phone-field">Add medication</div><button class="button">Continue</button></div></div><section><p class="kicker">Design tokens</p><h3 style="font-size:48px;line-height:1">Reusable patient system</h3><p style="line-height:1.7">Typography, spacing, colors, fields, review rows, buttons, and states defined before implementation.</p><div class="swatches"><span class="swatch" style="background:#151b18"></span><span class="swatch" style="background:#0d766f"></span><span class="swatch" style="background:#9fd9c8"></span><span class="swatch" style="background:#ee8067"></span><span class="swatch" style="background:#d5a843"></span></div></section></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 06</p><h3>Document Studio</h3><p>Feels like a premium clinical document review system instead of a dashboard.</p></div><span class="tag">Most refined</span></div>
+          <div class="screen-wrap"><div class="desktop fig-06"><section class="fig-doc"><p class="kicker">Patient check-in record</p><h3>Maria Lewis</h3><p style="color:var(--muted);line-height:1.7;margin-top:18px">The office reviews a clean medical-history record with carefully structured sections and fewer visual distractions.</p><div class="fig-table"><div class="table-row"><span>Insurance</span><span class="status">Changed</span><span>Open</span></div><div class="table-row"><span>Medications</span><span class="status">Current</span><span>Done</span></div><div class="table-row"><span>Allergies</span><span class="status">Current</span><span>Done</span></div></div></section><aside class="fig-doc-side"><p class="kicker">Review notes</p><h3>Focused and quiet</h3><p style="line-height:1.7;color:var(--muted)">This direction avoids heavy dashboards and treats check-in as an official clinical intake document.</p></aside></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 07</p><h3>Split Review</h3><p>Two-column review mode for comparing previous history against current update.</p></div><span class="tag">Best comparison</span></div>
+          <div class="screen-wrap"><div class="desktop fig-07"><div class="topline"><div><p class="kicker">Change review</p><h3>Previous vs current</h3></div><button class="button dark">Approve changes</button></div><div class="fig-panel-grid"><section class="fig-panel"><p class="kicker">Previous insurance</p><h3>Delta Dental</h3><p>Member ending 9041</p></section><section class="fig-panel"><p class="kicker">Current insurance</p><h3>Aetna Dental</h3><p>Member ending 4428</p></section><section class="fig-panel"><p class="kicker">Previous medication</p><h3>2 active</h3></section><section class="fig-panel"><p class="kicker">Current medication</p><h3>2 active</h3></section></div></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 08</p><h3>Queue Triage</h3><p>Three-zone layout: patient list, selected record, and decision panel.</p></div><span class="tag">Best daily use</span></div>
+          <div class="screen-wrap"><div class="desktop fig-08"><aside class="queue-left"><p class="kicker">Patients</p><div class="row"><strong>Maria Lewis</strong><span>Review</span></div><div class="row"><strong>Devon Carter</strong><span>Done</span></div><div class="row"><strong>Priya Shah</strong><span>Flag</span></div></aside><main class="queue-center"><p class="kicker">Selected record</p><h3>Maria Lewis</h3><div class="fig-table"><div class="table-row"><span>Insurance</span><span class="status">Changed</span><span>Open</span></div><div class="table-row"><span>Allergies</span><span class="status">Current</span><span>Done</span></div></div></main><aside class="queue-right"><p class="kicker">Decision</p><h3>Approve update?</h3><p style="color:var(--muted);line-height:1.7">Insurance changed. No clinical changes flagged.</p><button class="button dark">Approve</button></aside></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 09</p><h3>Schedule Board</h3><p>Appointment-day layout where check-in status is mapped directly to the schedule.</p></div><span class="tag">Best front desk</span></div>
+          <div class="screen-wrap"><div class="desktop fig-09"><div class="topline"><div><p class="kicker">Wednesday schedule</p><h3>Check-ins by appointment</h3></div><button class="button dark">Send batch links</button></div><div class="calendar-grid"><div class="calendar-cell"><p>8:00</p><h4>Maria</h4><span class="status">Review</span></div><div class="calendar-cell"><p>8:30</p><h4>Devon</h4><span class="status">Ready</span></div><div class="calendar-cell"><p>9:00</p><h4>Priya</h4><span class="status">Flag</span></div><div class="calendar-cell"><p>9:30</p><h4>Robert</h4><span class="status">Ready</span></div><div class="calendar-cell"><p>10:00</p><h4>Angela</h4><span class="status">Sent</span></div><div class="calendar-cell"><p>10:30</p><h4>Sam</h4><span class="status">Open</span></div></div></div></div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head"><div><p class="kicker">Figma 10</p><h3>Compliance Desk</h3><p>More serious, audit-aware design for production trust and medical-office credibility.</p></div><span class="tag">Most secure</span></div>
+          <div class="screen-wrap"><div class="desktop fig-10"><section class="fig-audit-left"><p class="kicker">Secure check-in</p><h3 style="font-size:56px;line-height:1">Every update has a trail.</h3><p style="color:#d7e5df;line-height:1.7;margin-top:18px">A darker, compliance-aware interface that foregrounds permissions, confirmations, and record history.</p></section><section class="fig-audit-right"><div class="row"><strong>Maria Lewis insurance update</strong><span class="status">Logged</span></div><div class="row"><strong>Provider reviewed allergy list</strong><span class="status">Logged</span></div><div class="row"><strong>Patient submitted confirmation</strong><span class="status">Logged</span></div><div class="row"><strong>Front desk approved record</strong><span class="status">Pending</span></div><button class="button dark">Complete audit step</button></section></div></div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

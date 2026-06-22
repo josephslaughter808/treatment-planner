@@ -7,9 +7,11 @@ import {
   emptyVault,
   makeBlankAllergy,
   makeBlankCondition,
+  makeBlankConditionDetail,
   makeBlankMedication,
   readVaultFromStorage,
   writeVaultToStorage,
+  type ConditionDetail,
   type PatientVault
 } from "@/lib/patient-vault";
 
@@ -270,20 +272,73 @@ export function PatientVaultView() {
         (condition) => condition.name.toLowerCase() === name.toLowerCase()
       );
 
+      const isNoKnownConditions = name === noKnownConditionsOption;
+      const withoutConflicts = isNoKnownConditions
+        ? current.medicalConditions.filter((condition) => !questionnaireConditionOptions.includes(condition.name))
+        : current.medicalConditions.filter((condition) => condition.name !== noKnownConditionsOption);
+
       return {
         ...current,
         medicalConditions: exists
           ? current.medicalConditions.filter((condition) => condition.name.toLowerCase() !== name.toLowerCase())
           : [
-              ...current.medicalConditions,
+              ...withoutConflicts,
               {
                 id: crypto.randomUUID(),
                 name,
-                notes: ""
+                notes: "",
+                details: []
               }
             ]
       };
     });
+  }
+
+  function getQuestionnaireCondition(name: string) {
+    return vault.medicalConditions.find((condition) => condition.name.toLowerCase() === name.toLowerCase());
+  }
+
+  function addQuestionnaireConditionDetail(category: string) {
+    updateDraftVault((current) => ({
+      ...current,
+      medicalConditions: current.medicalConditions.map((condition) =>
+        condition.name === category
+          ? { ...condition, details: [...(condition.details ?? []), makeBlankConditionDetail()] }
+          : condition
+      )
+    }));
+  }
+
+  function updateQuestionnaireConditionDetail(
+    category: string,
+    detailId: string,
+    field: keyof ConditionDetail,
+    value: string | string[]
+  ) {
+    updateDraftVault((current) => ({
+      ...current,
+      medicalConditions: current.medicalConditions.map((condition) =>
+        condition.name === category
+          ? {
+              ...condition,
+              details: (condition.details ?? []).map((detail) =>
+                detail.id === detailId ? { ...detail, [field]: value } : detail
+              )
+            }
+          : condition
+      )
+    }));
+  }
+
+  function removeQuestionnaireConditionDetail(category: string, detailId: string) {
+    updateDraftVault((current) => ({
+      ...current,
+      medicalConditions: current.medicalConditions.map((condition) =>
+        condition.name === category
+          ? { ...condition, details: (condition.details ?? []).filter((detail) => detail.id !== detailId) }
+          : condition
+      )
+    }));
   }
 
   function getQuestionnaireNote(title: string) {
@@ -451,6 +506,24 @@ export function PatientVaultView() {
                   </label>
                 ))}
               </div>
+            </div>
+
+            <div className="questionnaire-detail-stack">
+              {questionnaireConditionOptions
+                .filter((option) => option !== noKnownConditionsOption && hasConditionNamed(option))
+                .map((option) => (
+                  <ConditionDetailEditor
+                    category={option}
+                    details={getQuestionnaireCondition(option)?.details ?? []}
+                    key={option}
+                    medications={vault.medications}
+                    onAdd={() => addQuestionnaireConditionDetail(option)}
+                    onRemove={(detailId) => removeQuestionnaireConditionDetail(option, detailId)}
+                    onUpdate={(detailId, field, value) =>
+                      updateQuestionnaireConditionDetail(option, detailId, field, value)
+                    }
+                  />
+                ))}
             </div>
 
             <div className="grid two-up">
@@ -650,13 +723,26 @@ export function PatientVaultView() {
             ) : (
               <div className="saved-entry-list">
                 {vault.medicalConditions.length > 0 ? (
-                  vault.medicalConditions.map((condition) => (
-                    <SavedEntry
-                      key={condition.id}
-                      title={condition.name}
-                      subtitle={getConditionDisplayNote(condition.notes)}
-                    />
-                  ))
+                  vault.medicalConditions.flatMap((condition) => {
+                    const detailedConditions = (condition.details ?? []).filter((detail) => detail.name.trim());
+                    if (detailedConditions.length === 0) {
+                      return [
+                        <SavedEntry
+                          key={condition.id}
+                          title={condition.name}
+                          subtitle={getConditionDisplayNote(condition.notes)}
+                        />
+                      ];
+                    }
+
+                    return detailedConditions.map((detail) => (
+                      <SavedEntry
+                        key={detail.id}
+                        title={detail.name}
+                        subtitle={formatConditionDetailSummary(condition.name, detail, vault)}
+                      />
+                    ));
+                  })
                 ) : (
                   <EmptySavedState text="No conditions saved." />
                 )}
@@ -1091,6 +1177,158 @@ function EmptySavedState({ text }: { text: string }) {
   return <p className="saved-empty-state">{text}</p>;
 }
 
+function ConditionDetailEditor({
+  category,
+  details,
+  medications,
+  onAdd,
+  onRemove,
+  onUpdate
+}: {
+  category: string;
+  details: ConditionDetail[];
+  medications: PatientVault["medications"];
+  onAdd: () => void;
+  onRemove: (detailId: string) => void;
+  onUpdate: (detailId: string, field: keyof ConditionDetail, value: string | string[]) => void;
+}) {
+  return (
+    <section className="questionnaire-detail-panel">
+      <div className="questionnaire-detail-heading">
+        <div>
+          <p className="mini-label">Selected category</p>
+          <h3>{category}</h3>
+          <p>Add each diagnosis or event separately. Use the most specific name you know.</p>
+        </div>
+        <button className="secondary-button" onClick={onAdd} type="button">
+          Add specific diagnosis
+        </button>
+      </div>
+
+      {details.length > 0 ? (
+        <div className="condition-detail-editor-list">
+          {details.map((detail, index) => (
+            <article className="condition-detail-editor" key={detail.id}>
+              <div className="condition-detail-editor-title">
+                <strong>{detail.name || `Specific diagnosis ${index + 1}`}</strong>
+                <button className="edit-chip" onClick={() => onRemove(detail.id)} type="button">
+                  Remove
+                </button>
+              </div>
+
+              <div className="condition-detail-form-grid">
+                <label className="condition-detail-name-field">
+                  Exact diagnosis or event
+                  <input
+                    onChange={(event) => onUpdate(detail.id, "name", event.target.value)}
+                    placeholder="Example: Heart attack (myocardial infarction)"
+                    value={detail.name}
+                  />
+                </label>
+                <label>
+                  Diagnosed date or year
+                  <input
+                    onChange={(event) => onUpdate(detail.id, "diagnosedAt", event.target.value)}
+                    placeholder="2020 or 2020-06-14"
+                    value={detail.diagnosedAt}
+                  />
+                </label>
+                <label>
+                  Current status
+                  <select
+                    onChange={(event) => onUpdate(detail.id, "status", event.target.value)}
+                    value={detail.status}
+                  >
+                    <option value="active">Active or under treatment</option>
+                    <option value="managed">Managed or monitored</option>
+                    <option value="resolved">Resolved or past history</option>
+                    <option value="uncertain">Uncertain or being evaluated</option>
+                  </select>
+                </label>
+                <label>
+                  Diagnosed by
+                  <input
+                    onChange={(event) => onUpdate(detail.id, "diagnosedBy", event.target.value)}
+                    placeholder="Doctor, hospital, or office"
+                    value={detail.diagnosedBy}
+                  />
+                </label>
+                <label>
+                  Treating or monitoring provider
+                  <input
+                    onChange={(event) => onUpdate(detail.id, "treatingProvider", event.target.value)}
+                    placeholder="Example: Dr. Smith, cardiology"
+                    value={detail.treatingProvider}
+                  />
+                </label>
+                <label className="condition-detail-wide-field">
+                  Treatment, procedure, or monitoring
+                  <textarea
+                    onChange={(event) => onUpdate(detail.id, "treatmentSummary", event.target.value)}
+                    placeholder="Example: Stent placed; cardiology follow-up every six months"
+                    value={detail.treatmentSummary}
+                  />
+                </label>
+              </div>
+
+              <fieldset className="condition-medication-links">
+                <legend>Medications connected to this condition</legend>
+                {medications.length > 0 ? (
+                  <div className="condition-medication-grid">
+                    {medications.map((medication) => {
+                      const checked = detail.relatedMedicationIds.includes(medication.id);
+                      return (
+                        <label key={medication.id}>
+                          <input
+                            checked={checked}
+                            onChange={() =>
+                              onUpdate(
+                                detail.id,
+                                "relatedMedicationIds",
+                                checked
+                                  ? detail.relatedMedicationIds.filter((id) => id !== medication.id)
+                                  : [...detail.relatedMedicationIds, medication.id]
+                              )
+                            }
+                            type="checkbox"
+                          />
+                          <span>
+                            <strong>{medication.name || "Unnamed medication"}</strong>
+                            <small>{[medication.dose, medication.frequency].filter(Boolean).join(" · ")}</small>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="field-help">Add medications in the Current Medications section, then return here to connect them.</p>
+                )}
+              </fieldset>
+
+              <label className="condition-detail-notes-field">
+                Additional details or corrections
+                <textarea
+                  onChange={(event) => onUpdate(detail.id, "notes", event.target.value)}
+                  placeholder="Symptoms, complications, uncertainty, record corrections, or anything else a provider should know"
+                  value={detail.notes}
+                />
+              </label>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="condition-detail-prompt">
+          <strong>What specifically happened?</strong>
+          <p>This category is selected, but no exact diagnosis, date, treatment, or medication connection has been added yet.</p>
+          <button className="primary-button" onClick={onAdd} type="button">
+            Add the first specific diagnosis
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function SurgeryHistoryEditor({
   entries,
   onAdd,
@@ -1144,6 +1382,20 @@ function SurgeryHistoryEditor({
 
 function getConditionDisplayNote(notes: string) {
   return notes.trim().toLowerCase() === "selected in medical questionnaire." ? "" : notes;
+}
+
+function formatConditionDetailSummary(category: string, detail: ConditionDetail, vault: PatientVault) {
+  const linkedMedications = vault.medications
+    .filter((medication) => detail.relatedMedicationIds.includes(medication.id))
+    .map((medication) => medication.name)
+    .filter(Boolean);
+  const status = detail.status === "resolved" ? "Past or resolved" : detail.status === "active" ? "Active" : detail.status === "uncertain" ? "Being evaluated" : "Managed";
+  return [
+    category,
+    detail.diagnosedAt ? `Diagnosed ${detail.diagnosedAt}` : "",
+    status,
+    linkedMedications.length ? `Medications: ${linkedMedications.join(", ")}` : ""
+  ].filter(Boolean).join(" • ");
 }
 
 function getPatientCompletionItems(vault: PatientVault): {
@@ -1245,6 +1497,8 @@ const questionnaireConditionOptions = [
   "Hospitalization or ER visit in the last year",
   "Specialist care or ongoing medical monitoring"
 ];
+
+const noKnownConditionsOption = questionnaireConditionOptions[0];
 
 const surgeryHistoryTitle = "Surgery / hospitalization history";
 const pregnancyStatusTitle = "Pregnancy or nursing status";
@@ -1348,7 +1602,29 @@ function sanitizeVault(vault: PatientVault): PatientVault {
       .map((condition) => ({
         ...condition,
         name: condition.name.trim(),
-        notes: condition.notes.trim()
+        notes: condition.notes.trim(),
+        details: (condition.details ?? [])
+          .map((detail) => ({
+            ...detail,
+            name: detail.name.trim(),
+            diagnosedAt: detail.diagnosedAt.trim(),
+            diagnosedBy: detail.diagnosedBy.trim(),
+            treatingProvider: detail.treatingProvider.trim(),
+            treatmentSummary: detail.treatmentSummary.trim(),
+            notes: detail.notes.trim(),
+            relatedMedicationIds: Array.from(new Set(detail.relatedMedicationIds))
+          }))
+          .filter((detail) =>
+            Boolean(
+              detail.name ||
+              detail.diagnosedAt ||
+              detail.diagnosedBy ||
+              detail.treatingProvider ||
+              detail.treatmentSummary ||
+              detail.notes ||
+              detail.relatedMedicationIds.length
+            )
+          )
       }))
       .filter((condition) => condition.name || condition.notes),
     medications: vault.medications
@@ -1398,8 +1674,10 @@ function mergeVaults(baseVault: PatientVault, preferredVault: PatientVault): Pat
   return {
     ...baseVault,
     ...preferredVault,
-    medicalConditions: mergeByKey(baseVault.medicalConditions, preferredVault.medicalConditions, (condition) =>
-      `${condition.name.trim().toLowerCase()}::${condition.notes.trim().toLowerCase()}`
+    medicalConditions: mergeByKey(
+      baseVault.medicalConditions,
+      preferredVault.medicalConditions,
+      (condition) => condition.id || `${condition.name.trim().toLowerCase()}::${condition.notes.trim().toLowerCase()}`
     ),
     medications: mergeByKey(baseVault.medications, preferredVault.medications, (medication) =>
       `${medication.name.trim().toLowerCase()}::${medication.dose.trim().toLowerCase()}::${medication.frequency.trim().toLowerCase()}`

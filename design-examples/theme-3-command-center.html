@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Theme 3 Command Center</title>
+    <style>
+      :root {
+        --bg: #0f1417;
+        --panel: #161d21;
+        --panel-2: #1b2428;
+        --panel-3: #202c31;
+        --line: rgba(188, 222, 210, 0.12);
+        --text: #edf4f0;
+        --muted: #9fb1aa;
+        --green: #49c0a0;
+        --green-2: #2e7f6c;
+        --aqua: #77d6eb;
+        --gold: #d5b46d;
+        --pink: #d788b5;
+        --shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(73, 192, 160, 0.16), transparent 24%),
+          radial-gradient(circle at top right, rgba(119, 214, 235, 0.14), transparent 20%),
+          linear-gradient(180deg, #0d1215 0%, #131a1e 100%);
+      }
+
+      .page {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 36px 20px 84px;
+      }
+
+      .hero {
+        padding: 36px;
+        border: 1px solid var(--line);
+        background:
+          radial-gradient(circle at top left, rgba(73, 192, 160, 0.12), transparent 28%),
+          linear-gradient(135deg, rgba(29, 40, 45, 0.98), rgba(17, 22, 25, 0.98));
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--green);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 400;
+      }
+
+      h1 {
+        font-size: clamp(2.7rem, 5vw, 5.2rem);
+        line-height: 0.94;
+      }
+
+      .hero p {
+        max-width: 930px;
+        margin: 16px 0 0;
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 1.05rem;
+      }
+
+      .grid {
+        display: grid;
+        gap: 26px;
+        margin-top: 28px;
+      }
+
+      .concept {
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(24, 31, 35, 0.98), rgba(15, 20, 23, 0.98));
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .concept-head {
+        padding: 28px;
+        border-bottom: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(31, 42, 47, 0.9), rgba(22, 28, 32, 0.82));
+      }
+
+      .concept-head h2 {
+        font-size: clamp(2rem, 3vw, 3rem);
+        line-height: 1;
+      }
+
+      .concept-head p {
+        max-width: 800px;
+        margin: 12px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .chips {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      .chip {
+        padding: 8px 12px;
+        border: 1px solid rgba(119, 214, 235, 0.16);
+        background: rgba(119, 214, 235, 0.08);
+        color: var(--aqua);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      .body {
+        padding: 22px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .preview {
+        border: 1px solid var(--line);
+        background: #101619;
+        min-height: 540px;
+      }
+
+      .bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        color: #8fa39c;
+        background: rgba(26, 35, 39, 0.96);
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .dots {
+        display: flex;
+        gap: 7px;
+      }
+
+      .dots span {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.4;
+      }
+
+      .caption {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .layout-1 .content {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 490px;
+      }
+
+      .layout-1 .side {
+        padding: 18px;
+        border-right: 1px solid var(--line);
+        background: linear-gradient(180deg, #182126, #131a1e);
+      }
+
+      .layout-1 .main {
+        padding: 20px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .search {
+        padding: 0 0 10px;
+        border-bottom: 1px solid rgba(152, 179, 169, 0.18);
+        color: #93a7a0;
+        font-weight: 600;
+      }
+
+      .patients,
+      .mini-stack,
+      .events,
+      .trend-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .patient,
+      .mini,
+      .event,
+      .trend,
+      .stat,
+      .hero-panel,
+      .spotlight,
+      .tile,
+      .feed-card {
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(31, 43, 47, 0.94), rgba(20, 27, 31, 0.94));
+      }
+
+      .patient,
+      .mini,
+      .event,
+      .trend,
+      .tile,
+      .feed-card {
+        padding: 14px;
+      }
+
+      .patient strong,
+      .mini strong,
+      .event strong,
+      .trend strong,
+      .tile strong,
+      .feed-card strong,
+      .stat strong {
+        display: block;
+      }
+
+      .patient span,
+      .mini span,
+      .event span,
+      .trend span,
+      .tile span,
+      .feed-card span,
+      .stat p,
+      .hero-panel p,
+      .spotlight p {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: 0.93rem;
+      }
+
+      .main-top {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      .stat {
+        padding: 16px;
+      }
+
+      .stat strong {
+        font-size: 1.8rem;
+      }
+
+      .stat.green { box-shadow: inset 0 3px 0 var(--green); }
+      .stat.aqua { box-shadow: inset 0 3px 0 var(--aqua); }
+      .stat.gold { box-shadow: inset 0 3px 0 var(--gold); }
+      .stat.pink { box-shadow: inset 0 3px 0 var(--pink); }
+
+      .hero-panel {
+        padding: 22px;
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 14px;
+      }
+
+      .hero-panel h3 {
+        font-size: 2.2rem;
+        line-height: 1.02;
+      }
+
+      .visual {
+        min-height: 180px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        color: #91a59f;
+        background:
+          radial-gradient(circle at top right, rgba(73, 192, 160, 0.18), transparent 36%),
+          linear-gradient(135deg, #203039, #162128);
+        border: 1px solid var(--line);
+      }
+
+      .layout-2 .content {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 16px;
+        min-height: 490px;
+      }
+
+      .layout-2 .left,
+      .layout-2 .right,
+      .layout-4 .left,
+      .layout-4 .right,
+      .layout-5 .left,
+      .layout-5 .right {
+        display: grid;
+        gap: 14px;
+      }
+
+      .spotlight {
+        padding: 20px;
+        min-height: 180px;
+      }
+
+      .spotlight h3 {
+        font-size: 2rem;
+        line-height: 1.04;
+      }
+
+      .triple {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .layout-3 .content {
+        min-height: 490px;
+        padding: 20px;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 16px;
+      }
+
+      .headline {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 14px;
+      }
+
+      .headline-copy {
+        padding: 18px 0;
+      }
+
+      .headline-copy h3 {
+        font-size: 2.3rem;
+        line-height: 1;
+      }
+
+      .side-tower {
+        display: grid;
+        gap: 12px;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 14px;
+      }
+
+      .dashboard-grid .board,
+      .dashboard-grid .tower {
+        display: grid;
+        gap: 12px;
+      }
+
+      .wide-strip {
+        padding: 18px;
+      }
+
+      .layout-4 .content {
+        min-height: 490px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 16px;
+      }
+
+      .chart-card {
+        padding: 18px;
+        border: 1px solid var(--line);
+        background: linear-gradient(180deg, rgba(28, 39, 44, 0.95), rgba(18, 24, 28, 0.95));
+      }
+
+      .bars {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: 90px 1fr 44px;
+        gap: 10px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .bar-fill {
+        height: 10px;
+        background: linear-gradient(90deg, var(--green), var(--aqua));
+      }
+
+      .layout-5 .content {
+        min-height: 490px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 16px;
+      }
+
+      .feed {
+        display: grid;
+        gap: 12px;
+      }
+
+      .feed-card {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .feed-graphic {
+        min-height: 96px;
+        background:
+          radial-gradient(circle at top left, rgba(119,214,235,0.2), transparent 34%),
+          linear-gradient(135deg, #20323a, #162028);
+        border: 1px solid var(--line);
+      }
+
+      .layout-6 .content {
+        min-height: 490px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 16px;
+      }
+
+      .mosaic {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .mosaic .tile.large {
+        grid-column: span 2;
+        min-height: 180px;
+      }
+
+      .mosaic .tile.tall {
+        grid-row: span 2;
+      }
+
+      .rail-stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .notes strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .notes ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .notes li {
+        margin: 6px 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      @media (max-width: 1040px) {
+        .layout-1 .content,
+        .layout-2 .content,
+        .layout-3 .headline,
+        .layout-3 .dashboard-grid,
+        .layout-4 .content,
+        .layout-5 .content,
+        .layout-6 .content,
+        .hero-panel,
+        .main-top,
+        .triple,
+        .mosaic {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Theme 3 Dashboard Lab</p>
+        <h1>Modern Evidence, but sleeker, sharper, and more command-center driven.</h1>
+        <p>
+          These directions keep the stats, daily patients, and desktop-first energy you liked in the original Theme 3. The focus here is a more premium provider dashboard language: modern, slightly flashy, and much more intentional than generic rounded info bubbles.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="concept">
+          <div class="concept-head">
+            <p class="eyebrow">Direction 1</p>
+            <h2>Precision Desk</h2>
+            <p>A sleek desktop workspace with a patient queue on the left and a stat-led command view on the right. Feels sharp, expensive, and very software-native.</p>
+            <div class="chips">
+              <span class="chip">clean command center</span>
+              <span class="chip">strong stats</span>
+              <span class="chip">best overall balance</span>
+            </div>
+          </div>
+          <div class="body">
+            <section class="preview layout-1">
+              <div class="bar"><div class="dots"><span></span><span></span><span></span></div><div>Precision Desk</div></div>
+              <div class="content">
+                <aside class="side">
+                  <div class="search">Search daily patients</div>
+                  <div class="patients" style="margin-top:16px">
+                    <div class="patient"><strong>Sarah Mitchell</strong><span>Root canal discussion • 9:00 AM</span></div>
+                    <div class="patient"><strong>Darren Cole</strong><span>Apical abscess follow-up • 10:15 AM</span></div>
+                    <div class="patient"><strong>Emily Tran</strong><span>Bridge consultation • 11:30 AM</span></div>
+                    <div class="patient"><strong>Alex Rivera</strong><span>Cracked tooth review • 1:10 PM</span></div>
+                  </div>
+                </aside>
+                <div class="main">
+                  <div class="main-top">
+                    <div class="stat green"><strong>14</strong><p>Patients on deck</p></div>
+                    <div class="stat aqua"><strong>9</strong><p>Education pages sent</p></div>
+                    <div class="stat gold"><strong>82%</strong><p>Opened before visit</p></div>
+                    <div class="stat pink"><strong>6</strong><p>Pages customized today</p></div>
+                  </div>
+                  <div class="hero-panel">
+                    <div>
+                      <p class="eyebrow">Today's Focus</p>
+                      <h3>The provider side feels more like a premium clinical cockpit.</h3>
+                      <p>Strong stats, quick patient scanning, and a controlled visual hierarchy that still feels polished instead of sterile.</p>
+                    </div>
+                    <div class="visual">activity visualization or treatment page preview</div>
+                  </div>
+                  <div class="mini-stack">
+                    <div class="mini"><strong>Most-used treatment page</strong><span>Root canal therapy handout is outperforming all other pages this week.</span></div>
+                    <div class="mini"><strong>Patient readiness</strong><span>4 patients opened treatment education before their consultation started.</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <div class="caption">This is the strongest “modern and new” version without losing clarity. It feels expensive and practical at the same time.</div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <p class="eyebrow">Direction 2</p>
+            <h2>Signal Board</h2>
+            <p>More dramatic stats, more contrast, and a bolder “what matters today” dashboard language. Slightly flashier than Direction 1.</p>
+            <div class="chips">
+              <span class="chip">louder stats</span>
+              <span class="chip">executive energy</span>
+              <span class="chip">slightly flashy</span>
+            </div>
+          </div>
+          <div class="body">
+            <section class="preview layout-2">
+              <div class="bar"><div class="dots"><span></span><span></span><span></span></div><div>Signal Board</div></div>
+              <div class="content">
+                <div class="left">
+                  <div class="spotlight">
+                    <p class="eyebrow">Today At A Glance</p>
+                    <h3>Everything important is loud, visible, and immediately useful.</h3>
+                    <p>This one puts real energy into the numbers and the patient queue without becoming messy.</p>
+                  </div>
+                  <div class="triple">
+                    <div class="stat green"><strong>27</strong><p>Patients this week</p></div>
+                    <div class="stat aqua"><strong>11</strong><p>Treatment packages sent</p></div>
+                    <div class="stat gold"><strong>91%</strong><p>Viewed on mobile</p></div>
+                  </div>
+                  <div class="events">
+                    <div class="event"><strong>9:30 AM</strong><span>Sarah Mitchell ready for root canal conversation</span></div>
+                    <div class="event"><strong>10:00 AM</strong><span>Dr. Lee updated two diagnosis pages for cracked tooth cases</span></div>
+                    <div class="event"><strong>11:40 AM</strong><span>Three patients watched the treatment video before arrival</span></div>
+                  </div>
+                </div>
+                <div class="right">
+                  <div class="patients">
+                    <div class="patient"><strong>Current queue</strong><span>Daily patients should feel like a live feed, not a bland list.</span></div>
+                    <div class="patient"><strong>Emily Tran</strong><span>Bridge consult • opened materials</span></div>
+                    <div class="patient"><strong>Jordan Ross</strong><span>Endo review • waiting on provider</span></div>
+                    <div class="patient"><strong>Maria West</strong><span>Extraction follow-up • aftercare viewed</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <div class="caption">This is a stronger statement piece. Good if you want the product to feel impressive the second a provider logs in.</div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <p class="eyebrow">Direction 3</p>
+            <h2>Live Performance</h2>
+            <p>A dashboard that mixes patient queue, utilization stats, and performance signals together. Feels more like a real-time operational tool.</p>
+            <div class="chips">
+              <span class="chip">live office energy</span>
+              <span class="chip">performance-first</span>
+              <span class="chip">modern healthcare ops</span>
+            </div>
+          </div>
+          <div class="body">
+            <section class="preview layout-3">
+              <div class="bar"><div class="dots"><span></span><span></span><span></span></div><div>Live Performance</div></div>
+              <div class="content">
+                <div class="headline">
+                  <div class="headline-copy">
+                    <p class="eyebrow">Office Pulse</p>
+                    <h3>Stats and daily patients are blended into one active system.</h3>
+                    <p style="margin-top:14px; color:var(--muted); line-height:1.72;">This direction feels very current and capable, with a little more intensity than the calmer options.</p>
+                  </div>
+                  <div class="side-tower">
+                    <div class="stat green"><strong>63</strong><p>Pages viewed this month</p></div>
+                    <div class="stat aqua"><strong>4.8</strong><p>Avg minutes spent per page</p></div>
+                  </div>
+                </div>
+                <div class="dashboard-grid">
+                  <div class="board">
+                    <div class="wide-strip"><strong>Daily patients</strong><span style="display:block; margin-top:8px; color:var(--muted)">A cleaner hybrid between a live queue and a relationship-focused patient list.</span></div>
+                    <div class="feed-card"><div class="feed-graphic"></div><div><strong>Sarah Mitchell</strong><span>Root canal therapy opened • treatment preview personalized</span></div></div>
+                    <div class="feed-card"><div class="feed-graphic"></div><div><strong>Darren Cole</strong><span>Abscess page watched • needs provider follow-up</span></div></div>
+                  </div>
+                  <div class="tower">
+                    <div class="trend"><strong>Top treatment today</strong><span>Root canal therapy pages have the highest completion rate.</span></div>
+                    <div class="trend"><strong>Most active provider</strong><span>Dr. Lee customized 5 patient education pages this week.</span></div>
+                    <div class="trend"><strong>Readiness signal</strong><span>Patients who watched a video asked fewer repetitive questions.</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <div class="caption">This one is slightly more “healthcare software platform” than “beautiful handout product,” but it has a lot of energy and credibility.</div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <p class="eyebrow">Direction 4</p>
+            <h2>Analyst Lounge</h2>
+            <p>Stats become a more visual part of the experience, with charts and trend bars alongside the daily queue. Sleek, measured, and a little more elite.</p>
+            <div class="chips">
+              <span class="chip">trend graphics</span>
+              <span class="chip">quiet prestige</span>
+              <span class="chip">data-rich</span>
+            </div>
+          </div>
+          <div class="body">
+            <section class="preview layout-4">
+              <div class="bar"><div class="dots"><span></span><span></span><span></span></div><div>Analyst Lounge</div></div>
+              <div class="content">
+                <div class="left">
+                  <div class="chart-card">
+                    <p class="eyebrow">Patient Education Trends</p>
+                    <h3 style="font-size:2rem;">The stats look more designed and less generic.</h3>
+                    <div class="bars">
+                      <div class="bar-row"><span>Open rate</span><div class="bar-fill" style="width:88%"></div><span>88%</span></div>
+                      <div class="bar-row"><span>Video plays</span><div class="bar-fill" style="width:72%"></div><span>72%</span></div>
+                      <div class="bar-row"><span>Page edits</span><div class="bar-fill" style="width:46%"></div><span>46%</span></div>
+                    </div>
+                  </div>
+                  <div class="stat gold"><strong>18</strong><p>Patients reviewed their materials before check-in today.</p></div>
+                </div>
+                <div class="right">
+                  <div class="patients">
+                    <div class="patient"><strong>Daily patient queue</strong><span>The list feels elevated and purposeful.</span></div>
+                    <div class="patient"><strong>Sarah Mitchell</strong><span>Viewed diagnosis + treatment pages</span></div>
+                    <div class="patient"><strong>James Carter</strong><span>Needs new extraction aftercare package</span></div>
+                    <div class="patient"><strong>Angela Kim</strong><span>Pending provider note on RCT follow-up</span></div>
+                  </div>
+                  <div class="mini-stack">
+                    <div class="mini"><strong>Best performing page</strong><span>Cracked tooth education page kept patients engaged for 6.2 minutes.</span></div>
+                    <div class="mini"><strong>Office trend</strong><span>Customized pages are being opened more often than defaults.</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <div class="caption">This is strong if you want the product to feel polished, intelligent, and slightly luxurious without going overboard.</div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <p class="eyebrow">Direction 5</p>
+            <h2>Patient Flow Feed</h2>
+            <p>Leans into the daily patient stream and makes it feel alive. Less static dashboard, more fast-moving provider feed with stats above it.</p>
+            <div class="chips">
+              <span class="chip">daily patients first</span>
+              <span class="chip">activity feed</span>
+              <span class="chip">high movement feel</span>
+            </div>
+          </div>
+          <div class="body">
+            <section class="preview layout-5">
+              <div class="bar"><div class="dots"><span></span><span></span><span></span></div><div>Patient Flow Feed</div></div>
+              <div class="content">
+                <div class="left">
+                  <div class="main-top">
+                    <div class="stat green"><strong>8</strong><p>Patients today</p></div>
+                    <div class="stat aqua"><strong>5</strong><p>Materials sent</p></div>
+                    <div class="stat pink"><strong>3</strong><p>Pages edited</p></div>
+                    <div class="stat gold"><strong>76%</strong><p>Viewed before visit</p></div>
+                  </div>
+                  <div class="feed">
+                    <div class="feed-card"><div class="feed-graphic"></div><div><strong>Sarah Mitchell entered chart review</strong><span>Diagnosis page opened 14 minutes before appointment.</span></div></div>
+                    <div class="feed-card"><div class="feed-graphic"></div><div><strong>Emily Tran received custom bridge handout</strong><span>Office-specific copy saved as default for her treatment package.</span></div></div>
+                    <div class="feed-card"><div class="feed-graphic"></div><div><strong>Darren Cole watched post-op video</strong><span>Video completion recorded in provider dashboard.</span></div></div>
+                  </div>
+                </div>
+                <div class="right">
+                  <div class="spotlight">
+                    <p class="eyebrow">What Providers Notice</p>
+                    <h3>Daily patients become the star of the interface.</h3>
+                    <p>The stats support the activity instead of dominating it. This feels faster and more alive.</p>
+                  </div>
+                  <div class="trend-list">
+                    <div class="trend"><strong>Most viewed media</strong><span>Root canal explainer video</span></div>
+                    <div class="trend"><strong>Patient readiness</strong><span>4 patients arrived already understanding the plan</span></div>
+                    <div class="trend"><strong>Page improvement</strong><span>Custom FAQs lifted time-on-page by 22%</span></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <div class="caption">This one is great if the provider home screen should feel dynamic and operational instead of static and report-like.</div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <p class="eyebrow">Direction 6</p>
+            <h2>Glass Signal</h2>
+            <p>A sleeker, slightly flashier version with more layered panels, glow, and depth. It is still clinical, but more visually daring.</p>
+            <div class="chips">
+              <span class="chip">sleekest</span>
+              <span class="chip">a little flashy</span>
+              <span class="chip">premium wow factor</span>
+            </div>
+          </div>
+          <div class="body">
+            <section class="preview layout-6">
+              <div class="bar"><div class="dots"><span></span><span></span><span></span></div><div>Glass Signal</div></div>
+              <div class="content">
+                <div class="mosaic">
+                  <div class="tile large"><strong>Today’s clinical signal</strong><span>Big headline panel with motion or glow-driven chart energy.</span></div>
+                  <div class="tile tall"><strong>Queue</strong><span>Sarah Mitchell</span><span>Darren Cole</span><span>Emily Tran</span></div>
+                  <div class="tile"><strong>88%</strong><span>open rate</span></div>
+                  <div class="tile"><strong>11</strong><span>pages sent</span></div>
+                  <div class="tile large"><strong>Provider highlight</strong><span>Daily patients and stats are both premium surfaces, not generic cards.</span></div>
+                </div>
+                <div class="rail-stack">
+                  <div class="spotlight">
+                    <p class="eyebrow">Why It Works</p>
+                    <h3>Feels new and polished the second it opens.</h3>
+                    <p>If you want the program to feel like a premium modern platform with more visual swagger, this is the boldest direction.</p>
+                  </div>
+                  <div class="trend"><strong>Tradeoff</strong><span>This needs discipline so it stays elegant and does not become overdesigned.</span></div>
+                </div>
+              </div>
+            </section>
+            <div class="caption">This is the flashiest option. If you want sleek and slightly showy, this is the one to look at closely.</div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

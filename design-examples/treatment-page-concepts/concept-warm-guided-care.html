@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Concept 2 - Warm Guided Care</title>
+    <style>
+      :root {
+        --cream: #f9f4ec;
+        --clay: #d8c4ab;
+        --ink: #2f261f;
+        --muted: #6d6154;
+        --rose: #b07a69;
+        --sage: #627268;
+        --card: rgba(255, 250, 244, 0.88);
+        --line: rgba(95, 71, 48, 0.13);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top center, rgba(255,255,255,0.62), transparent 28%),
+          linear-gradient(180deg, #f6ecdf 0%, #efdfcd 100%);
+        padding: 34px 18px 70px;
+      }
+
+      .page {
+        max-width: 1020px;
+        margin: 0 auto;
+        display: grid;
+        gap: 18px;
+      }
+
+      .hero,
+      .panel,
+      .faq article,
+      .closing {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        box-shadow: 0 24px 60px rgba(82, 58, 36, 0.1);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 22px;
+        padding: 30px;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--sage);
+        font: 700 0.8rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.3rem, 4.8vw, 4rem);
+        line-height: 1.02;
+      }
+
+      h2 {
+        margin: 6px 0 12px;
+        font-size: 1.95rem;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+        font: 500 1rem/1.76 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .hero-visual {
+        display: grid;
+        gap: 14px;
+      }
+
+      .visual,
+      .media-row div {
+        border-radius: 24px;
+        border: 1px solid var(--line);
+        background: linear-gradient(135deg, #e7d7c4, #d4c0a6);
+        min-height: 180px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 20px;
+        color: #66594f;
+        font: 700 0.94rem/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .summary article,
+      .timeline-step {
+        border-radius: 24px;
+        padding: 18px;
+        background: rgba(255,255,255,0.6);
+        border: 1px solid var(--line);
+      }
+
+      .summary strong,
+      .timeline-step strong {
+        display: block;
+        margin-bottom: 10px;
+        font: 700 0.84rem/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--rose);
+      }
+
+      .panel {
+        padding: 26px 30px;
+      }
+
+      .media-row {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 1fr 1fr;
+        margin-top: 16px;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .faq {
+        display: grid;
+        gap: 12px;
+      }
+
+      .faq article {
+        padding: 18px 20px;
+      }
+
+      .faq h3 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+      }
+
+      .closing {
+        padding: 26px 30px;
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 18px;
+      }
+
+      @media (max-width: 820px) {
+        .hero,
+        .summary,
+        .media-row,
+        .timeline,
+        .closing {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Guided Treatment Page</p>
+          <h1>This version feels softer, warmer, and more personal without losing clarity.</h1>
+          <p>
+            If the goal is for the patient to feel cared for and guided, this direction works well. It still explains treatment carefully, but the emotional tone is gentler and a little more boutique.
+          </p>
+        </div>
+        <div class="hero-visual">
+          <div class="visual">Hero video, patient-friendly diagram, or calm office explainer visual</div>
+          <div class="summary">
+            <article>
+              <strong>Understand</strong>
+              <p>Simple explanation of the treatment.</p>
+            </article>
+            <article>
+              <strong>Prepare</strong>
+              <p>Clear expectations before the visit.</p>
+            </article>
+            <article>
+              <strong>Recover</strong>
+              <p>Practical aftercare and next steps.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">Why This Feels Different</p>
+        <h2>It explains treatment like a trusted guide instead of a technical brochure.</h2>
+        <p>
+          This concept uses warmer color, more breathing room, and a more caring visual tone. It is still structured, but it feels less formal than the first concept.
+        </p>
+        <div class="media-row">
+          <div>Before-and-after style image block</div>
+          <div>Short explainer animation or annotated diagram</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">Treatment Journey</p>
+        <h2>The care path still needs structure, even when the page feels softer.</h2>
+        <div class="timeline">
+          <article class="timeline-step">
+            <strong>Before</strong>
+            <p>What the patient should understand before treatment begins.</p>
+          </article>
+          <article class="timeline-step">
+            <strong>During</strong>
+            <p>What the visit feels like, what happens, and how comfort is managed.</p>
+          </article>
+          <article class="timeline-step">
+            <strong>After</strong>
+            <p>What healing, soreness, and follow-up usually look like.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="faq">
+        <article>
+          <h3>What patients feel from this design</h3>
+          <p>It feels less intimidating and slightly more human, while still giving legitimate medical information.</p>
+        </article>
+        <article>
+          <h3>Where this concept is strongest</h3>
+          <p>It would work really well for offices that want a more elevated and relationship-driven patient experience.</p>
+        </article>
+      </section>
+
+      <section class="closing">
+        <div>
+          <p class="eyebrow">Overall Feel</p>
+          <h2>High-end guided care.</h2>
+        </div>
+        <p>
+          This one is probably best if you want the page to feel luxurious and reassuring, but not cold. It is more emotional than the first concept and less modern-tech than the third.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

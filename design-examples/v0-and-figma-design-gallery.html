@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearPath Care: v0 and Figma Design Gallery</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --ink: #151b18;
+        --muted: #60706a;
+        --line: rgba(21, 27, 24, 0.13);
+        --paper: #f7f6f0;
+        --teal: #0d766f;
+        --mint: #9fd9c8;
+        --blue: #2f66d0;
+        --coral: #ee8067;
+        --gold: #d5a843;
+        --violet: #5b5bd6;
+      }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(135deg, rgba(159, 217, 200, 0.28), transparent 28%),
+          linear-gradient(235deg, rgba(238, 128, 103, 0.18), transparent 30%),
+          #f2f4ef;
+        color: var(--ink);
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+      }
+
+      .page {
+        width: min(1560px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 36px 0 80px;
+      }
+
+      .hero {
+        min-height: 360px;
+        padding: 38px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 32px;
+        align-items: end;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .kicker {
+        margin: 0 0 10px;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 900px;
+        font-size: clamp(48px, 7vw, 108px);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      .hero p {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.72;
+      }
+
+      .section-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: end;
+        margin: 42px 0 20px;
+      }
+
+      .section-title h2 {
+        font-size: clamp(30px, 4vw, 54px);
+      }
+
+      .section-title p {
+        max-width: 620px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 26px;
+      }
+
+      .concept {
+        border: 1px solid rgba(21, 27, 24, 0.12);
+        border-radius: 18px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.76);
+        box-shadow: 0 24px 72px rgba(21, 27, 24, 0.1);
+      }
+
+      .concept.wide {
+        grid-column: span 2;
+      }
+
+      .concept-head {
+        padding: 23px 24px 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .concept-head h3 {
+        margin-top: 5px;
+        font-size: 25px;
+      }
+
+      .concept-head p {
+        margin-top: 8px;
+        max-width: 700px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .tag {
+        align-self: start;
+        white-space: nowrap;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 11px;
+        font-size: 12px;
+        font-weight: 850;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .screen {
+        min-height: 520px;
+        padding: 24px;
+      }
+
+      .mini-browser {
+        min-height: 468px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(21, 27, 24, 0.15);
+        background: #fff;
+      }
+
+      .button {
+        border: 0;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-weight: 850;
+        background: var(--mint);
+        color: #06110e;
+      }
+
+      .ghost {
+        border: 1px solid rgba(21, 27, 24, 0.14);
+        background: rgba(255, 255, 255, 0.68);
+      }
+
+      .metric {
+        padding: 14px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 9px;
+        font-size: 31px;
+      }
+
+      .bars {
+        display: flex;
+        gap: 9px;
+        align-items: end;
+        height: 150px;
+      }
+
+      .bars span {
+        flex: 1;
+        min-width: 9px;
+        border-radius: 5px 5px 0 0;
+        background: linear-gradient(180deg, var(--coral), var(--teal));
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 13px 0;
+        border-bottom: 1px solid rgba(21, 27, 24, 0.09);
+      }
+
+      .status {
+        width: fit-content;
+        padding: 5px 8px;
+        border-radius: 6px;
+        background: #e1f5ee;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 850;
+      }
+
+      .v0-command {
+        display: grid;
+        grid-template-columns: 76px 1fr 310px;
+        min-height: 468px;
+        background: #0c1714;
+        color: #f2fff9;
+      }
+
+      .rail {
+        padding: 18px 13px;
+        background: #06100e;
+      }
+
+      .mark {
+        width: 38px;
+        height: 38px;
+        margin: 0 auto 18px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--mint), #ffe7a0);
+      }
+
+      .rail div:not(.mark) {
+        width: 38px;
+        height: 38px;
+        margin: 10px auto;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .command-main {
+        padding: 26px;
+      }
+
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .search {
+        margin: 23px 0;
+        padding: 15px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .photo-panel {
+        padding: 22px;
+        background:
+          linear-gradient(rgba(7, 18, 15, 0.18), rgba(7, 18, 15, 0.84)),
+          url("https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=900&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .v0-cards {
+        min-height: 468px;
+        padding: 26px;
+        background: #f7f8f2;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .flat-card {
+        min-height: 132px;
+        padding: 18px;
+        border-radius: 10px;
+        background: #fff;
+        border: 1px solid rgba(21, 27, 24, 0.1);
+      }
+
+      .large-card {
+        grid-row: span 2;
+        min-height: 282px;
+        color: #fff;
+        background:
+          linear-gradient(rgba(12, 23, 20, 0.1), rgba(12, 23, 20, 0.85)),
+          url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=900&q=80");
+        background-size: cover;
+      }
+
+      .v0-stream {
+        min-height: 468px;
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        background: #fff;
+      }
+
+      .stream-left {
+        padding: 28px;
+        color: #fff;
+        background: #1b2b27;
+      }
+
+      .stream-right {
+        padding: 28px;
+      }
+
+      .v0-glass {
+        min-height: 468px;
+        padding: 26px;
+        color: #f7fff9;
+        background:
+          linear-gradient(135deg, rgba(8, 16, 14, 0.84), rgba(12, 48, 43, 0.78)),
+          url("https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .glass-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 26px;
+      }
+
+      .glass-card {
+        min-height: 150px;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.13);
+      }
+
+      .v0-mobile-first {
+        min-height: 468px;
+        display: grid;
+        place-items: center;
+        background:
+          linear-gradient(135deg, rgba(47, 102, 208, 0.1), transparent),
+          #f7f7f2;
+      }
+
+      .phone {
+        width: 300px;
+        min-height: 420px;
+        border: 8px solid #151b18;
+        border-radius: 30px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .phone-hero {
+        min-height: 180px;
+        padding: 20px;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        background:
+          linear-gradient(rgba(8, 26, 22, 0.05), rgba(8, 26, 22, 0.8)),
+          url("https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=800&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .phone-list {
+        padding: 15px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .phone-field {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(21, 27, 24, 0.1);
+      }
+
+      .fig-system {
+        min-height: 468px;
+        display: grid;
+        grid-template-columns: 230px 1fr;
+        background: #fbfaf4;
+      }
+
+      .fig-sidebar {
+        padding: 22px;
+        background: #fff;
+        border-right: 1px solid var(--line);
+      }
+
+      .fig-main {
+        padding: 26px;
+      }
+
+      .brandmark {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        background: conic-gradient(from 45deg, var(--teal), var(--mint), var(--gold), var(--coral), var(--teal));
+        margin-bottom: 12px;
+      }
+
+      .navline {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(21, 27, 24, 0.09);
+        font-weight: 750;
+      }
+
+      .fig-table {
+        margin-top: 22px;
+        border-top: 3px solid var(--ink);
+        background: #fff;
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: 1fr 110px 78px;
+        gap: 10px;
+        padding: 13px 14px;
+        border-bottom: 1px solid rgba(21, 27, 24, 0.1);
+      }
+
+      .fig-editorial {
+        min-height: 468px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: #f8f4ea;
+      }
+
+      .editorial-photo {
+        min-height: 468px;
+        background:
+          linear-gradient(rgba(20, 27, 24, 0.04), rgba(20, 27, 24, 0.36)),
+          url("https://images.unsplash.com/photo-1581595220892-b0739db3ba8c?auto=format&fit=crop&w=1000&q=80");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .editorial-copy {
+        padding: 38px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .editorial-copy h3 {
+        font-size: 46px;
+        line-height: 0.98;
+      }
+
+      .fig-clinic {
+        min-height: 468px;
+        padding: 26px;
+        background: #fff;
+      }
+
+      .clinic-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 0.8fr;
+        gap: 0;
+        margin-top: 22px;
+        border: 1px solid var(--line);
+      }
+
+      .clinic-cell {
+        min-height: 124px;
+        padding: 16px;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .fig-checklist {
+        min-height: 468px;
+        background: #f9faf7;
+        padding: 26px;
+      }
+
+      .checklist {
+        display: grid;
+        gap: 11px;
+        margin-top: 22px;
+      }
+
+      .check-item {
+        display: grid;
+        grid-template-columns: 34px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 14px;
+        background: #fff;
+        border-left: 4px solid var(--teal);
+      }
+
+      .box {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        display: grid;
+        place-items: center;
+        background: #dff3ec;
+        color: var(--teal);
+        font-weight: 900;
+      }
+
+      .fig-mobile-kit {
+        min-height: 468px;
+        display: grid;
+        grid-template-columns: 0.75fr 1fr;
+        gap: 24px;
+        align-items: center;
+        padding: 28px;
+        background: #17201c;
+        color: #fff;
+      }
+
+      .fig-mobile-kit .phone {
+        background: #faf8ef;
+        color: var(--ink);
+      }
+
+      .token-panel {
+        display: grid;
+        gap: 14px;
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+      }
+
+      .swatch {
+        height: 42px;
+        border-radius: 7px;
+      }
+
+      @media (max-width: 1120px) {
+        .hero,
+        .gallery,
+        .concept.wide,
+        .v0-command,
+        .v0-stream,
+        .fig-system,
+        .fig-editorial,
+        .fig-mobile-kit {
+          grid-template-columns: 1fr;
+        }
+
+        .concept.wide {
+          grid-column: span 1;
+        }
+
+        .rail,
+        .fig-sidebar {
+          display: none;
+        }
+
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <p class="kicker">ClearPath Care design gallery</p>
+          <h1>Five v0 directions. Five Figma directions.</h1>
+        </div>
+        <p>
+          All ten concepts are aimed at the first launch product: medical history, allergy,
+          medication, and insurance check-in. The v0 side is faster and more app-like. The Figma
+          side is more deliberate, branded, and system-driven.
+        </p>
+      </section>
+
+      <section class="section-title">
+        <div>
+          <p class="kicker">v0-style</p>
+          <h2>Fast product UI concepts</h2>
+        </div>
+        <p>These are the kinds of directions I would expect from a strong v0 prompt, then we would tune by hand.</p>
+      </section>
+
+      <section class="gallery">
+        <article class="concept wide">
+          <div class="concept-head">
+            <div><p class="kicker">v0 01</p><h3>Command Center</h3><p>Dark, polished, metrics-heavy provider view with a live check-in queue.</p></div>
+            <span class="tag">Most SaaS</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser v0-command">
+              <aside class="rail"><div class="mark"></div><div></div><div></div><div></div></aside>
+              <section class="command-main">
+                <div class="topline"><div><p class="kicker">Provider check-in</p><h3>Today&apos;s patient flow</h3></div><button class="button">New invite</button></div>
+                <div class="search">Search patient, phone, insurance, member ID</div>
+                <div class="metrics"><div class="metric"><p>Ready</p><strong>18</strong></div><div class="metric"><p>Updated</p><strong>7</strong></div><div class="metric"><p>Review</p><strong>4</strong></div></div>
+                <div class="bars"><span style="height:42%"></span><span style="height:64%"></span><span style="height:49%"></span><span style="height:78%"></span><span style="height:58%"></span><span style="height:92%"></span><span style="height:70%"></span></div>
+              </section>
+              <aside class="photo-panel">
+                <p class="kicker">Live queue</p>
+                <div class="row"><strong>Maria L.</strong><span>Updated</span></div>
+                <div class="row"><strong>Devon C.</strong><span>Current</span></div>
+                <div class="row"><strong>Priya S.</strong><span>Review</span></div>
+              </aside>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">v0 02</p><h3>Smart Cards</h3><p>Modern card-based view with one hero patient and quick tasks.</p></div>
+            <span class="tag">Cleanest</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser v0-cards">
+              <div class="topline"><div><p class="kicker">Check-in workspace</p><h3>Patient updates</h3></div><button class="button">Send link</button></div>
+              <div class="card-grid">
+                <div class="flat-card large-card"><p class="kicker">Next patient</p><h3>Maria Lewis</h3></div>
+                <div class="flat-card"><p>Insurance changed</p><h3>Needs review</h3></div>
+                <div class="flat-card"><p>Allergies</p><h3>No change</h3></div>
+                <div class="flat-card"><p>Medications</p><h3>2 active</h3></div>
+                <div class="flat-card"><p>History</p><h3>Confirmed</h3></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">v0 03</p><h3>Live Stream</h3><p>Operational feed with patient activity on one side and actions on the other.</p></div>
+            <span class="tag">Most workflow</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser v0-stream">
+              <section class="stream-left"><p class="kicker">Live activity</p><h3>Updates arriving now</h3><div class="metric"><p>Average check-in</p><strong>2:14</strong></div></section>
+              <section class="stream-right">
+                <div class="row"><strong>Insurance updated</strong><span class="status">Open</span></div>
+                <div class="row"><strong>New medication added</strong><span class="status">Review</span></div>
+                <div class="row"><strong>No changes confirmed</strong><span class="status">Done</span></div>
+                <div class="row"><strong>Allergy updated</strong><span class="status">Open</span></div>
+              </section>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">v0 04</p><h3>Glass Practice</h3><p>Slightly flashy and premium with photography, glass panels, and high contrast.</p></div>
+            <span class="tag">Most visual</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser v0-glass">
+              <p class="kicker">ClearPath intake</p><h3>Front desk command</h3>
+              <div class="glass-grid">
+                <div class="glass-card"><p>Ready</p><h3>18</h3></div>
+                <div class="glass-card"><p>Flagged</p><h3>4</h3></div>
+                <div class="glass-card"><p>Sent</p><h3>31</h3></div>
+                <div class="glass-card"><p>Insurance</p><h3>6 changes</h3></div>
+                <div class="glass-card"><p>Medications</p><h3>3 changes</h3></div>
+                <div class="glass-card"><p>Allergies</p><h3>1 change</h3></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">v0 05</p><h3>Mobile First</h3><p>Patient experience leads; provider interface becomes the review console behind it.</p></div>
+            <span class="tag">Best patient first</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser v0-mobile-first">
+              <div class="phone">
+                <div class="phone-hero"><p class="kicker">Before your visit</p><h3>Confirm your health profile.</h3></div>
+                <div class="phone-list">
+                  <div class="phone-field"><strong>Insurance</strong><p>Delta Dental</p></div>
+                  <div class="phone-field"><strong>Medications</strong><p>2 active</p></div>
+                  <div class="phone-field"><strong>Allergies</strong><p>1 flagged</p></div>
+                  <button class="button">Submit update</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-title">
+        <div>
+          <p class="kicker">Figma-led</p>
+          <h2>Brand system concepts</h2>
+        </div>
+        <p>These feel more designed from first principles: tokens, layout rules, patient tone, and repeatable components.</p>
+      </section>
+
+      <section class="gallery">
+        <article class="concept wide">
+          <div class="concept-head">
+            <div><p class="kicker">Figma 01</p><h3>Clinic System</h3><p>A crisp product system with sidebar, table hierarchy, restrained color, and reusable status patterns.</p></div>
+            <span class="tag">Most scalable</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser fig-system">
+              <aside class="fig-sidebar"><div class="brandmark"></div><strong>ClearPath Care</strong><div class="navline">Check-in queue</div><div class="navline">Patient lookup</div><div class="navline">Invites</div><div class="navline">Settings</div></aside>
+              <section class="fig-main">
+                <div class="topline"><div><p class="kicker">May 20</p><h3>Check-in queue</h3></div><button class="button">Send link</button></div>
+                <div class="fig-table">
+                  <div class="table-row"><strong>Patient</strong><strong>Status</strong><strong>Time</strong></div>
+                  <div class="table-row"><span>Maria Lewis</span><span class="status">Updated</span><span>8:10</span></div>
+                  <div class="table-row"><span>Devon Carter</span><span class="status">Current</span><span>8:35</span></div>
+                  <div class="table-row"><span>Priya Shah</span><span class="status">Review</span><span>9:05</span></div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">Figma 02</p><h3>Editorial Care</h3><p>More emotional, warmer, and branded around a calm patient journey.</p></div>
+            <span class="tag">Most human</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser fig-editorial">
+              <div class="editorial-photo"></div>
+              <div class="editorial-copy"><div><p class="kicker">Before your visit</p><h3>Care starts with what changed.</h3></div><p>Guided check-in language, more warmth, less dashboard density.</p><button class="button">Review profile</button></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">Figma 03</p><h3>Clinical Grid</h3><p>Structured and professional, built around clinical review instead of generic cards.</p></div>
+            <span class="tag">Most clinical</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser fig-clinic">
+              <div class="topline"><div><p class="kicker">Patient review</p><h3>Maria Lewis</h3></div><button class="button ghost">Approve</button></div>
+              <div class="clinic-grid">
+                <div class="clinic-cell"><p>Medical conditions</p><h3>3</h3></div>
+                <div class="clinic-cell"><p>Medications</p><h3>2</h3></div>
+                <div class="clinic-cell"><p>Allergies</p><h3>1</h3></div>
+                <div class="clinic-cell"><p>Insurance</p><h3>Changed</h3></div>
+                <div class="clinic-cell"><p>Subscriber</p><h3>Self</h3></div>
+                <div class="clinic-cell"><p>Status</p><h3>Review</h3></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">Figma 04</p><h3>Checklist OS</h3><p>Every flow is a clear checklist: easier to train staff, easier to QA.</p></div>
+            <span class="tag">Most usable</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser fig-checklist">
+              <p class="kicker">Appointment prep</p><h3>Verify before seating</h3>
+              <div class="checklist">
+                <div class="check-item"><span class="box">✓</span><strong>Insurance confirmed</strong><span>Done</span></div>
+                <div class="check-item"><span class="box">✓</span><strong>Medical history reviewed</strong><span>Done</span></div>
+                <div class="check-item"><span class="box">!</span><strong>Medication changed</strong><span>Review</span></div>
+                <div class="check-item"><span class="box">✓</span><strong>Allergy list confirmed</strong><span>Done</span></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="concept">
+          <div class="concept-head">
+            <div><p class="kicker">Figma 05</p><h3>Mobile Design Kit</h3><p>A patient-first system with tokens, mobile controls, and consistent form behavior.</p></div>
+            <span class="tag">Best foundation</span>
+          </div>
+          <div class="screen">
+            <div class="mini-browser fig-mobile-kit">
+              <div class="phone">
+                <div class="phone-list">
+                  <p class="kicker">Step 2 of 4</p>
+                  <h3>Medications</h3>
+                  <div class="phone-field">Lisinopril 10mg</div>
+                  <div class="phone-field">Add medication</div>
+                  <button class="button">Continue</button>
+                </div>
+              </div>
+              <div class="token-panel">
+                <p class="kicker">Design tokens</p>
+                <h3>Reusable patient system</h3>
+                <p>Typography, spacing, colors, fields, review rows, buttons, and states defined before implementation.</p>
+                <div class="swatches"><span class="swatch" style="background:#151b18"></span><span class="swatch" style="background:#0d766f"></span><span class="swatch" style="background:#9fd9c8"></span><span class="swatch" style="background:#ee8067"></span><span class="swatch" style="background:#d5a843"></span></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

@@ -81,20 +81,70 @@ export function buildDiagnosticRecords(vault: PatientVault, timeline: TimelineEv
   const authenticatedNames = new Set(timelineRecords.map((record) => normalizeName(record.name)));
   const patientRecords = vault.medicalConditions
     .filter((condition) => condition.name.trim() && !narrativeVaultEntries.includes(condition.name))
-    .filter((condition) => !authenticatedNames.has(normalizeName(condition.name)))
-    .map((condition): DiagnosticRecord => ({
-      id: `patient-${condition.id}`,
-      name: condition.name.trim(),
-      plainName: condition.name.trim(),
-      regions: inferBodyRegions(condition.name),
-      status: "managed",
-      verification: "patient-reported",
-      diagnosedBy: "Added by patient",
-      sourceOrganization: "Patient health profile",
-      lastReviewedAt: vault.lastUpdatedAt || undefined,
-      summary: condition.notes.trim() || "Patient-reported condition awaiting clinical reconciliation.",
-      treatments: []
-    }));
+    .flatMap((condition): DiagnosticRecord[] => {
+      const detailedRecords = (condition.details ?? [])
+        .filter((detail) => detail.name.trim())
+        .filter((detail) => !authenticatedNames.has(normalizeName(detail.name)))
+        .map((detail): DiagnosticRecord => {
+          const relatedMedications = vault.medications.filter((medication) =>
+            detail.relatedMedicationIds.includes(medication.id)
+          );
+
+          return {
+            id: `patient-detail-${detail.id}`,
+            name: detail.name.trim(),
+            plainName: detail.name.trim(),
+            regions: inferBodyRegions(`${detail.name} ${condition.name}`),
+            status: detail.status === "resolved" ? "resolved" : detail.status === "active" ? "active" : "managed",
+            verification: "patient-reported",
+            diagnosedAt: detail.diagnosedAt || undefined,
+            diagnosedBy: detail.diagnosedBy.trim() || "Reported by patient",
+            sourceOrganization: detail.treatingProvider.trim() || "Patient health profile",
+            lastReviewedAt: vault.lastUpdatedAt || undefined,
+            summary:
+              [detail.treatmentSummary.trim(), detail.notes.trim()].filter(Boolean).join(" ") ||
+              `Patient-reported detail under ${condition.name}.`,
+            treatments: [
+              ...(detail.treatmentSummary.trim()
+                ? [{
+                    id: `${detail.id}-treatment`,
+                    name: detail.treatmentSummary.trim(),
+                    status: detail.status === "resolved" ? "completed" as const : "active" as const,
+                    provider: detail.treatingProvider.trim() || undefined
+                  }]
+                : []),
+              ...relatedMedications.map((medication) => ({
+                id: `${detail.id}-medication-${medication.id}`,
+                name: medication.name,
+                status: "active" as const,
+                note: [medication.dose, medication.frequency].filter(Boolean).join(" · ")
+              }))
+            ]
+          };
+        });
+
+      if (detailedRecords.length > 0) {
+        return detailedRecords;
+      }
+
+      if (authenticatedNames.has(normalizeName(condition.name))) {
+        return [];
+      }
+
+      return [{
+        id: `patient-${condition.id}`,
+        name: condition.name.trim(),
+        plainName: condition.name.trim(),
+        regions: inferBodyRegions(condition.name),
+        status: "managed",
+        verification: "patient-reported",
+        diagnosedBy: "Added by patient",
+        sourceOrganization: "Patient health profile",
+        lastReviewedAt: vault.lastUpdatedAt || undefined,
+        summary: condition.notes.trim() || "Patient-reported condition awaiting specific clinical details.",
+        treatments: []
+      }];
+    });
 
   const records = [...timelineRecords, ...patientRecords];
   return records.length > 0 ? records : sampleDiagnosticRecords;

@@ -21,9 +21,10 @@ Phase I discovery should answer:
 
 Recommended Phase I participant groups:
 
-- Dentists and oral surgeons
 - Primary care providers
 - Specialists who request outside records
+- Hospital discharge or care-transition staff
+- Behavioral health or rehabilitation providers
 - Office managers
 - Front desk or records staff
 - Patients or caregivers
@@ -35,21 +36,21 @@ The first discovery group can stay small. Quality of feedback matters more than 
 
 Phase I should test a few high-value scenarios:
 
-### Scenario 1: Dental Or Oral Surgery Medical Clearance
+### Scenario 1: Specialist Requests Primary Care Records
 
-Requesting provider needs medication history, allergies, conditions, surgical history, and clearance context before treatment.
-
-Why it matters:
-
-This scenario is concrete, familiar, and connects the original dental workflow to the broader medical communication platform.
-
-### Scenario 2: Specialist Requests Prior Records
-
-A specialist needs prior diagnoses, labs, imaging reports, medication list, and treatment notes from another provider.
+A specialist needs diagnoses, medication history, allergies, recent laboratory results, and relevant imaging reports from a primary care office.
 
 Why it matters:
 
-This demonstrates interdisciplinary exchange beyond dentistry.
+This is a common cross-discipline workflow and tests whether ClearPath can reduce delays without making the patient manually transport records.
+
+### Scenario 2: Rehabilitation Provider Requests Discharge Records
+
+A rehabilitation provider needs a discharge summary, medication list, restrictions, treatment notes, and follow-up instructions after a hospital stay.
+
+Why it matters:
+
+This tests time-sensitive care transitions between organizations and disciplines.
 
 ### Scenario 3: Patient-Mediated Records Release
 
