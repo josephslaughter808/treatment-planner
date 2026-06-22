@@ -18,8 +18,7 @@ export function LoginView() {
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function submitLogin() {
     if (!isAuthConfigured) {
       setMessage("Account access is not configured yet. Add Supabase environment variables before pilot use.");
       return;
@@ -42,6 +41,11 @@ export function LoginView() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void submitLogin();
   }
 
   function selectDemoAccount(nextEmail: string) {
@@ -141,7 +145,12 @@ export function LoginView() {
           </label>
 
           <div className="form-footer">
-            <button className="primary-button" disabled={isSubmitting || !isAuthConfigured} type="submit">
+            <button
+              className="primary-button"
+              disabled={isSubmitting || !isAuthConfigured}
+              onClick={() => void submitLogin()}
+              type="button"
+            >
               {isSubmitting ? "Logging in..." : "Log in"}
             </button>
             <Link className="secondary-button" href="/signup">

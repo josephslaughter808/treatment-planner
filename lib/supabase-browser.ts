@@ -17,6 +17,10 @@ export function isSupabaseBrowserConfigured() {
 }
 
 export function isSupabaseRequiredInBrowser() {
+  if (process.env.NEXT_PUBLIC_CLEARPATH_ALLOW_LOCAL_AUTH === "true") {
+    return false;
+  }
+
   return process.env.NEXT_PUBLIC_CLEARPATH_REQUIRE_SUPABASE === "true" || process.env.NODE_ENV === "production";
 }
 
