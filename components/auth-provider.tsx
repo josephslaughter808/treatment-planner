@@ -446,6 +446,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
         clearSupabaseProxySession();
+        try {
+          await fetch("/api/auth/sign-out", { method: "POST" });
+        } catch (error) {
+          console.error("Unable to clear the ClearPath server session.", error);
+        }
         setCurrentUser(null);
       },
       async updateProfile(input) {

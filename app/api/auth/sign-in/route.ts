@@ -4,37 +4,40 @@ import {
   getAppUserProfileRecord,
   saveAppUserProfileRecord
 } from "@/lib/persistence";
+import { isPatientRole } from "@/lib/account-directory";
+import {
+  supabaseAccessTokenCookieKey,
+  supabaseRefreshTokenCookieKey
+} from "@/lib/auth-session-cookies";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function POST(request: NextRequest) {
+  const isFormSubmission = request.headers.get("content-type")?.includes("form") ?? false;
+
   if (!isSupabaseConfigured()) {
-    return NextResponse.json(
-      { error: "Supabase auth is not configured yet." },
-      { status: 503 }
-    );
+    return authFailure(request, isFormSubmission, "auth-unavailable", "Supabase auth is not configured yet.", 503);
   }
 
-  const body = (await request.json()) as {
-    email?: string;
-    password?: string;
-  };
-  const email = body.email?.trim();
-  const password = body.password || "";
+  let email = "";
+  let password = "";
+  if (isFormSubmission) {
+    const form = await request.formData();
+    email = String(form.get("email") || "").trim();
+    password = String(form.get("password") || "");
+  } else {
+    const body = (await request.json()) as { email?: string; password?: string };
+    email = body.email?.trim() || "";
+    password = body.password || "";
+  }
 
   if (!email || !password) {
-    return NextResponse.json(
-      { error: "Email and password are required." },
-      { status: 400 }
-    );
+    return authFailure(request, isFormSubmission, "invalid-login", "Email and password are required.", 400, email);
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json(
-      { error: "Supabase browser credentials are missing." },
-      { status: 503 }
-    );
+    return authFailure(request, isFormSubmission, "auth-unavailable", "Supabase browser credentials are missing.", 503, email);
   }
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -50,10 +53,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (error || !data.user || !data.session) {
-    return NextResponse.json(
-      { error: error?.message || "Unable to sign in." },
-      { status: 401 }
-    );
+    return authFailure(request, isFormSubmission, "invalid-login", error?.message || "Unable to sign in.", 401, email);
   }
 
   let profileResult = await getAppUserProfileRecord({
@@ -79,16 +79,66 @@ export async function POST(request: NextRequest) {
   }
 
   if (!profileResult.profile) {
-    return NextResponse.json(
-      { error: "Sign-in worked, but ClearPath could not prepare this profile yet." },
-      { status: 500 }
+    return authFailure(
+      request,
+      isFormSubmission,
+      "profile-unavailable",
+      "Sign-in worked, but ClearPath could not prepare this profile yet.",
+      500,
+      email
     );
   }
 
-  return NextResponse.json({
-    profile: profileResult.profile,
-    accessToken: data.session.access_token,
-    refreshToken: data.session.refresh_token,
-    expiresAt: data.session.expires_at ?? null
+  const response = isFormSubmission
+    ? NextResponse.redirect(
+        new URL(isPatientRole(profileResult.profile.role) ? "/patient" : "/", getRequestOrigin(request)),
+        303
+      )
+    : NextResponse.json({
+        profile: profileResult.profile,
+        accessToken: data.session.access_token,
+        refreshToken: data.session.refresh_token,
+        expiresAt: data.session.expires_at ?? null
+      });
+
+  const secure = getRequestOrigin(request).startsWith("https://");
+  response.cookies.set(supabaseAccessTokenCookieKey, data.session.access_token, {
+    httpOnly: true,
+    maxAge: Math.max(60, (data.session.expires_at || Math.floor(Date.now() / 1000) + 3600) - Math.floor(Date.now() / 1000)),
+    path: "/",
+    sameSite: "lax",
+    secure
   });
+  response.cookies.set(supabaseRefreshTokenCookieKey, data.session.refresh_token, {
+    httpOnly: true,
+    maxAge: 60 * 60 * 24 * 30,
+    path: "/",
+    sameSite: "lax",
+    secure
+  });
+  return response;
+}
+
+function authFailure(
+  request: NextRequest,
+  isFormSubmission: boolean,
+  code: string,
+  message: string,
+  status: number,
+  email = ""
+) {
+  if (!isFormSubmission) {
+    return NextResponse.json({ error: message }, { status });
+  }
+
+  const loginUrl = new URL("/login", getRequestOrigin(request));
+  loginUrl.searchParams.set("error", code);
+  if (email) loginUrl.searchParams.set("email", email);
+  return NextResponse.redirect(loginUrl, 303);
+}
+
+function getRequestOrigin(request: NextRequest) {
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const protocol = request.headers.get("x-forwarded-proto") || request.nextUrl.protocol.replace(":", "") || "http";
+  return host ? `${protocol}://${host}` : request.nextUrl.origin;
 }

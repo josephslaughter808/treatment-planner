@@ -15,11 +15,7 @@ export function LoginView() {
   const isAuthConfigured = authMode !== "unconfigured";
   const [email, setEmail] = useState(searchParams.get("email") || (authMode === "local" ? (demoAccounts[0]?.email ?? "") : ""));
   const [password, setPassword] = useState(authMode === "local" ? "clearpath123" : "");
-  const [message, setMessage] = useState<string | null>(() =>
-    searchParams.get("error") === "invalid-login"
-      ? "We could not find a ClearPath account with that email and password."
-      : null
-  );
+  const [message, setMessage] = useState<string | null>(() => getLoginErrorMessage(searchParams.get("error")));
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submitLogin() {
@@ -120,9 +116,9 @@ export function LoginView() {
 
       <aside className="landing-access-column">
         <form
-          action={authMode === "local" ? "/api/auth/local-sign-in" : undefined}
+          action={authMode === "local" ? "/api/auth/local-sign-in" : "/api/auth/sign-in"}
           className="panel landing-login-card"
-          method={authMode === "local" ? "post" : undefined}
+          method="post"
           onSubmit={handleSubmit}
         >
           <div className="panel-heading">
@@ -218,4 +214,17 @@ export function LoginView() {
       </aside>
     </section>
   );
+}
+
+function getLoginErrorMessage(error: string | null) {
+  if (error === "invalid-login") {
+    return "We could not find a ClearPath account with that email and password.";
+  }
+  if (error === "profile-unavailable") {
+    return "Your login worked, but ClearPath could not load your profile yet.";
+  }
+  if (error === "auth-unavailable") {
+    return "ClearPath account access is temporarily unavailable.";
+  }
+  return null;
 }

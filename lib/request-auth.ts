@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { isPatientRole, isProviderWorkspaceRole, type UserRole } from "@/lib/account-directory";
+import { supabaseAccessTokenCookieKey } from "@/lib/auth-session-cookies";
 import { createAdminSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
 
 export type RequestActor = {
@@ -17,7 +18,9 @@ export async function getRequestActor(request: NextRequest): Promise<RequestActo
   }
 
   const authHeader = request.headers.get("authorization");
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice(7).trim()
+    : request.cookies.get(supabaseAccessTokenCookieKey)?.value || "";
   if (!token) {
     return null;
   }
