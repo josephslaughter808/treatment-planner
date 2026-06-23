@@ -2,51 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import clearPathLogo from "@/ClearPath-Care-logo.png";
 import { useAuth } from "@/components/auth-provider";
 import { demoAccounts, isPatientRole } from "@/lib/account-directory";
 
 export function LoginView() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { authMode, signIn } = useAuth();
+  const { authMode } = useAuth();
   const isAuthConfigured = authMode !== "unconfigured";
   const [email, setEmail] = useState(searchParams.get("email") || (authMode === "local" ? (demoAccounts[0]?.email ?? "") : ""));
   const [password, setPassword] = useState(authMode === "local" ? "clearpath123" : "");
-  const [message, setMessage] = useState<string | null>(() => getLoginErrorMessage(searchParams.get("error")));
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  async function submitLogin() {
-    if (!isAuthConfigured) {
-      setMessage("Account access is not configured yet. Add Supabase environment variables before pilot use.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const result = await signIn({ email, password });
-      setMessage(result.message);
-
-      if (result.ok) {
-        router.push(result.redirectTo || "/");
-      }
-    } catch (error) {
-      setMessage(
-        error instanceof Error
-          ? error.message
-          : "Login could not finish. Please try again in a moment."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    void submitLogin();
-  }
+  const message = getLoginErrorMessage(searchParams.get("error"));
 
   function selectDemoAccount(nextEmail: string) {
     setEmail(nextEmail);
@@ -119,7 +87,6 @@ export function LoginView() {
           action={authMode === "local" ? "/api/auth/local-sign-in" : "/api/auth/sign-in"}
           className="panel landing-login-card"
           method="post"
-          onSubmit={handleSubmit}
         >
           <div className="panel-heading">
             <div>
@@ -154,10 +121,10 @@ export function LoginView() {
           <div className="form-footer">
             <button
               className="primary-button"
-              disabled={isSubmitting || !isAuthConfigured}
+              disabled={!isAuthConfigured}
               type="submit"
             >
-              {isSubmitting ? "Logging in..." : "Log in"}
+              Log in
             </button>
             <Link className="secondary-button" href="/signup">
               Create Patient Access
