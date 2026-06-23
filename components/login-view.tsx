@@ -15,7 +15,11 @@ export function LoginView() {
   const isAuthConfigured = authMode !== "unconfigured";
   const [email, setEmail] = useState(searchParams.get("email") || (authMode === "local" ? (demoAccounts[0]?.email ?? "") : ""));
   const [password, setPassword] = useState(authMode === "local" ? "clearpath123" : "");
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(() =>
+    searchParams.get("error") === "invalid-login"
+      ? "We could not find a ClearPath account with that email and password."
+      : null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submitLogin() {
@@ -115,7 +119,12 @@ export function LoginView() {
       </section>
 
       <aside className="landing-access-column">
-        <form className="panel landing-login-card" onSubmit={handleSubmit}>
+        <form
+          action={authMode === "local" ? "/api/auth/local-sign-in" : undefined}
+          className="panel landing-login-card"
+          method={authMode === "local" ? "post" : undefined}
+          onSubmit={handleSubmit}
+        >
           <div className="panel-heading">
             <div>
               <p className="eyebrow">Secure access</p>
@@ -128,6 +137,7 @@ export function LoginView() {
             Email
             <input
               disabled={!isAuthConfigured}
+              name="email"
               onChange={(event) => setEmail(event.target.value)}
               type="email"
               value={email}
@@ -138,6 +148,7 @@ export function LoginView() {
             Password
             <input
               disabled={!isAuthConfigured}
+              name="password"
               onChange={(event) => setPassword(event.target.value)}
               type="password"
               value={password}
@@ -148,8 +159,7 @@ export function LoginView() {
             <button
               className="primary-button"
               disabled={isSubmitting || !isAuthConfigured}
-              onClick={() => void submitLogin()}
-              type="button"
+              type="submit"
             >
               {isSubmitting ? "Logging in..." : "Log in"}
             </button>

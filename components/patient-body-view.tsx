@@ -170,7 +170,7 @@ export function PatientBodyView() {
               <span><i className="legend-empty" /> No condition mapped</span>
             </div>
             <p className="anatomy-attribution">
-              Anatomical surface: <a href="https://github.com/Z-Anatomy/Unity-app_Z-Anatomy" rel="noreferrer" target="_blank">Z-Anatomy</a>, licensed CC BY-SA 4.0.
+              Anatomical models: <a href="https://github.com/Z-Anatomy/Unity-app_Z-Anatomy" rel="noreferrer" target="_blank">Z-Anatomy</a>, licensed CC BY-SA 4.0.
             </p>
           </div>
 

@@ -2,7 +2,7 @@
 
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, useCursor, useFBX } from "@react-three/drei";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 import { bodyRegionLabels, type BodyRegion } from "@/lib/diagnostic-records";
 
@@ -12,9 +12,15 @@ export type AnatomyRegionSummary = {
 };
 
 type AnatomyLayer = "surface" | "organs";
+type SurfaceDisplayMode = "clinical" | "context";
 
 const anatomicalModelUrl =
   "https://raw.githubusercontent.com/Z-Anatomy/Unity-app_Z-Anatomy/PC-Version/Resources/Models/FBX/Regions%20of%20human%20body100.fbx";
+const visceralModelUrl =
+  "https://raw.githubusercontent.com/Z-Anatomy/Unity-app_Z-Anatomy/PC-Version/Resources/Models/FBX/VisceralSystem100.fbx";
+const referenceBodyHeight = 174.37225661187355;
+const referenceBodyCenter: [number, number, number] = [-3.734500054594573, 87.14788533796111, 1.1369439999576674];
+const referenceBodyScale = 6.25 / referenceBodyHeight;
 
 export function AnatomicalBodyView({
   selectedRegion,
@@ -26,6 +32,8 @@ export function AnatomicalBodyView({
   onSelect: (region: BodyRegion) => void;
 }) {
   const [layer, setLayer] = useState<AnatomyLayer>("surface");
+  const [isOrganLoading, setIsOrganLoading] = useState(false);
+  const handleOrganReady = useCallback(() => setIsOrganLoading(false), []);
 
   return (
     <div className="anatomy-explorer">
@@ -34,7 +42,10 @@ export function AnatomicalBodyView({
           <button
             aria-pressed={layer === "surface"}
             className={layer === "surface" ? "active" : ""}
-            onClick={() => setLayer("surface")}
+            onClick={() => {
+              setLayer("surface");
+              setIsOrganLoading(false);
+            }}
             type="button"
           >
             Body
@@ -42,7 +53,10 @@ export function AnatomicalBodyView({
           <button
             aria-pressed={layer === "organs"}
             className={layer === "organs" ? "active" : ""}
-            onClick={() => setLayer("organs")}
+            onClick={() => {
+              setLayer("organs");
+              setIsOrganLoading(true);
+            }}
             type="button"
           >
             Organs
@@ -69,22 +83,24 @@ export function AnatomicalBodyView({
           <ambientLight intensity={1.25} />
           <directionalLight castShadow intensity={2.2} position={[4, 7, 6]} />
           <directionalLight color="#b9d7ff" intensity={1.1} position={[-4, 2, 3]} />
-          <Suspense fallback={null}>
-            <group position={[0, -0.15, 0]}>
+          <group position={[0, -0.15, 0]}>
+            <Suspense fallback={null}>
               <AnatomicalSurfaceModel
+                displayMode={layer === "surface" ? "clinical" : "context"}
                 onSelect={onSelect}
                 selectedRegion={selectedRegion}
                 summaries={summaries}
-                visible={layer === "surface"}
               />
-              {layer === "organs" ? (
+            </Suspense>
+            {layer === "organs" ? (
+              <Suspense fallback={null}>
                 <>
-                  <HumanSurface layer="organs" onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
-                  <InternalOrgans onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
+                  <VisceralSystemModel onReady={handleOrganReady} onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
+                  <SupplementalOrgans onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
                 </>
-              ) : null}
-            </group>
-          </Suspense>
+              </Suspense>
+            ) : null}
+          </group>
           <mesh position={[0, -3.65, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
             <circleGeometry args={[2.15, 64]} />
             <shadowMaterial opacity={0.14} />
@@ -98,6 +114,8 @@ export function AnatomicalBodyView({
         </Canvas>
       </div>
 
+      {isOrganLoading ? <div className="anatomy-layer-status" role="status">Loading detailed organs...</div> : null}
+
       <div className="anatomy-orientation" aria-hidden="true">
         <span>R</span>
         <strong>3D</strong>
@@ -108,12 +126,12 @@ export function AnatomicalBodyView({
 }
 
 function AnatomicalSurfaceModel({
-  visible,
+  displayMode,
   selectedRegion,
   summaries,
   onSelect
 }: {
-  visible: boolean;
+  displayMode: SurfaceDisplayMode;
   selectedRegion: BodyRegion;
   summaries: Partial<Record<BodyRegion, AnatomyRegionSummary>>;
   onSelect: (region: BodyRegion) => void;
@@ -157,6 +175,16 @@ function AnatomicalSurfaceModel({
   useEffect(() => {
     model.traverse((object) => {
       if (!(object instanceof THREE.Mesh) || !(object.material instanceof THREE.MeshPhysicalMaterial)) return;
+      if (displayMode === "context") {
+        object.material.color.set("#d7dee7");
+        object.material.opacity = 0.1;
+        object.material.transparent = true;
+        object.material.depthWrite = false;
+        object.material.emissive.set("#000000");
+        object.material.emissiveIntensity = 0;
+        object.material.needsUpdate = true;
+        return;
+      }
       const region = object.userData.bodyRegion as BodyRegion | undefined;
       const summary = region ? summaries[region] : undefined;
       const highlighted = Boolean(region && (selectedRegion === region || hoveredRegion === region));
@@ -175,7 +203,7 @@ function AnatomicalSurfaceModel({
       object.material.emissiveIntensity = highlighted ? 0.16 : 0;
       object.material.needsUpdate = true;
     });
-  }, [hoveredRegion, model, selectedRegion, summaries]);
+  }, [displayMode, hoveredRegion, model, selectedRegion, summaries]);
 
   function regionFromEvent(event: ThreeEvent<PointerEvent | MouseEvent>) {
     return event.object.userData.bodyRegion as BodyRegion | undefined;
@@ -184,17 +212,16 @@ function AnatomicalSurfaceModel({
   return (
     <primitive
       object={model}
-      onClick={(event: ThreeEvent<MouseEvent>) => {
+      onClick={displayMode === "clinical" ? (event: ThreeEvent<MouseEvent>) => {
         event.stopPropagation();
         const region = regionFromEvent(event);
         if (region) onSelect(region);
-      }}
-      onPointerMove={(event: ThreeEvent<PointerEvent>) => {
+      } : undefined}
+      onPointerMove={displayMode === "clinical" ? (event: ThreeEvent<PointerEvent>) => {
         event.stopPropagation();
         setHoveredRegion(regionFromEvent(event) ?? null);
-      }}
-      onPointerOut={() => setHoveredRegion(null)}
-      visible={visible}
+      } : undefined}
+      onPointerOut={displayMode === "clinical" ? () => setHoveredRegion(null) : undefined}
     />
   );
 }
@@ -224,128 +251,125 @@ function inferModelRegion(meshName: string): BodyRegion | null {
 
 useFBX.preload(anatomicalModelUrl);
 
-function HumanSurface({
-  layer,
+function VisceralSystemModel({
+  selectedRegion,
+  summaries,
+  onSelect,
+  onReady
+}: {
+  selectedRegion: BodyRegion;
+  summaries: Partial<Record<BodyRegion, AnatomyRegionSummary>>;
+  onSelect: (region: BodyRegion) => void;
+  onReady: () => void;
+}) {
+  const source = useFBX(visceralModelUrl);
+  const [hoveredRegion, setHoveredRegion] = useState<BodyRegion | null>(null);
+  useCursor(Boolean(hoveredRegion));
+
+  const model = useMemo(() => {
+    const clone = source.clone(true);
+    clone.scale.setScalar(referenceBodyScale);
+    clone.position.set(
+      -referenceBodyCenter[0] * referenceBodyScale,
+      -referenceBodyCenter[1] * referenceBodyScale,
+      -referenceBodyCenter[2] * referenceBodyScale
+    );
+    clone.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const descriptor = describeVisceralStructure(object.name);
+      if (!descriptor || !object.geometry.attributes.position?.count) {
+        object.visible = false;
+        return;
+      }
+      object.userData.bodyRegion = descriptor.region;
+      object.userData.baseColor = descriptor.color;
+      object.castShadow = true;
+      object.receiveShadow = true;
+      object.material = new THREE.MeshPhysicalMaterial({
+        color: descriptor.color,
+        roughness: 0.58,
+        metalness: 0,
+        clearcoat: 0.12,
+        clearcoatRoughness: 0.74,
+        side: THREE.DoubleSide
+      });
+    });
+    return clone;
+  }, [source]);
+
+  useEffect(() => onReady(), [onReady, source]);
+
+  useEffect(() => {
+    model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh) || !(object.material instanceof THREE.MeshPhysicalMaterial)) return;
+      const region = object.userData.bodyRegion as BodyRegion | undefined;
+      const baseColor = new THREE.Color(String(object.userData.baseColor || "#b86d61"));
+      const highlighted = Boolean(region && (selectedRegion === region || hoveredRegion === region));
+      object.material.color.copy(baseColor);
+      object.material.emissive.set(highlighted ? "#12365d" : "#000000");
+      object.material.emissiveIntensity = highlighted ? 0.18 : 0;
+      object.material.needsUpdate = true;
+    });
+  }, [hoveredRegion, model, selectedRegion, summaries]);
+
+  function regionFromEvent(event: ThreeEvent<PointerEvent | MouseEvent>) {
+    return event.object.userData.bodyRegion as BodyRegion | undefined;
+  }
+
+  return (
+    <primitive
+      object={model}
+      onClick={(event: ThreeEvent<MouseEvent>) => {
+        event.stopPropagation();
+        const region = regionFromEvent(event);
+        if (region) onSelect(region);
+      }}
+      onPointerMove={(event: ThreeEvent<PointerEvent>) => {
+        event.stopPropagation();
+        setHoveredRegion(regionFromEvent(event) ?? null);
+      }}
+      onPointerOut={() => setHoveredRegion(null)}
+    />
+  );
+}
+
+function describeVisceralStructure(meshName: string): { region: BodyRegion; color: string } | null {
+  const name = meshName.toLowerCase();
+  if (name.endsWith("j") || /cavity|cross_section|profile|mucosa|omentum|mesocolon|taenia/.test(name)) return null;
+
+  if (/lobe_of_(left|right)_lung|main_bronchus|^trachea$/.test(name)) return { region: "chest", color: "#c8787b" };
+  if (name === "liver") return { region: "abdomen", color: "#8e3c32" };
+  if (/^gallbladder$|^bile_duct$/.test(name)) return { region: "abdomen", color: "#728848" };
+  if (name === "pancreas") return { region: "abdomen", color: "#d6a269" };
+  if (/^stomach$|^oesophagus$/.test(name)) return { region: "abdomen", color: "#c88168" };
+  if (/^duodenum$|^jejunum$|_colon$|vermiform_appendix/.test(name)) return { region: "abdomen", color: "#d59a78" };
+  if (/^kidney[lr]$|^renal_pelvis[lr]$|^ureter[lr]$/.test(name)) return { region: "abdomen", color: "#8d5546" };
+  if (/^urinary_bladder$|^urethra$|prostate|testis|epididymis|ductus_deferens|seminal_gland/.test(name)) {
+    return { region: "pelvis", color: "#b77972" };
+  }
+  if (/thyroid_gland|parathyroid_gland|^tongue$|salivary_gland|^uvula_of_palate$|^soft_palate$|pharynx/.test(name)) {
+    return { region: "head-neck", color: "#c88488" };
+  }
+  if (/suprarenal_gland/.test(name)) return { region: "abdomen", color: "#c79255" };
+  return null;
+}
+
+function SupplementalOrgans({
   selectedRegion,
   summaries,
   onSelect
 }: {
-  layer: AnatomyLayer;
   selectedRegion: BodyRegion;
   summaries: Partial<Record<BodyRegion, AnatomyRegionSummary>>;
   onSelect: (region: BodyRegion) => void;
 }) {
-  const opacity = layer === "organs" ? 0.2 : 0.92;
-
   return (
     <group scale={0.92}>
-      <AnatomyPart
-        geometry={<sphereGeometry args={[0.42, 42, 32]} />}
-        opacity={opacity}
-        onSelect={onSelect}
-        position={[0, 2.58, 0]}
-        region="head-neck"
-        scale={[0.88, 1.08, 0.9]}
-        selectedRegion={selectedRegion}
-        summaries={summaries}
-      />
-      <AnatomyPart
-        geometry={<capsuleGeometry args={[0.2, 0.24, 8, 24]} />}
-        opacity={opacity}
-        onSelect={onSelect}
-        position={[0, 2.06, 0]}
-        region="head-neck"
-        selectedRegion={selectedRegion}
-        summaries={summaries}
-      />
-      <AnatomyPart
-        geometry={<capsuleGeometry args={[0.67, 0.96, 12, 36]} />}
-        opacity={opacity}
-        onSelect={onSelect}
-        position={[0, 1.25, 0]}
-        region="chest"
-        scale={[1.08, 1, 0.63]}
-        selectedRegion={selectedRegion}
-        summaries={summaries}
-      />
-      <AnatomyPart
-        geometry={<capsuleGeometry args={[0.52, 0.55, 12, 32]} />}
-        opacity={opacity}
-        onSelect={onSelect}
-        position={[0, 0.34, 0]}
-        region="abdomen"
-        scale={[1, 1, 0.68]}
-        selectedRegion={selectedRegion}
-        summaries={summaries}
-      />
-      <AnatomyPart
-        geometry={<sphereGeometry args={[0.61, 36, 24]} />}
-        opacity={opacity}
-        onSelect={onSelect}
-        position={[0, -0.28, 0]}
-        region="pelvis"
-        scale={[1.1, 0.66, 0.72]}
-        selectedRegion={selectedRegion}
-        summaries={summaries}
-      />
-      <Limb side="right" opacity={opacity} onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
-      <Limb side="left" opacity={opacity} onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
-      <Leg side="right" opacity={opacity} onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
-      <Leg side="left" opacity={opacity} onSelect={onSelect} selectedRegion={selectedRegion} summaries={summaries} />
-    </group>
-  );
-}
-
-function Limb({ side, ...props }: AnatomySideProps) {
-  const sign = side === "right" ? -1 : 1;
-  const region: BodyRegion = side === "right" ? "right-arm" : "left-arm";
-  return (
-    <group>
-      <AnatomyPart {...props} geometry={<sphereGeometry args={[0.25, 28, 20]} />} position={[sign * 0.79, 1.62, 0]} region={region} scale={[1, 1.12, 0.92]} />
-      <AnatomyPart {...props} geometry={<capsuleGeometry args={[0.2, 0.9, 8, 24]} />} position={[sign * 1.02, 0.92, 0]} region={region} rotation={[0, 0, sign * 0.18]} scale={[1, 1, 0.92]} />
-      <AnatomyPart {...props} geometry={<capsuleGeometry args={[0.16, 0.78, 8, 24]} />} position={[sign * 1.21, -0.03, 0]} region={region} rotation={[0, 0, sign * 0.16]} scale={[1, 1, 0.9]} />
-      <AnatomyPart {...props} geometry={<capsuleGeometry args={[0.17, 0.2, 8, 20]} />} position={[sign * 1.3, -0.62, 0]} region={region} scale={[0.88, 1.2, 0.55]} />
-    </group>
-  );
-}
-
-function Leg({ side, ...props }: AnatomySideProps) {
-  const sign = side === "right" ? -1 : 1;
-  const legRegion: BodyRegion = side === "right" ? "right-leg" : "left-leg";
-  const footRegion: BodyRegion = side === "right" ? "right-foot" : "left-foot";
-  return (
-    <group>
-      <AnatomyPart {...props} geometry={<capsuleGeometry args={[0.28, 1.18, 10, 28]} />} position={[sign * 0.35, -1.2, 0]} region={legRegion} rotation={[0, 0, sign * 0.04]} scale={[1, 1, 0.9]} />
-      <AnatomyPart {...props} geometry={<sphereGeometry args={[0.24, 28, 20]} />} position={[sign * 0.38, -2.02, 0]} region={legRegion} scale={[1, 1.1, 0.9]} />
-      <AnatomyPart {...props} geometry={<capsuleGeometry args={[0.2, 1.02, 10, 26]} />} position={[sign * 0.4, -2.75, 0]} region={legRegion} scale={[0.9, 1, 0.82]} />
-      <AnatomyPart {...props} geometry={<capsuleGeometry args={[0.21, 0.42, 8, 24]} />} position={[sign * 0.4, -3.42, 0.13]} region={footRegion} rotation={[Math.PI / 2.4, 0, 0]} scale={[0.9, 1.15, 0.7]} />
-    </group>
-  );
-}
-
-type AnatomySideProps = {
-  side: "left" | "right";
-  opacity: number;
-  selectedRegion: BodyRegion;
-  summaries: Partial<Record<BodyRegion, AnatomyRegionSummary>>;
-  onSelect: (region: BodyRegion) => void;
-};
-
-function InternalOrgans({
-  selectedRegion,
-  summaries,
-  onSelect
-}: Omit<AnatomySideProps, "side" | "opacity">) {
-  return (
-    <group scale={0.92}>
-      <OrganPart color="#d9a9a0" label="Brain" onSelect={onSelect} position={[0, 2.6, 0.04]} region="head-neck" scale={[0.32, 0.38, 0.28]} selectedRegion={selectedRegion} summaries={summaries} />
-      <OrganPart color="#d68282" label="Right lung" onSelect={onSelect} position={[-0.27, 1.31, 0.08]} region="chest" scale={[0.3, 0.58, 0.22]} selectedRegion={selectedRegion} summaries={summaries} />
-      <OrganPart color="#d68282" label="Left lung" onSelect={onSelect} position={[0.27, 1.31, 0.08]} region="chest" scale={[0.3, 0.58, 0.22]} selectedRegion={selectedRegion} summaries={summaries} />
-      <OrganPart color="#a4142e" label="Heart" onSelect={onSelect} position={[0.08, 1.08, 0.28]} region="chest" rotation={[0, 0, -0.22]} scale={[0.22, 0.3, 0.2]} selectedRegion={selectedRegion} summaries={summaries} />
-      <OrganPart color="#8d3129" label="Liver" onSelect={onSelect} position={[-0.18, 0.52, 0.15]} region="abdomen" rotation={[0, 0, 0.12]} scale={[0.48, 0.24, 0.24]} selectedRegion={selectedRegion} summaries={summaries} />
-      <OrganPart color="#d99573" label="Stomach" onSelect={onSelect} position={[0.27, 0.34, 0.16]} region="abdomen" rotation={[0, 0, -0.35]} scale={[0.25, 0.35, 0.2]} selectedRegion={selectedRegion} summaries={summaries} />
-      <OrganPart color="#875035" label="Right kidney" onSelect={onSelect} position={[-0.3, 0.12, -0.12]} region="abdomen" scale={[0.14, 0.25, 0.12]} selectedRegion={selectedRegion} summaries={summaries} />
-      <OrganPart color="#875035" label="Left kidney" onSelect={onSelect} position={[0.3, 0.12, -0.12]} region="abdomen" scale={[0.14, 0.25, 0.12]} selectedRegion={selectedRegion} summaries={summaries} />
+      <group position={[0.07, 1.06, 0.27]} rotation={[0, 0, -0.2]}>
+        <OrganPart color="#a4142e" label="Heart" onSelect={onSelect} position={[-0.09, 0.08, 0]} region="chest" scale={[0.16, 0.2, 0.16]} selectedRegion={selectedRegion} summaries={summaries} />
+        <OrganPart color="#a4142e" label="Heart" onSelect={onSelect} position={[0.09, 0.08, 0]} region="chest" scale={[0.16, 0.2, 0.16]} selectedRegion={selectedRegion} summaries={summaries} />
+        <AnatomyPart color="#981329" geometry={<coneGeometry args={[0.25, 0.46, 28]} />} opacity={1} onSelect={onSelect} position={[0, -0.15, 0]} region="chest" rotation={[0, 0, Math.PI]} selectedRegion={selectedRegion} summaries={summaries} />
+      </group>
     </group>
   );
 }
@@ -396,7 +420,7 @@ function AnatomyPart({
   const selected = selectedRegion === region;
   useCursor(hovered);
   const baseColor = color ?? (summary?.currentCount ? "#4c9e9c" : summary?.count ? "#c79046" : "#dbe3eb");
-  const displayColor = selected || hovered ? "#3378c5" : baseColor;
+  const highlighted = selected || hovered;
 
   function select(event: ThreeEvent<MouseEvent>) {
     event.stopPropagation();
@@ -419,8 +443,10 @@ function AnatomyPart({
     >
       {geometry}
       <meshPhysicalMaterial
-        color={displayColor}
+        color={baseColor}
         depthWrite={opacity > 0.5}
+        emissive={highlighted ? "#12365d" : "#000000"}
+        emissiveIntensity={highlighted ? 0.22 : 0}
         metalness={0.02}
         opacity={opacity}
         roughness={0.6}

@@ -12,6 +12,7 @@ import { type Session } from "@supabase/supabase-js";
 import {
   authStorageKeys,
   demoAccounts,
+  localAuthCookieKey,
   type AccountProfile,
   isPatientRole,
   type UserRole
@@ -149,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    window.localStorage.setItem(authStorageKeys.profiles, JSON.stringify(accounts));
+    writeLocalStorage(authStorageKeys.profiles, JSON.stringify(accounts));
   }, [accounts, authMode]);
 
   useEffect(() => {
@@ -158,9 +159,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (currentUser?.id) {
-      window.localStorage.setItem(authStorageKeys.sessionUserId, currentUser.id);
+      writeLocalStorage(authStorageKeys.sessionUserId, currentUser.id);
+      writeLocalSessionCookie(currentUser.id);
     } else {
-      window.localStorage.removeItem(authStorageKeys.sessionUserId);
+      removeLocalStorage(authStorageKeys.sessionUserId);
+      removeLocalSessionCookie();
     }
   }, [currentUser, authMode]);
 
@@ -541,7 +544,7 @@ function readStoredAccounts() {
     return demoAccounts;
   }
 
-  const storedProfiles = window.localStorage.getItem(authStorageKeys.profiles);
+  const storedProfiles = readLocalStorage(authStorageKeys.profiles);
   if (!storedProfiles) {
     return demoAccounts;
   }
@@ -559,7 +562,61 @@ function readStoredSessionUserId() {
     return null;
   }
 
-  return window.localStorage.getItem(authStorageKeys.sessionUserId);
+  return readLocalStorage(authStorageKeys.sessionUserId) || readLocalSessionCookie();
+}
+
+function readLocalSessionCookie() {
+  try {
+    const prefix = `${localAuthCookieKey}=`;
+    const value = document.cookie
+      .split(";")
+      .map((entry) => entry.trim())
+      .find((entry) => entry.startsWith(prefix))
+      ?.slice(prefix.length);
+    return value ? decodeURIComponent(value) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalSessionCookie(accountId: string) {
+  try {
+    document.cookie = `${localAuthCookieKey}=${encodeURIComponent(accountId)}; Path=/; Max-Age=2592000; SameSite=Lax`;
+  } catch {
+    // The in-memory session still works if the browser blocks cookies.
+  }
+}
+
+function removeLocalSessionCookie() {
+  try {
+    document.cookie = `${localAuthCookieKey}=; Path=/; Max-Age=0; SameSite=Lax`;
+  } catch {
+    // Cookie access may be unavailable in a privacy-restricted browser.
+  }
+}
+
+function readLocalStorage(key: string) {
+  try {
+    return window.localStorage?.getItem(key) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalStorage(key: string, value: string) {
+  try {
+    window.localStorage?.setItem(key, value);
+  } catch {
+    // Keep the in-memory demo session usable when an embedded browser blocks storage.
+  }
+}
+
+function removeLocalStorage(key: string) {
+  try {
+    window.localStorage?.removeItem(key);
+  } catch {
+    // Storage may be unavailable in embedded or privacy-restricted browsers.
+  }
 }
 
 function readInitialLocalCurrentUser() {

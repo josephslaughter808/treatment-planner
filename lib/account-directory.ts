@@ -107,6 +107,8 @@ export const authStorageKeys = {
   sessionUserId: "clearpath-auth-session"
 };
 
+export const localAuthCookieKey = "clearpath-local-session";
+
 export const roles: { value: UserRole; label: string }[] = [
   { value: "admin", label: "Practice admin" },
   { value: "front-desk", label: "Front desk" },
