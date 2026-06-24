@@ -3,37 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ClearPath Care | 3D Model Directions</title>
+    <title>ClearPath Care | Real 3D Model Candidates</title>
     <style>
       :root {
         color-scheme: light;
-        --ink: #172233;
-        --muted: #607085;
-        --line: #d8e0e8;
-        --panel: #ffffff;
-        --soft: #f3f6f8;
-        --teal: #197a78;
-        --teal-dark: #125d5c;
-        --blue: #2d6da3;
-        --amber: #b66f29;
+        --ink: #172333;
+        --muted: #5f7082;
+        --line: #d8e0e7;
+        --soft: #f2f5f7;
+        --teal: #167875;
+        --teal-dark: #105b59;
+        --blue: #27699d;
+        --amber: #9b641f;
+        --green-soft: #eaf7f3;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       * { box-sizing: border-box; }
-
-      html, body { margin: 0; min-height: 100%; background: #eef2f5; color: var(--ink); }
-
-      body { min-height: 100vh; }
-
-      button { font: inherit; }
-
-      .page-shell {
-        min-height: 100vh;
-        display: grid;
-        grid-template-rows: auto 1fr;
-      }
+      html { background: #eef2f5; }
+      body { margin: 0; color: var(--ink); background: #eef2f5; }
+      a { color: inherit; }
 
       header {
+        position: sticky;
+        z-index: 10;
+        top: 0;
         min-height: 68px;
         display: flex;
         align-items: center;
@@ -41,588 +35,266 @@
         gap: 24px;
         padding: 12px 24px;
         border-bottom: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.96);
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(12px);
       }
 
       .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
       .brand img { width: 38px; height: 38px; object-fit: contain; }
-      .brand strong { display: block; font-size: 0.95rem; }
-      .brand span { display: block; margin-top: 2px; color: var(--muted); font-size: 0.78rem; }
+      .brand strong { display: block; font-size: 0.94rem; }
+      .brand span { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; }
+      .header-status { color: var(--teal-dark); font-size: 0.76rem; font-weight: 800; }
 
-      .header-note { color: var(--muted); font-size: 0.82rem; text-align: right; }
+      main { max-width: 1380px; margin: 0 auto; padding: 30px 28px 44px; }
 
-      main {
-        min-height: 0;
+      .intro {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 350px;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 450px);
+        gap: 34px;
+        align-items: end;
+        margin-bottom: 26px;
       }
 
-      .viewer {
-        position: relative;
-        min-height: 680px;
+      .eyebrow { margin: 0 0 7px; color: var(--teal-dark); font-size: 0.7rem; font-weight: 850; text-transform: uppercase; }
+      h1 { max-width: 760px; margin: 0; font-size: clamp(1.8rem, 4vw, 3.2rem); line-height: 1.04; letter-spacing: 0; }
+      .intro-copy { max-width: 750px; margin: 13px 0 0; color: var(--muted); font-size: 0.94rem; line-height: 1.55; }
+
+      .safety-standard {
+        padding: 17px 18px;
+        border: 1px solid #9dc9bf;
+        border-radius: 7px;
+        background: var(--green-soft);
+      }
+
+      .safety-standard strong { display: block; font-size: 0.88rem; }
+      .safety-standard p { margin: 6px 0 0; color: #3f625f; font-size: 0.78rem; line-height: 1.5; }
+
+      .recommendation {
+        display: grid;
+        grid-template-columns: 270px minmax(0, 1fr) 310px;
+        min-height: 305px;
+        margin-bottom: 30px;
         overflow: hidden;
-        background:
-          linear-gradient(#dce5eb 1px, transparent 1px),
-          linear-gradient(90deg, #dce5eb 1px, transparent 1px),
-          #f5f8fa;
-        background-size: 38px 38px;
+        border: 1px solid #aacbc5;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 12px 32px rgba(35, 55, 72, 0.08);
       }
 
-      .viewer::after {
-        content: "";
+      .recommendation-media { position: relative; min-height: 305px; background: #dde4e7; overflow: hidden; }
+      .recommendation-media img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+      .recommendation-media span {
         position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: linear-gradient(to bottom, rgba(255,255,255,.72), transparent 25%, transparent 72%, rgba(226,234,239,.8));
-      }
-
-      canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
-
-      .viewer-heading {
-        position: absolute;
-        z-index: 3;
-        top: 24px;
-        left: 28px;
-        max-width: 430px;
-      }
-
-      .eyebrow {
-        margin: 0 0 7px;
-        color: var(--teal-dark);
-        font-size: 0.7rem;
-        font-weight: 800;
+        top: 12px;
+        left: 12px;
+        padding: 6px 8px;
+        border-radius: 5px;
+        background: rgba(16, 39, 50, 0.88);
+        color: #fff;
+        font-size: 0.66rem;
+        font-weight: 850;
         text-transform: uppercase;
       }
 
-      h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.35rem); line-height: 1.08; letter-spacing: 0; }
-      .viewer-heading p:last-child { margin: 9px 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.45; }
+      .recommendation-copy { padding: 24px; }
+      .recommendation-copy h2 { margin: 0; font-size: 1.45rem; }
+      .recommendation-copy > p { margin: 9px 0 17px; color: var(--muted); font-size: 0.86rem; line-height: 1.5; }
+      .pair-list { display: grid; gap: 9px; }
+      .pair-row { display: grid; grid-template-columns: 86px 1fr; gap: 10px; font-size: 0.78rem; }
+      .pair-row span { color: var(--muted); }
+      .pair-row strong { font-weight: 800; }
 
-      .viewer-tools {
-        position: absolute;
-        z-index: 4;
-        top: 24px;
-        right: 24px;
+      .recommendation-actions {
         display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .icon-button {
-        width: 40px;
-        height: 40px;
-        display: grid;
-        place-items: center;
-        border: 1px solid #c8d2dc;
-        border-radius: 6px;
-        background: rgba(255,255,255,.94);
-        color: var(--ink);
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 800;
-        box-shadow: 0 5px 18px rgba(32,49,67,.08);
-      }
-
-      .icon-button:hover, .icon-button:focus-visible { border-color: var(--teal); outline: 2px solid rgba(25,122,120,.18); }
-
-      .region-status {
-        position: absolute;
-        z-index: 3;
-        left: 28px;
-        bottom: 24px;
-        display: flex;
-        align-items: center;
+        flex-direction: column;
+        justify-content: center;
         gap: 10px;
-        min-height: 46px;
-        padding: 8px 13px;
-        border: 1px solid #cbd6df;
-        border-radius: 6px;
-        background: rgba(255,255,255,.94);
-        box-shadow: 0 8px 22px rgba(32,49,67,.08);
-      }
-
-      .region-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
-      .region-status span { color: var(--muted); font-size: 0.76rem; }
-      .region-status strong { display: block; margin-top: 1px; font-size: 0.86rem; }
-
-      .control-panel {
-        min-height: 0;
-        overflow: auto;
         padding: 22px;
         border-left: 1px solid var(--line);
-        background: var(--panel);
+        background: #f8fafb;
       }
 
-      .control-panel h2 { margin: 0; font-size: 1.1rem; }
-      .control-panel > p { margin: 7px 0 18px; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
-
-      .segmented {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 3px;
-        padding: 3px;
-        border: 1px solid var(--line);
-        border-radius: 7px;
-        background: var(--soft);
-      }
-
-      .segmented button {
-        min-height: 38px;
-        border: 0;
-        border-radius: 5px;
-        background: transparent;
-        color: var(--muted);
-        cursor: pointer;
-        font-weight: 750;
-      }
-
-      .segmented button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(28,45,64,.12); }
-
-      .section-label { margin: 22px 0 9px; color: var(--muted); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-
-      .option-list { display: grid; gap: 9px; }
-
-      .model-option {
-        width: 100%;
-        min-height: 82px;
-        display: grid;
-        grid-template-columns: 42px 1fr 18px;
+      .action-link {
+        min-height: 42px;
+        display: flex;
         align-items: center;
-        gap: 11px;
-        padding: 11px;
-        border: 1px solid var(--line);
-        border-radius: 7px;
-        background: #fff;
-        color: var(--ink);
-        text-align: left;
-        cursor: pointer;
-      }
-
-      .model-option:hover { border-color: #9bb5c4; background: #f9fbfc; }
-      .model-option.active { border-color: var(--teal); box-shadow: inset 3px 0 0 var(--teal); background: #f4fbfa; }
-
-      .swatch { width: 42px; height: 54px; border-radius: 6px; border: 1px solid rgba(23,34,51,.12); }
-      .swatch.clinical { background: linear-gradient(#e8f0f2 0 24%, #3f8c8a 24% 65%, #cdd8de 65%); }
-      .swatch.resin { background: linear-gradient(#dac4b4 0 28%, #b7c3ca 28% 67%, #9cabb5 67%); }
-      .swatch.scrubs { background: linear-gradient(#d8b8a6 0 23%, #4d7d8d 23% 58%, #325e70 58%); }
-      .swatch.frosted { background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(130,177,196,.5)); }
-
-      .model-option strong { display: block; font-size: 0.88rem; }
-      .model-option small { display: block; margin-top: 4px; color: var(--muted); font-size: 0.72rem; line-height: 1.35; }
-      .check { color: var(--teal); font-size: 1rem; opacity: 0; }
-      .model-option.active .check { opacity: 1; }
-
-      .selection-summary {
-        margin-top: 18px;
-        padding-top: 16px;
-        border-top: 1px solid var(--line);
-      }
-
-      .selection-summary dl { margin: 0; display: grid; grid-template-columns: 92px 1fr; gap: 7px; font-size: 0.78rem; }
-      .selection-summary dt { color: var(--muted); }
-      .selection-summary dd { margin: 0; font-weight: 750; }
-
-      .choose-button {
-        width: 100%;
-        min-height: 44px;
-        margin-top: 15px;
+        justify-content: center;
+        padding: 9px 12px;
         border: 1px solid var(--teal-dark);
         border-radius: 6px;
         background: var(--teal);
         color: #fff;
-        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        font-size: 0.8rem;
         font-weight: 800;
       }
 
-      .choose-button:hover { background: var(--teal-dark); }
-      .choose-button.saved { background: #fff; color: var(--teal-dark); }
+      .action-link.secondary { background: #fff; color: var(--teal-dark); }
+      .action-link:hover, .action-link:focus-visible { outline: 3px solid rgba(22,120,117,.16); }
+      .recommendation-actions small { color: var(--muted); font-size: 0.68rem; line-height: 1.4; }
 
-      @media (max-width: 900px) {
-        header { padding: 10px 14px; }
-        .header-note { display: none; }
-        main { grid-template-columns: 1fr; }
-        .viewer { min-height: 62vh; }
-        .control-panel { border-left: 0; border-top: 1px solid var(--line); overflow: visible; }
-        .option-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin: 0 0 13px; }
+      .section-heading h2 { margin: 0; font-size: 1.18rem; }
+      .section-heading p { max-width: 570px; margin: 0; color: var(--muted); font-size: 0.78rem; text-align: right; }
+
+      .asset-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+
+      .asset-card {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
       }
 
-      @media (max-width: 560px) {
-        .viewer { min-height: 570px; }
-        .viewer-heading { top: 18px; left: 18px; right: 72px; }
-        .viewer-heading p:last-child { font-size: 0.78rem; }
-        .viewer-tools { top: 16px; right: 16px; }
-        .region-status { left: 16px; bottom: 16px; }
-        .control-panel { padding: 18px 14px 24px; }
-        .option-list { grid-template-columns: 1fr; }
-        .model-option { min-height: 74px; }
+      .asset-image { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #dfe4e7; }
+      .asset-image img { width: 100%; height: 100%; display: block; object-fit: cover; }
+      .asset-image .fit { object-fit: contain; }
+      .asset-badge { position: absolute; top: 9px; left: 9px; padding: 5px 7px; border-radius: 4px; background: rgba(20,35,48,.86); color: #fff; font-size: 0.61rem; font-weight: 850; text-transform: uppercase; }
+      .asset-badge.match { background: rgba(16,91,89,.92); }
+
+      .asset-body { padding: 14px; }
+      .asset-body h3 { margin: 0; font-size: 0.96rem; line-height: 1.25; }
+      .asset-body > p { min-height: 55px; margin: 7px 0 11px; color: var(--muted); font-size: 0.73rem; line-height: 1.45; }
+      .asset-meta { display: grid; grid-template-columns: 72px 1fr; gap: 5px; margin: 0 0 12px; font-size: 0.68rem; }
+      .asset-meta dt { color: var(--muted); }
+      .asset-meta dd { margin: 0; font-weight: 750; }
+      .source-link { display: inline-flex; align-items: center; min-height: 34px; padding: 7px 10px; border: 1px solid #b8c6d0; border-radius: 5px; color: var(--blue); text-decoration: none; font-size: 0.72rem; font-weight: 800; }
+      .source-link:hover { border-color: var(--blue); }
+
+      .decision-note {
+        margin-top: 28px;
+        padding: 18px 20px;
+        border-left: 4px solid var(--amber);
+        background: #fffaf1;
+      }
+      .decision-note strong { display: block; font-size: 0.86rem; }
+      .decision-note p { margin: 5px 0 0; color: #69583f; font-size: 0.76rem; line-height: 1.5; }
+
+      @media (max-width: 1050px) {
+        .recommendation { grid-template-columns: 235px 1fr; }
+        .recommendation-actions { grid-column: 1 / -1; flex-direction: row; border-left: 0; border-top: 1px solid var(--line); }
+        .recommendation-actions .action-link { flex: 1; }
+        .recommendation-actions small { flex: 1.3; align-self: center; }
+        .asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 720px) {
+        header { padding: 10px 14px; }
+        .header-status { display: none; }
+        main { padding: 22px 14px 34px; }
+        .intro { grid-template-columns: 1fr; gap: 17px; }
+        .recommendation { grid-template-columns: 1fr; }
+        .recommendation-media { min-height: 330px; }
+        .recommendation-actions { grid-column: auto; flex-direction: column; }
+        .section-heading { align-items: start; flex-direction: column; gap: 5px; }
+        .section-heading p { text-align: left; }
+      }
+
+      @media (max-width: 520px) {
+        .asset-grid { grid-template-columns: 1fr; }
+        .asset-body > p { min-height: 0; }
+        .recommendation-copy { padding: 18px; }
       }
     </style>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
-        }
-      }
-    </script>
   </head>
   <body>
-    <div class="page-shell">
-      <header>
-        <div class="brand">
-          <img src="/thinnerlogo.png" alt="ClearPath Care" />
-          <div><strong>ClearPath Care</strong><span>3D health map model directions</span></div>
+    <header>
+      <div class="brand">
+        <img src="/thinnerlogo.png" alt="ClearPath Care" />
+        <div><strong>ClearPath Care</strong><span>Real 3D human model research</span></div>
+      </div>
+      <div class="header-status">Only non-explicit previews are included</div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">Revised asset study</p>
+          <h1>Real human meshes with permanent modesty coverage.</h1>
+          <p class="intro-copy">These are real downloadable 3D models, not generated shape studies. The closest pair uses athletic coverage for the female presentation and boxer briefs for the male presentation while leaving the body visible for region-based health navigation.</p>
         </div>
-        <div class="header-note">Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Tap a region</div>
-      </header>
-
-      <main>
-        <section class="viewer" aria-label="Interactive 3D body model preview">
-          <div class="viewer-heading">
-            <p class="eyebrow">Design study</p>
-            <h1 id="style-title">Clinical bodysuit</h1>
-            <p id="style-description">A polished, fully covered figure designed for clear body-region selection.</p>
-          </div>
-
-          <div class="viewer-tools">
-            <button class="icon-button" id="reset-view" type="button" title="Reset view" aria-label="Reset view">↺</button>
-          </div>
-
-          <canvas id="model-canvas"></canvas>
-
-          <div class="region-status" aria-live="polite">
-            <i class="region-dot"></i>
-            <div><span>Selected region</span><strong id="selected-region">None selected</strong></div>
-          </div>
-        </section>
-
-        <aside class="control-panel">
-          <h2>Compare directions</h2>
-          <p>Every option is intentionally modest and avoids explicit anatomical detail.</p>
-
-          <div class="segmented" aria-label="Body model presentation">
-            <button class="active" data-sex="female" type="button">Female</button>
-            <button data-sex="male" type="button">Male</button>
-          </div>
-
-          <p class="section-label">Visual style</p>
-          <div class="option-list">
-            <button class="model-option active" data-style="clinical" type="button">
-              <span class="swatch clinical"></span>
-              <span><strong>Clinical bodysuit</strong><small>Clean, approachable, and easy to map.</small></span>
-              <span class="check">✓</span>
-            </button>
-            <button class="model-option" data-style="resin" type="button">
-              <span class="swatch resin"></span>
-              <span><strong>Soft neutral</strong><small>Warm resin finish with subtle clothing zones.</small></span>
-              <span class="check">✓</span>
-            </button>
-            <button class="model-option" data-style="scrubs" type="button">
-              <span class="swatch scrubs"></span>
-              <span><strong>Patient scrubs</strong><small>Most modest and familiar in a care setting.</small></span>
-              <span class="check">✓</span>
-            </button>
-            <button class="model-option" data-style="frosted" type="button">
-              <span class="swatch frosted"></span>
-              <span><strong>Frosted guide</strong><small>Abstract, modern, and visually lightweight.</small></span>
-              <span class="check">✓</span>
-            </button>
-          </div>
-
-          <div class="selection-summary">
-            <dl>
-              <dt>Presentation</dt><dd id="summary-sex">Female</dd>
-              <dt>Direction</dt><dd id="summary-style">Clinical bodysuit</dd>
-              <dt>Detail level</dt><dd>Modest / simplified</dd>
-            </dl>
-            <button class="choose-button" id="choose-model" type="button">Mark as preferred</button>
-          </div>
+        <aside class="safety-standard">
+          <strong>Production safety requirement</strong>
+          <p>Garments must be fused into the deliverable model. Covered chest and pelvic geometry must be deleted, not merely hidden, so no child or adult can reveal an explicit layer through controls, browser tools, or asset inspection. Pediatric accounts should use the same neutral adult-style map rather than a realistic child body model.</p>
         </aside>
-      </main>
-    </div>
+      </section>
 
-    <script type="module">
-      import * as THREE from "three";
-      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+      <section class="recommendation">
+        <div class="recommendation-media">
+          <img src="https://media.sketchfab.com/models/450c4d7006f1413caa82260edad9a057/thumbnails/0b0cc9604a7341dea5a52e3fbaa2847f/4e46bf98abe24ce284d3341c0b71b4e2.jpeg" alt="Realistic female 3D character wearing athletic coverage" />
+          <span>Closest female match</span>
+        </div>
+        <div class="recommendation-copy">
+          <p class="eyebrow">Recommended direction</p>
+          <h2>Realistic body surface + fixed athletic coverage</h2>
+          <p>Use these assets as quality references, then standardize both models into the same neutral A-pose, material palette, lighting, and region map. Hair, shoes, tattoos, and fashion styling would be removed.</p>
+          <div class="pair-list">
+            <div class="pair-row"><span>Female base</span><strong>Realistic CC5 mesh, sports-bra and shorts coverage</strong></div>
+            <div class="pair-row"><span>Male base</span><strong>James realistic mesh, boxer-brief coverage</strong></div>
+            <div class="pair-row"><span>Licensing</span><strong>Both listed as downloadable CC Attribution</strong></div>
+            <div class="pair-row"><span>App work</span><strong>Retopology, garment fusion, region tagging, GLB optimization</strong></div>
+          </div>
+        </div>
+        <div class="recommendation-actions">
+          <a class="action-link" href="https://sketchfab.com/3d-models/your-college-girlfriend-rigged-cc5-character-450c4d7006f1413caa82260edad9a057" rel="noreferrer" target="_blank">Open female model in 3D</a>
+          <a class="action-link secondary" href="https://sketchfab.com/3d-models/james-realistic-male-character-3d-model-394c101990a54fa0adfc71d3d967fa2e" rel="noreferrer" target="_blank">Open male model in 3D</a>
+          <small>Source names and creator credits remain linked for license compliance. A legal review is still required before production use.</small>
+        </div>
+      </section>
 
-      const canvas = document.querySelector("#model-canvas");
-      const viewer = document.querySelector(".viewer");
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
+      <div class="section-heading">
+        <h2>Additional real-model options</h2>
+        <p>Every preview below is non-explicit. “Benchmark” models may be too heavy or too clothed for the final health map, but they help us compare realism, rigging, and performance.</p>
+      </div>
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
+      <section class="asset-grid">
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/394c101990a54fa0adfc71d3d967fa2e/thumbnails/4ffef8737a2e4bbaaf14d4e0b6f8a115/44fbd1f1a910493f96b09c5243e2750a.jpeg" alt="Realistic male 3D model in boxer briefs" /><span class="asset-badge match">Strong match</span></div>
+          <div class="asset-body"><h3>James realistic male</h3><p>High-fidelity male body with the exact boxer-brief coverage target. Neutralize the face and convert to the same pose as the female model.</p><dl class="asset-meta"><dt>Creator</dt><dd>StormierTunic16</dd><dt>Mesh</dt><dd>61,128 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/james-realistic-male-character-3d-model-394c101990a54fa0adfc71d3d967fa2e" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
 
-      const controls = new OrbitControls(camera, canvas);
-      controls.enableDamping = true;
-      controls.enablePan = false;
-      controls.minDistance = 8.5;
-      controls.maxDistance = 17;
-      let compactCamera = null;
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/450c4d7006f1413caa82260edad9a057/thumbnails/0b0cc9604a7341dea5a52e3fbaa2847f/4e46bf98abe24ce284d3341c0b71b4e2.jpeg" alt="Realistic female 3D model in athletic coverage" /><span class="asset-badge match">Strong match</span></div>
+          <div class="asset-body"><h3>Realistic female athletic base</h3><p>Detailed female mesh with sports-bra and shorts coverage. Hair, shoes, tattoos, and styling would be removed for a neutral clinical presentation.</p><dl class="asset-meta"><dt>Creator</dt><dd>XRProfXR</dd><dt>Mesh</dt><dd>86,149 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/your-college-girlfriend-rigged-cc5-character-450c4d7006f1413caa82260edad9a057" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
 
-      function setResponsiveCamera(force = false) {
-        const compact = viewer.clientWidth <= 560;
-        if (!force && compact === compactCamera) return;
-        compactCamera = compact;
-        camera.position.set(0, compact ? 0.85 : 0.15, compact ? 15 : 12.6);
-        controls.target.set(0, compact ? 0.85 : 0, 0);
-        controls.update();
-      }
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/597af5b4817e4f4792ff8653045ba9b2/thumbnails/8a85280ce4f345f9b8006f25ac5d67f5/cb0a60442aa246dea2b26b44ba20d975.jpeg" alt="Stylized female 3D model in athletic coverage" /><span class="asset-badge">Lighter style</span></div>
+          <div class="asset-body"><h3>Stylized female T-pose</h3><p>Already uses modest athletic coverage and a clean T-pose. Less realistic than the preferred pair, but approachable and easier to optimize.</p><dl class="asset-meta"><dt>Creator</dt><dd>3dUVpro</dd><dt>Mesh</dt><dd>89,322 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/girl-japanese-t-pose-stylized-597af5b4817e4f4792ff8653045ba9b2" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
 
-      setResponsiveCamera(true);
+        <article class="asset-card">
+          <div class="asset-image"><img class="fit" src="https://media.sketchfab.com/models/4ed77432624c4cf4a1b1d468bb8d7f8b/thumbnails/0d72833af0754ac4b989a86d4bbe2389/3260a83c126543f2882113a394a69401.jpeg" alt="Rigged human 3D model wearing clothes" /><span class="asset-badge">Performance</span></div>
+          <div class="asset-body"><h3>Human model with clothes</h3><p>A simpler rigged human at a practical web mesh size. Useful as a performance baseline, though its anatomy is less refined.</p><dl class="asset-meta"><dt>Creator</dt><dd>pronixer132sd</dd><dt>Mesh</dt><dd>37,320 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/human-model-with-clothes-4ed77432624c4cf4a1b1d468bb8d7f8b" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
 
-      scene.add(new THREE.HemisphereLight(0xffffff, 0x8da2af, 2.15));
-      const key = new THREE.DirectionalLight(0xffffff, 3.2);
-      key.position.set(4, 6, 7);
-      key.castShadow = true;
-      scene.add(key);
-      const rim = new THREE.DirectionalLight(0x9ddad7, 2.1);
-      rim.position.set(-5, 2, -4);
-      scene.add(rim);
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/0abc982946cf445fa6c0b68a20e1514f/thumbnails/75bc12ab0c9849f28b7299e47d085e44/cea2a7be2cd948b9aa957a2eee623783.jpeg" alt="Rigged surgical nurse 3D model" /><span class="asset-badge">Medical</span></div>
+          <div class="asset-body"><h3>Rigged surgical nurse</h3><p>A real rigged female model with moderate geometry and a medical visual language. Too clothed for detailed body-region mapping.</p><dl class="asset-meta"><dt>Creator</dt><dd>bachelorgkv</dd><dt>Mesh</dt><dd>35,512 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/nurse-surgical-rigged-0abc982946cf445fa6c0b68a20e1514f" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
 
-      const floor = new THREE.Mesh(
-        new THREE.CircleGeometry(2.4, 72),
-        new THREE.ShadowMaterial({ color: 0x607080, opacity: 0.18 })
-      );
-      floor.rotation.x = -Math.PI / 2;
-      floor.position.y = -3.57;
-      floor.receiveShadow = true;
-      scene.add(floor);
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/79e23af07d1243c789b3372c6ec72c27/thumbnails/18affe3d83b84879b6c4ade530e28bd1/f98598616cf84fc299487dae9e83aafd.jpeg" alt="Realistic male surgical doctor 3D model" /><span class="asset-badge">Medical</span></div>
+          <div class="asset-body"><h3>Male surgical doctor</h3><p>A realistic scanned male model that demonstrates attainable human fidelity. Scrubs prevent direct torso and leg region selection.</p><dl class="asset-meta"><dt>Creator</dt><dd>deep3dstudio</dd><dt>Mesh</dt><dd>99,998 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/free-download-male-surgical-doctor-working-222-79e23af07d1243c789b3372c6ec72c27" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
 
-      const styles = {
-        clinical: {
-          title: "Clinical bodysuit",
-          description: "A polished, fully covered figure designed for clear body-region selection.",
-          skin: 0xd6b8a7,
-          torso: 0x3d8a88,
-          lower: 0xcbd7dc,
-          accent: 0x155f5e,
-          roughness: 0.58,
-          opacity: 1,
-          scrubs: false
-        },
-        resin: {
-          title: "Soft neutral",
-          description: "A warm, object-like model that feels human without reading as realistic or exposed.",
-          skin: 0xd4bdad,
-          torso: 0xb4c0c7,
-          lower: 0x98a8b2,
-          accent: 0x5d7482,
-          roughness: 0.74,
-          opacity: 1,
-          scrubs: false
-        },
-        scrubs: {
-          title: "Patient scrubs",
-          description: "A familiar care-setting presentation with relaxed coverage and strong modesty.",
-          skin: 0xd4ad98,
-          torso: 0x487b8c,
-          lower: 0x315d6e,
-          accent: 0x173f50,
-          roughness: 0.82,
-          opacity: 1,
-          scrubs: true
-        },
-        frosted: {
-          title: "Frosted guide",
-          description: "A calm, abstract figure that keeps attention on health information instead of anatomy.",
-          skin: 0xc9dce2,
-          torso: 0x89b4c1,
-          lower: 0xa8c3cb,
-          accent: 0x397889,
-          roughness: 0.22,
-          opacity: 0.72,
-          scrubs: false
-        }
-      };
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/f61c61c98be743c0b37008a44ef113c4/thumbnails/b7e69ed964684adab270052e8c762208/7725d0408410470bb2d4991d82ae4f2e.jpeg" alt="High-fidelity scanned male 3D model" /><span class="asset-badge">Scan benchmark</span></div>
+          <div class="asset-body"><h3>Scanned posing man</h3><p>A photogrammetry-quality benchmark. Realistic, but the fixed pose, suit, and scan topology make it a poor direct app asset.</p><dl class="asset-meta"><dt>Creator</dt><dd>1-3D.com</dd><dt>Mesh</dt><dd>99,964 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/scanned-posing-man-dennis-f61c61c98be743c0b37008a44ef113c4" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
 
-      let sex = "female";
-      let styleKey = "clinical";
-      let body = null;
-      let selectedMesh = null;
-      let hoveredMesh = null;
-      let pointerDown = null;
-      const raycaster = new THREE.Raycaster();
-      const pointer = new THREE.Vector2();
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/c67725338c4d40fcafa5918009ccbc37/thumbnails/6c45ce149b2644ce953b513f8d7ffbc7/13a262aad7db47efac7a984e4093f752.jpeg" alt="High-detail realistic male 3D character" /><span class="asset-badge">Quality benchmark</span></div>
+          <div class="asset-body"><h3>Realistic male character</h3><p>Excellent skin and face quality, but more than 640,000 triangles is far too heavy for the mobile health map without major retopology.</p><dl class="asset-meta"><dt>Creator</dt><dd>adhamasalah</dd><dt>Mesh</dt><dd>642,562 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/realistic-male-character-c67725338c4d40fcafa5918009ccbc37" rel="noreferrer" target="_blank">View interactive model</a></div>
+        </article>
+      </section>
 
-      function material(color, options = {}) {
-        return new THREE.MeshPhysicalMaterial({
-          color,
-          roughness: options.roughness ?? styles[styleKey].roughness,
-          metalness: 0,
-          clearcoat: styleKey === "frosted" ? 0.62 : 0.12,
-          clearcoatRoughness: 0.5,
-          transparent: styles[styleKey].opacity < 1,
-          opacity: styles[styleKey].opacity,
-          side: THREE.DoubleSide
-        });
-      }
-
-      function part(geometry, color, region, position, scale = [1, 1, 1], rotation = [0, 0, 0]) {
-        const mesh = new THREE.Mesh(geometry, material(color));
-        mesh.position.set(...position);
-        mesh.scale.set(...scale);
-        mesh.rotation.set(...rotation);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        mesh.userData.region = region;
-        mesh.userData.baseColor = color;
-        body.add(mesh);
-        return mesh;
-      }
-
-      function capsule(radius, length, segments = 20) {
-        return new THREE.CapsuleGeometry(radius, length, 8, segments);
-      }
-
-      function buildModel() {
-        if (body) scene.remove(body);
-        body = new THREE.Group();
-        body.rotation.y = -0.18;
-        body.position.x = viewer.clientWidth > 700 ? 0.72 : 0.12;
-        scene.add(body);
-        selectedMesh = null;
-        hoveredMesh = null;
-        document.querySelector("#selected-region").textContent = "None selected";
-
-        const palette = styles[styleKey];
-        const female = sex === "female";
-        const shoulder = female ? 0.77 : 0.9;
-        const hip = female ? 0.66 : 0.58;
-        const torsoColor = palette.torso;
-        const lowerColor = palette.lower;
-        const skin = palette.skin;
-
-        part(new THREE.SphereGeometry(0.43, 40, 30), skin, "Head and neck", [0, 2.76, 0], [0.89, 1.08, 0.9]);
-        part(capsule(0.17, 0.2), skin, "Head and neck", [0, 2.25, 0]);
-
-        if (palette.scrubs) {
-          part(new THREE.BoxGeometry(1.35, 1.55, 0.7, 4, 4, 2), torsoColor, "Chest and abdomen", [0, 1.3, 0], [shoulder, 1, 1]);
-          part(new THREE.BoxGeometry(1.22, 0.52, 0.68, 4, 2, 2), torsoColor, "Pelvis", [0, 0.32, 0], [hip / 0.62, 1, 1]);
-        } else {
-          part(capsule(0.62, 0.92), torsoColor, "Chest and abdomen", [0, 1.35, 0], [shoulder, 1, 0.66]);
-          part(new THREE.SphereGeometry(0.62, 34, 24), lowerColor, "Pelvis", [0, 0.28, 0], [hip / 0.62, 0.66, 0.7]);
-        }
-
-        const armX = shoulder + 0.14;
-        for (const side of [-1, 1]) {
-          const label = side < 0 ? "Right arm" : "Left arm";
-          part(capsule(0.18, 0.95), torsoColor, label, [side * armX, 1.35, 0], [1, 1, 0.93], [0, 0, side * 0.08]);
-          part(capsule(0.145, 0.86), styleKey === "scrubs" ? skin : torsoColor, label, [side * (armX + 0.1), 0.38, 0], [1, 1, 0.9], [0, 0, side * 0.05]);
-          part(new THREE.SphereGeometry(0.16, 24, 18), skin, label, [side * (armX + 0.13), -0.2, 0], [0.86, 1.2, 0.62]);
-        }
-
-        for (const side of [-1, 1]) {
-          const legLabel = side < 0 ? "Right leg" : "Left leg";
-          const footLabel = side < 0 ? "Right foot" : "Left foot";
-          part(capsule(palette.scrubs ? 0.28 : 0.24, 1.18), lowerColor, legLabel, [side * 0.34, -0.74, 0], [1, 1, 0.9], [0, 0, side * 0.025]);
-          part(capsule(palette.scrubs ? 0.23 : 0.19, 1.02), lowerColor, legLabel, [side * 0.36, -2.04, 0], [1, 1, 0.88]);
-          part(capsule(0.19, 0.34), palette.accent, footLabel, [side * 0.36, -2.92, 0.17], [1, 1.18, 0.72], [Math.PI / 2.25, 0, 0]);
-        }
-
-        part(new THREE.TorusGeometry(0.48, 0.028, 10, 48), palette.accent, "Waist", [0, 0.66, 0], [1, 1, 0.72], [Math.PI / 2, 0, 0]);
-        applySelectionState();
-      }
-
-      function applySelectionState() {
-        if (!body) return;
-        body.traverse((object) => {
-          if (!object.isMesh || !object.material) return;
-          const highlighted = object === selectedMesh || object === hoveredMesh;
-          object.material.color.set(highlighted ? 0x2f79b8 : object.userData.baseColor);
-          object.material.emissive.set(highlighted ? 0x153d5c : 0x000000);
-          object.material.emissiveIntensity = highlighted ? 0.22 : 0;
-        });
-      }
-
-      function resize() {
-        const width = viewer.clientWidth;
-        const height = viewer.clientHeight;
-        renderer.setSize(width, height, false);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        if (body) body.position.x = width > 700 ? 0.72 : 0.12;
-        setResponsiveCamera();
-      }
-
-      function updatePointer(event) {
-        const rect = canvas.getBoundingClientRect();
-        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      }
-
-      function hitTest(event) {
-        updatePointer(event);
-        raycaster.setFromCamera(pointer, camera);
-        return raycaster.intersectObjects(body.children, true)[0]?.object || null;
-      }
-
-      canvas.addEventListener("pointerdown", (event) => { pointerDown = { x: event.clientX, y: event.clientY }; });
-      canvas.addEventListener("pointermove", (event) => {
-        if (event.buttons) return;
-        const next = hitTest(event);
-        if (next !== hoveredMesh) {
-          hoveredMesh = next;
-          canvas.style.cursor = next ? "pointer" : "grab";
-          applySelectionState();
-        }
-      });
-      canvas.addEventListener("pointerup", (event) => {
-        if (!pointerDown || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 7) return;
-        selectedMesh = hitTest(event);
-        document.querySelector("#selected-region").textContent = selectedMesh?.userData.region || "None selected";
-        applySelectionState();
-      });
-      canvas.addEventListener("pointerleave", () => { hoveredMesh = null; applySelectionState(); });
-
-      document.querySelectorAll("[data-sex]").forEach((button) => {
-        button.addEventListener("click", () => {
-          sex = button.dataset.sex;
-          document.querySelectorAll("[data-sex]").forEach((item) => item.classList.toggle("active", item === button));
-          document.querySelector("#summary-sex").textContent = sex === "female" ? "Female" : "Male";
-          document.querySelector("#choose-model").classList.remove("saved");
-          document.querySelector("#choose-model").textContent = "Mark as preferred";
-          buildModel();
-        });
-      });
-
-      document.querySelectorAll("[data-style]").forEach((button) => {
-        button.addEventListener("click", () => {
-          styleKey = button.dataset.style;
-          const choice = styles[styleKey];
-          document.querySelectorAll("[data-style]").forEach((item) => item.classList.toggle("active", item === button));
-          document.querySelector("#style-title").textContent = choice.title;
-          document.querySelector("#style-description").textContent = choice.description;
-          document.querySelector("#summary-style").textContent = choice.title;
-          document.querySelector("#choose-model").classList.remove("saved");
-          document.querySelector("#choose-model").textContent = "Mark as preferred";
-          buildModel();
-        });
-      });
-
-      document.querySelector("#reset-view").addEventListener("click", () => {
-        setResponsiveCamera(true);
-        body.rotation.y = -0.18;
-      });
-
-      document.querySelector("#choose-model").addEventListener("click", (event) => {
-        event.currentTarget.classList.add("saved");
-        event.currentTarget.textContent = `${sex === "female" ? "Female" : "Male"} ${styles[styleKey].title} selected`;
-      });
-
-      new ResizeObserver(resize).observe(viewer);
-      buildModel();
-
-      function animate() {
-        controls.update();
-        renderer.render(scene, camera);
-        requestAnimationFrame(animate);
-      }
-      animate();
-    </script>
+      <aside class="decision-note">
+        <strong>Important: “downloadable” does not mean production-ready.</strong>
+        <p>Before adopting any model, we must verify the exact downloaded files, creator attribution, texture rights, hidden mesh layers, age appropriateness, rig quality, and whether the license permits the planned modifications. The recommended pair is a visual direction, not yet a final legal or technical selection.</p>
+      </aside>
+    </main>
   </body>
 </html>
