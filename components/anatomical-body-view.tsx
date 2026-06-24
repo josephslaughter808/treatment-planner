@@ -151,7 +151,9 @@ function AnatomicalSurfaceModel({
     clone.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
     clone.traverse((object) => {
       if (!(object instanceof THREE.Mesh)) return;
-      if (object.name.toLowerCase().endsWith("j") || !object.geometry.attributes.position?.count) {
+      const meshName = object.name.toLowerCase();
+      const isSensitiveGeometry = meshName.includes("urogenital_region") || meshName === "pubic_hairs";
+      if (meshName.endsWith("j") || isSensitiveGeometry || !object.geometry.attributes.position?.count) {
         object.visible = false;
         return;
       }
@@ -171,6 +173,17 @@ function AnatomicalSurfaceModel({
 
     return clone;
   }, [source]);
+  const modestyGeometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-0.28, 0.18);
+    shape.lineTo(0.28, 0.18);
+    shape.lineTo(0.25, 0.02);
+    shape.lineTo(0.14, -0.25);
+    shape.lineTo(-0.14, -0.25);
+    shape.lineTo(-0.25, 0.02);
+    shape.closePath();
+    return new THREE.ExtrudeGeometry(shape, { depth: 0.06, bevelEnabled: true, bevelSize: 0.025, bevelThickness: 0.025, bevelSegments: 3 });
+  }, []);
 
   useEffect(() => {
     model.traverse((object) => {
@@ -210,19 +223,26 @@ function AnatomicalSurfaceModel({
   }
 
   return (
-    <primitive
-      object={model}
-      onClick={displayMode === "clinical" ? (event: ThreeEvent<MouseEvent>) => {
-        event.stopPropagation();
-        const region = regionFromEvent(event);
-        if (region) onSelect(region);
-      } : undefined}
-      onPointerMove={displayMode === "clinical" ? (event: ThreeEvent<PointerEvent>) => {
-        event.stopPropagation();
-        setHoveredRegion(regionFromEvent(event) ?? null);
-      } : undefined}
-      onPointerOut={displayMode === "clinical" ? () => setHoveredRegion(null) : undefined}
-    />
+    <>
+      <primitive
+        object={model}
+        onClick={displayMode === "clinical" ? (event: ThreeEvent<MouseEvent>) => {
+          event.stopPropagation();
+          const region = regionFromEvent(event);
+          if (region) onSelect(region);
+        } : undefined}
+        onPointerMove={displayMode === "clinical" ? (event: ThreeEvent<PointerEvent>) => {
+          event.stopPropagation();
+          setHoveredRegion(regionFromEvent(event) ?? null);
+        } : undefined}
+        onPointerOut={displayMode === "clinical" ? () => setHoveredRegion(null) : undefined}
+      />
+      {displayMode === "clinical" ? (
+        <mesh geometry={modestyGeometry} position={[0.134, -0.06, 0.31]}>
+          <meshPhysicalMaterial color="#647584" roughness={0.78} clearcoat={0.04} />
+        </mesh>
+      ) : null}
+    </>
   );
 }
 

@@ -83,6 +83,8 @@
 
       .recommendation-media { position: relative; min-height: 305px; background: #dde4e7; overflow: hidden; }
       .recommendation-media img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+      .recommendation-media canvas { width: 100%; height: 100%; display: block; }
+      .model-status { position: absolute; inset: auto 12px 12px; margin: 0; padding: 7px 9px; border-radius: 5px; background: rgba(16,39,50,.86); color: #fff; font-size: 0.67rem; line-height: 1.35; }
       .recommendation-media span {
         position: absolute;
         top: 12px;
@@ -213,7 +215,7 @@
         <div>
           <p class="eyebrow">Revised asset study</p>
           <h1>Real human meshes with permanent modesty coverage.</h1>
-          <p class="intro-copy">These are real downloadable 3D models, not generated shape studies. The closest pair uses athletic coverage for the female presentation and boxer briefs for the male presentation while leaving the body visible for region-based health navigation.</p>
+          <p class="intro-copy">This page now starts with the exact body-region mesh ClearPath uses today. It also separates what is already in the app from candidate assets so we do not mistake a reference model for a production decision.</p>
         </div>
         <aside class="safety-standard">
           <strong>Production safety requirement</strong>
@@ -223,46 +225,52 @@
 
       <section class="recommendation">
         <div class="recommendation-media">
-          <img src="https://media.sketchfab.com/models/450c4d7006f1413caa82260edad9a057/thumbnails/0b0cc9604a7341dea5a52e3fbaa2847f/4e46bf98abe24ce284d3341c0b71b4e2.jpeg" alt="Realistic female 3D character wearing athletic coverage" />
-          <span>Closest female match</span>
+          <canvas id="current-model" aria-label="Interactive preview of the current ClearPath shared anatomy model"></canvas>
+          <span>Current ClearPath model</span>
+          <p class="model-status" id="model-status">Loading the model used in the app...</p>
         </div>
         <div class="recommendation-copy">
-          <p class="eyebrow">Recommended direction</p>
-          <h2>Realistic body surface + fixed athletic coverage</h2>
-          <p>Use these assets as quality references, then standardize both models into the same neutral A-pose, material palette, lighting, and region map. Hair, shoes, tattoos, and fashion styling would be removed.</p>
+          <p class="eyebrow">What is in the app today</p>
+          <h2>One shared Z-Anatomy surface model</h2>
+          <p>ClearPath does not currently have a separate female model. Female and male users see this same region-based body mesh. The preview uses the neutral gray presentation you preferred; drag to rotate and scroll to zoom.</p>
           <div class="pair-list">
-            <div class="pair-row"><span>Female base</span><strong>Realistic CC5 mesh, sports-bra and shorts coverage</strong></div>
-            <div class="pair-row"><span>Male base</span><strong>James realistic mesh, boxer-brief coverage</strong></div>
-            <div class="pair-row"><span>Licensing</span><strong>Both listed as downloadable CC Attribution</strong></div>
-            <div class="pair-row"><span>App work</span><strong>Retopology, garment fusion, region tagging, GLB optimization</strong></div>
+            <div class="pair-row"><span>Female today</span><strong>This same shared model; no female-specific asset</strong></div>
+            <div class="pair-row"><span>Source</span><strong>Z-Anatomy body-region FBX</strong></div>
+            <div class="pair-row"><span>License</span><strong>CC BY-SA 4.0</strong></div>
+            <div class="pair-row"><span>Next step</span><strong>Create a matched female variant with fused coverage</strong></div>
           </div>
         </div>
         <div class="recommendation-actions">
-          <a class="action-link" href="https://sketchfab.com/3d-models/your-college-girlfriend-rigged-cc5-character-450c4d7006f1413caa82260edad9a057" rel="noreferrer" target="_blank">Open female model in 3D</a>
-          <a class="action-link secondary" href="https://sketchfab.com/3d-models/james-realistic-male-character-3d-model-394c101990a54fa0adfc71d3d967fa2e" rel="noreferrer" target="_blank">Open male model in 3D</a>
-          <small>Source names and creator credits remain linked for license compliance. A legal review is still required before production use.</small>
+          <a class="action-link" href="/health-map" target="_blank">Open the live ClearPath body view</a>
+          <a class="action-link secondary" href="https://github.com/Z-Anatomy/Unity-app_Z-Anatomy" rel="noreferrer" target="_blank">Open the current model source</a>
+          <small>This is an anatomy-navigation mesh, not a sex-specific representation. That distinction is now explicit in the shortlist.</small>
         </div>
       </section>
 
       <div class="section-heading">
-        <h2>Additional real-model options</h2>
-        <p>Every preview below is non-explicit. “Benchmark” models may be too heavy or too clothed for the final health map, but they help us compare realism, rigging, and performance.</p>
+        <h2>Production directions and references</h2>
+        <p>James remains the strongest realistic male candidate. The Procreate body bundle is now the leading matched male/female visual direction because it omits sensitive anatomy without relying on removable clothing.</p>
       </div>
 
       <section class="asset-grid">
         <article class="asset-card">
-          <div class="asset-image"><img src="https://media.sketchfab.com/models/394c101990a54fa0adfc71d3d967fa2e/thumbnails/4ffef8737a2e4bbaaf14d4e0b6f8a115/44fbd1f1a910493f96b09c5243e2750a.jpeg" alt="Realistic male 3D model in boxer briefs" /><span class="asset-badge match">Strong match</span></div>
-          <div class="asset-body"><h3>James realistic male</h3><p>High-fidelity male body with the exact boxer-brief coverage target. Neutralize the face and convert to the same pose as the female model.</p><dl class="asset-meta"><dt>Creator</dt><dd>StormierTunic16</dd><dt>Mesh</dt><dd>61,128 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/james-realistic-male-character-3d-model-394c101990a54fa0adfc71d3d967fa2e" rel="noreferrer" target="_blank">View interactive model</a></div>
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/394c101990a54fa0adfc71d3d967fa2e/thumbnails/4ffef8737a2e4bbaaf14d4e0b6f8a115/44fbd1f1a910493f96b09c5243e2750a.jpeg" alt="Realistic male 3D model in boxer briefs" /><span class="asset-badge match">Male leader</span></div>
+          <div class="asset-body"><h3>James realistic male</h3><p>High-fidelity male body with the right boxer-brief coverage. Replace its materials with ClearPath gray and standardize its pose and region map.</p><dl class="asset-meta"><dt>Creator</dt><dd>StormierTunic16</dd><dt>Mesh</dt><dd>61,128 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/james-realistic-male-character-3d-model-394c101990a54fa0adfc71d3d967fa2e" rel="noreferrer" target="_blank">View interactive model</a></div>
         </article>
 
         <article class="asset-card">
-          <div class="asset-image"><img src="https://media.sketchfab.com/models/450c4d7006f1413caa82260edad9a057/thumbnails/0b0cc9604a7341dea5a52e3fbaa2847f/4e46bf98abe24ce284d3341c0b71b4e2.jpeg" alt="Realistic female 3D model in athletic coverage" /><span class="asset-badge match">Strong match</span></div>
-          <div class="asset-body"><h3>Realistic female athletic base</h3><p>Detailed female mesh with sports-bra and shorts coverage. Hair, shoes, tattoos, and styling would be removed for a neutral clinical presentation.</p><dl class="asset-meta"><dt>Creator</dt><dd>XRProfXR</dd><dt>Mesh</dt><dd>86,149 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/your-college-girlfriend-rigged-cc5-character-450c4d7006f1413caa82260edad9a057" rel="noreferrer" target="_blank">View interactive model</a></div>
+          <div class="asset-image"><img class="fit" src="https://img-new.cgtrader.com/items/4858523/98e1c8bbd8/procreate-3d-model-super-body-bundle-male-and-female-3d-model-98e1c8bbd8.webp" alt="Neutral gray male and female anatomical mannequin models" /><span class="asset-badge match">Female leader</span></div>
+          <div class="asset-body"><h3>Procreate male + female bundle</h3><p>The closest visual match so far: realistic gray anatomical mannequins with sensitive anatomy omitted from the geometry. It includes separate body-region files, but needs web optimization and license review.</p><dl class="asset-meta"><dt>Creator</dt><dd>Initial-C</dd><dt>Contents</dt><dd>18 low-poly OBJ models</dd><dt>Listing</dt><dd>$6 sale · royalty-free, no AI</dd></dl><a class="source-link" href="https://www.cgtrader.com/3d-models/character/human-anatomy/procreate-3d-model-super-body-bundle-male-and-female-d8b474d1-82a8-4477-9808-b07ecd088956" rel="noreferrer" target="_blank">View CGTrader listing</a></div>
         </article>
 
         <article class="asset-card">
-          <div class="asset-image"><img src="https://media.sketchfab.com/models/597af5b4817e4f4792ff8653045ba9b2/thumbnails/8a85280ce4f345f9b8006f25ac5d67f5/cb0a60442aa246dea2b26b44ba20d975.jpeg" alt="Stylized female 3D model in athletic coverage" /><span class="asset-badge">Lighter style</span></div>
-          <div class="asset-body"><h3>Stylized female T-pose</h3><p>Already uses modest athletic coverage and a clean T-pose. Less realistic than the preferred pair, but approachable and easier to optimize.</p><dl class="asset-meta"><dt>Creator</dt><dd>3dUVpro</dd><dt>Mesh</dt><dd>89,322 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/girl-japanese-t-pose-stylized-597af5b4817e4f4792ff8653045ba9b2" rel="noreferrer" target="_blank">View interactive model</a></div>
+          <div class="asset-image"><img class="fit" src="https://media.sketchfab.com/models/96fa14a5a3f0413e98b605e3f65e447c/thumbnails/8ad5873a0d0f45a38708e36f0d36eefd/1887359179e14b058f1748d41b380e16.jpeg" alt="Matched male and female base meshes" /><span class="asset-badge">Matched topology</span></div>
+          <div class="asset-body"><h3>Custom matched female direction</h3><p>Build the female form from a matched neutral base, then add fused sports-top and brief coverage and the same gray clinical material. This is a workflow reference, not the final visual.</p><dl class="asset-meta"><dt>Reference</dt><dd>Human male/female basemesh</dd><dt>Mesh</dt><dd>37,324 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/human-malefemale-basemesh-rigged-96fa14a5a3f0413e98b605e3f65e447c" rel="noreferrer" target="_blank">View topology reference</a></div>
+        </article>
+
+        <article class="asset-card">
+          <div class="asset-image"><img src="https://media.sketchfab.com/models/34c0179c3be84bbdaa339b73145384c8/thumbnails/6fa75b26e0774b3483233f77fae90dcf/5e433da66d364253840975adee8b6ee1.jpeg" alt="Female 3D model in neutral athletic clothing" /><span class="asset-badge">Coverage reference</span></div>
+          <div class="asset-body"><h3>Neutral athletic coverage</h3><p>This is closer to the intended modesty standard but covers too much anatomy for precise region selection. Use its coverage concept, not the model itself.</p><dl class="asset-meta"><dt>Creator</dt><dd>kane_sk06</dd><dt>Mesh</dt><dd>238,096 triangles</dd><dt>License</dt><dd>CC BY 4.0</dd></dl><a class="source-link" href="https://sketchfab.com/3d-models/female-gym-outfit-sports-bra-and-leggins-34c0179c3be84bbdaa339b73145384c8" rel="noreferrer" target="_blank">View coverage reference</a></div>
         </article>
 
         <article class="asset-card">
@@ -292,9 +300,96 @@
       </section>
 
       <aside class="decision-note">
-        <strong>Important: “downloadable” does not mean production-ready.</strong>
-        <p>Before adopting any model, we must verify the exact downloaded files, creator attribution, texture rights, hidden mesh layers, age appropriateness, rig quality, and whether the license permits the planned modifications. The recommended pair is a visual direction, not yet a final legal or technical selection.</p>
+        <strong>Current decision: James leads for realism; the Procreate bundle leads for the matched pair.</strong>
+        <p>The bundle solves the modesty problem at the geometry level and gives us both body forms in one style. Before purchasing or embedding it, we need written confirmation that its royalty-free license permits modified OBJ geometry to be delivered to a web browser, plus a technical inspection of topology, region separation, pose, and mobile performance.</p>
       </aside>
     </main>
+    <script type="importmap">
+      {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/"}}
+    </script>
+    <script type="module">
+      import * as THREE from "three";
+      import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      const canvas = document.querySelector("#current-model");
+      const status = document.querySelector("#model-status");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color("#dde4e7");
+      const camera = new THREE.PerspectiveCamera(28, 1, 0.01, 100);
+      camera.position.set(0, 0.15, 8.2);
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = true;
+      controls.enablePan = false;
+      controls.minDistance = 5.5;
+      controls.maxDistance = 11;
+      scene.add(new THREE.HemisphereLight("#ffffff", "#80909c", 2.2));
+      const key = new THREE.DirectionalLight("#ffffff", 3.4);
+      key.position.set(4, 6, 5);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight("#9fc7d0", 1.5);
+      fill.position.set(-4, 2, 3);
+      scene.add(fill);
+
+      new FBXLoader().load(
+        "https://raw.githubusercontent.com/Z-Anatomy/Unity-app_Z-Anatomy/PC-Version/Resources/Models/FBX/Regions%20of%20human%20body100.fbx",
+        (model) => {
+          model.traverse((object) => {
+            if (!object.isMesh) return;
+            const meshName = object.name.toLowerCase();
+            const isSensitiveGeometry = meshName.includes("urogenital_region") || meshName === "pubic_hairs";
+            if (meshName.endsWith("j") || isSensitiveGeometry || !object.geometry.attributes.position?.count) {
+              object.visible = false;
+              return;
+            }
+            object.material = new THREE.MeshPhysicalMaterial({ color: "#c8d0d6", roughness: 0.78, clearcoat: 0.05, side: THREE.DoubleSide });
+          });
+          const bounds = new THREE.Box3().setFromObject(model);
+          const center = bounds.getCenter(new THREE.Vector3());
+          const height = bounds.max.y - bounds.min.y;
+          const scale = 6.25 / height;
+          model.scale.setScalar(scale);
+          model.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+          scene.add(model);
+          const modestyShape = new THREE.Shape();
+          modestyShape.moveTo(-0.28, 0.18);
+          modestyShape.lineTo(0.28, 0.18);
+          modestyShape.lineTo(0.25, 0.02);
+          modestyShape.lineTo(0.14, -0.25);
+          modestyShape.lineTo(-0.14, -0.25);
+          modestyShape.lineTo(-0.25, 0.02);
+          modestyShape.closePath();
+          const modestyShell = new THREE.Mesh(
+            new THREE.ExtrudeGeometry(modestyShape, { depth: 0.06, bevelEnabled: true, bevelSize: 0.025, bevelThickness: 0.025, bevelSegments: 3 }),
+            new THREE.MeshPhysicalMaterial({ color: "#647584", roughness: 0.78, clearcoat: 0.04 })
+          );
+          modestyShell.position.set(0.134, -0.06, 0.31);
+          scene.add(modestyShell);
+          status.textContent = "Current shared mesh · no female-specific model yet";
+        },
+        undefined,
+        () => { status.textContent = "Current model preview could not load. Open the live body view instead."; }
+      );
+
+      function resize() {
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        if (canvas.width !== width || canvas.height !== height) {
+          renderer.setSize(width, height, false);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        }
+      }
+      function animate() {
+        resize();
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    </script>
   </body>
 </html>
