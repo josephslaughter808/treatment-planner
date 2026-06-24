@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ClearPath Care | 3D Model Directions</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172233;
+        --muted: #607085;
+        --line: #d8e0e8;
+        --panel: #ffffff;
+        --soft: #f3f6f8;
+        --teal: #197a78;
+        --teal-dark: #125d5c;
+        --blue: #2d6da3;
+        --amber: #b66f29;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body { margin: 0; min-height: 100%; background: #eef2f5; color: var(--ink); }
+
+      body { min-height: 100vh; }
+
+      button { font: inherit; }
+
+      .page-shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      header {
+        min-height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 12px 24px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.96);
+      }
+
+      .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+      .brand img { width: 38px; height: 38px; object-fit: contain; }
+      .brand strong { display: block; font-size: 0.95rem; }
+      .brand span { display: block; margin-top: 2px; color: var(--muted); font-size: 0.78rem; }
+
+      .header-note { color: var(--muted); font-size: 0.82rem; text-align: right; }
+
+      main {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 350px;
+      }
+
+      .viewer {
+        position: relative;
+        min-height: 680px;
+        overflow: hidden;
+        background:
+          linear-gradient(#dce5eb 1px, transparent 1px),
+          linear-gradient(90deg, #dce5eb 1px, transparent 1px),
+          #f5f8fa;
+        background-size: 38px 38px;
+      }
+
+      .viewer::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(to bottom, rgba(255,255,255,.72), transparent 25%, transparent 72%, rgba(226,234,239,.8));
+      }
+
+      canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+
+      .viewer-heading {
+        position: absolute;
+        z-index: 3;
+        top: 24px;
+        left: 28px;
+        max-width: 430px;
+      }
+
+      .eyebrow {
+        margin: 0 0 7px;
+        color: var(--teal-dark);
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      h1 { margin: 0; font-size: clamp(1.45rem, 3vw, 2.35rem); line-height: 1.08; letter-spacing: 0; }
+      .viewer-heading p:last-child { margin: 9px 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.45; }
+
+      .viewer-tools {
+        position: absolute;
+        z-index: 4;
+        top: 24px;
+        right: 24px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .icon-button {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border: 1px solid #c8d2dc;
+        border-radius: 6px;
+        background: rgba(255,255,255,.94);
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 800;
+        box-shadow: 0 5px 18px rgba(32,49,67,.08);
+      }
+
+      .icon-button:hover, .icon-button:focus-visible { border-color: var(--teal); outline: 2px solid rgba(25,122,120,.18); }
+
+      .region-status {
+        position: absolute;
+        z-index: 3;
+        left: 28px;
+        bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 46px;
+        padding: 8px 13px;
+        border: 1px solid #cbd6df;
+        border-radius: 6px;
+        background: rgba(255,255,255,.94);
+        box-shadow: 0 8px 22px rgba(32,49,67,.08);
+      }
+
+      .region-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+      .region-status span { color: var(--muted); font-size: 0.76rem; }
+      .region-status strong { display: block; margin-top: 1px; font-size: 0.86rem; }
+
+      .control-panel {
+        min-height: 0;
+        overflow: auto;
+        padding: 22px;
+        border-left: 1px solid var(--line);
+        background: var(--panel);
+      }
+
+      .control-panel h2 { margin: 0; font-size: 1.1rem; }
+      .control-panel > p { margin: 7px 0 18px; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+
+      .segmented {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3px;
+        padding: 3px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--soft);
+      }
+
+      .segmented button {
+        min-height: 38px;
+        border: 0;
+        border-radius: 5px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font-weight: 750;
+      }
+
+      .segmented button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(28,45,64,.12); }
+
+      .section-label { margin: 22px 0 9px; color: var(--muted); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+
+      .option-list { display: grid; gap: 9px; }
+
+      .model-option {
+        width: 100%;
+        min-height: 82px;
+        display: grid;
+        grid-template-columns: 42px 1fr 18px;
+        align-items: center;
+        gap: 11px;
+        padding: 11px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        color: var(--ink);
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .model-option:hover { border-color: #9bb5c4; background: #f9fbfc; }
+      .model-option.active { border-color: var(--teal); box-shadow: inset 3px 0 0 var(--teal); background: #f4fbfa; }
+
+      .swatch { width: 42px; height: 54px; border-radius: 6px; border: 1px solid rgba(23,34,51,.12); }
+      .swatch.clinical { background: linear-gradient(#e8f0f2 0 24%, #3f8c8a 24% 65%, #cdd8de 65%); }
+      .swatch.resin { background: linear-gradient(#dac4b4 0 28%, #b7c3ca 28% 67%, #9cabb5 67%); }
+      .swatch.scrubs { background: linear-gradient(#d8b8a6 0 23%, #4d7d8d 23% 58%, #325e70 58%); }
+      .swatch.frosted { background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(130,177,196,.5)); }
+
+      .model-option strong { display: block; font-size: 0.88rem; }
+      .model-option small { display: block; margin-top: 4px; color: var(--muted); font-size: 0.72rem; line-height: 1.35; }
+      .check { color: var(--teal); font-size: 1rem; opacity: 0; }
+      .model-option.active .check { opacity: 1; }
+
+      .selection-summary {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+      }
+
+      .selection-summary dl { margin: 0; display: grid; grid-template-columns: 92px 1fr; gap: 7px; font-size: 0.78rem; }
+      .selection-summary dt { color: var(--muted); }
+      .selection-summary dd { margin: 0; font-weight: 750; }
+
+      .choose-button {
+        width: 100%;
+        min-height: 44px;
+        margin-top: 15px;
+        border: 1px solid var(--teal-dark);
+        border-radius: 6px;
+        background: var(--teal);
+        color: #fff;
+        cursor: pointer;
+        font-weight: 800;
+      }
+
+      .choose-button:hover { background: var(--teal-dark); }
+      .choose-button.saved { background: #fff; color: var(--teal-dark); }
+
+      @media (max-width: 900px) {
+        header { padding: 10px 14px; }
+        .header-note { display: none; }
+        main { grid-template-columns: 1fr; }
+        .viewer { min-height: 62vh; }
+        .control-panel { border-left: 0; border-top: 1px solid var(--line); overflow: visible; }
+        .option-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 560px) {
+        .viewer { min-height: 570px; }
+        .viewer-heading { top: 18px; left: 18px; right: 72px; }
+        .viewer-heading p:last-child { font-size: 0.78rem; }
+        .viewer-tools { top: 16px; right: 16px; }
+        .region-status { left: 16px; bottom: 16px; }
+        .control-panel { padding: 18px 14px 24px; }
+        .option-list { grid-template-columns: 1fr; }
+        .model-option { min-height: 74px; }
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header>
+        <div class="brand">
+          <img src="/thinnerlogo.png" alt="ClearPath Care" />
+          <div><strong>ClearPath Care</strong><span>3D health map model directions</span></div>
+        </div>
+        <div class="header-note">Drag to rotate &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; Tap a region</div>
+      </header>
+
+      <main>
+        <section class="viewer" aria-label="Interactive 3D body model preview">
+          <div class="viewer-heading">
+            <p class="eyebrow">Design study</p>
+            <h1 id="style-title">Clinical bodysuit</h1>
+            <p id="style-description">A polished, fully covered figure designed for clear body-region selection.</p>
+          </div>
+
+          <div class="viewer-tools">
+            <button class="icon-button" id="reset-view" type="button" title="Reset view" aria-label="Reset view">↺</button>
+          </div>
+
+          <canvas id="model-canvas"></canvas>
+
+          <div class="region-status" aria-live="polite">
+            <i class="region-dot"></i>
+            <div><span>Selected region</span><strong id="selected-region">None selected</strong></div>
+          </div>
+        </section>
+
+        <aside class="control-panel">
+          <h2>Compare directions</h2>
+          <p>Every option is intentionally modest and avoids explicit anatomical detail.</p>
+
+          <div class="segmented" aria-label="Body model presentation">
+            <button class="active" data-sex="female" type="button">Female</button>
+            <button data-sex="male" type="button">Male</button>
+          </div>
+
+          <p class="section-label">Visual style</p>
+          <div class="option-list">
+            <button class="model-option active" data-style="clinical" type="button">
+              <span class="swatch clinical"></span>
+              <span><strong>Clinical bodysuit</strong><small>Clean, approachable, and easy to map.</small></span>
+              <span class="check">✓</span>
+            </button>
+            <button class="model-option" data-style="resin" type="button">
+              <span class="swatch resin"></span>
+              <span><strong>Soft neutral</strong><small>Warm resin finish with subtle clothing zones.</small></span>
+              <span class="check">✓</span>
+            </button>
+            <button class="model-option" data-style="scrubs" type="button">
+              <span class="swatch scrubs"></span>
+              <span><strong>Patient scrubs</strong><small>Most modest and familiar in a care setting.</small></span>
+              <span class="check">✓</span>
+            </button>
+            <button class="model-option" data-style="frosted" type="button">
+              <span class="swatch frosted"></span>
+              <span><strong>Frosted guide</strong><small>Abstract, modern, and visually lightweight.</small></span>
+              <span class="check">✓</span>
+            </button>
+          </div>
+
+          <div class="selection-summary">
+            <dl>
+              <dt>Presentation</dt><dd id="summary-sex">Female</dd>
+              <dt>Direction</dt><dd id="summary-style">Clinical bodysuit</dd>
+              <dt>Detail level</dt><dd>Modest / simplified</dd>
+            </dl>
+            <button class="choose-button" id="choose-model" type="button">Mark as preferred</button>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      const canvas = document.querySelector("#model-canvas");
+      const viewer = document.querySelector(".viewer");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = true;
+      controls.enablePan = false;
+      controls.minDistance = 8.5;
+      controls.maxDistance = 17;
+      let compactCamera = null;
+
+      function setResponsiveCamera(force = false) {
+        const compact = viewer.clientWidth <= 560;
+        if (!force && compact === compactCamera) return;
+        compactCamera = compact;
+        camera.position.set(0, compact ? 0.85 : 0.15, compact ? 15 : 12.6);
+        controls.target.set(0, compact ? 0.85 : 0, 0);
+        controls.update();
+      }
+
+      setResponsiveCamera(true);
+
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x8da2af, 2.15));
+      const key = new THREE.DirectionalLight(0xffffff, 3.2);
+      key.position.set(4, 6, 7);
+      key.castShadow = true;
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x9ddad7, 2.1);
+      rim.position.set(-5, 2, -4);
+      scene.add(rim);
+
+      const floor = new THREE.Mesh(
+        new THREE.CircleGeometry(2.4, 72),
+        new THREE.ShadowMaterial({ color: 0x607080, opacity: 0.18 })
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = -3.57;
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      const styles = {
+        clinical: {
+          title: "Clinical bodysuit",
+          description: "A polished, fully covered figure designed for clear body-region selection.",
+          skin: 0xd6b8a7,
+          torso: 0x3d8a88,
+          lower: 0xcbd7dc,
+          accent: 0x155f5e,
+          roughness: 0.58,
+          opacity: 1,
+          scrubs: false
+        },
+        resin: {
+          title: "Soft neutral",
+          description: "A warm, object-like model that feels human without reading as realistic or exposed.",
+          skin: 0xd4bdad,
+          torso: 0xb4c0c7,
+          lower: 0x98a8b2,
+          accent: 0x5d7482,
+          roughness: 0.74,
+          opacity: 1,
+          scrubs: false
+        },
+        scrubs: {
+          title: "Patient scrubs",
+          description: "A familiar care-setting presentation with relaxed coverage and strong modesty.",
+          skin: 0xd4ad98,
+          torso: 0x487b8c,
+          lower: 0x315d6e,
+          accent: 0x173f50,
+          roughness: 0.82,
+          opacity: 1,
+          scrubs: true
+        },
+        frosted: {
+          title: "Frosted guide",
+          description: "A calm, abstract figure that keeps attention on health information instead of anatomy.",
+          skin: 0xc9dce2,
+          torso: 0x89b4c1,
+          lower: 0xa8c3cb,
+          accent: 0x397889,
+          roughness: 0.22,
+          opacity: 0.72,
+          scrubs: false
+        }
+      };
+
+      let sex = "female";
+      let styleKey = "clinical";
+      let body = null;
+      let selectedMesh = null;
+      let hoveredMesh = null;
+      let pointerDown = null;
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+
+      function material(color, options = {}) {
+        return new THREE.MeshPhysicalMaterial({
+          color,
+          roughness: options.roughness ?? styles[styleKey].roughness,
+          metalness: 0,
+          clearcoat: styleKey === "frosted" ? 0.62 : 0.12,
+          clearcoatRoughness: 0.5,
+          transparent: styles[styleKey].opacity < 1,
+          opacity: styles[styleKey].opacity,
+          side: THREE.DoubleSide
+        });
+      }
+
+      function part(geometry, color, region, position, scale = [1, 1, 1], rotation = [0, 0, 0]) {
+        const mesh = new THREE.Mesh(geometry, material(color));
+        mesh.position.set(...position);
+        mesh.scale.set(...scale);
+        mesh.rotation.set(...rotation);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.userData.region = region;
+        mesh.userData.baseColor = color;
+        body.add(mesh);
+        return mesh;
+      }
+
+      function capsule(radius, length, segments = 20) {
+        return new THREE.CapsuleGeometry(radius, length, 8, segments);
+      }
+
+      function buildModel() {
+        if (body) scene.remove(body);
+        body = new THREE.Group();
+        body.rotation.y = -0.18;
+        body.position.x = viewer.clientWidth > 700 ? 0.72 : 0.12;
+        scene.add(body);
+        selectedMesh = null;
+        hoveredMesh = null;
+        document.querySelector("#selected-region").textContent = "None selected";
+
+        const palette = styles[styleKey];
+        const female = sex === "female";
+        const shoulder = female ? 0.77 : 0.9;
+        const hip = female ? 0.66 : 0.58;
+        const torsoColor = palette.torso;
+        const lowerColor = palette.lower;
+        const skin = palette.skin;
+
+        part(new THREE.SphereGeometry(0.43, 40, 30), skin, "Head and neck", [0, 2.76, 0], [0.89, 1.08, 0.9]);
+        part(capsule(0.17, 0.2), skin, "Head and neck", [0, 2.25, 0]);
+
+        if (palette.scrubs) {
+          part(new THREE.BoxGeometry(1.35, 1.55, 0.7, 4, 4, 2), torsoColor, "Chest and abdomen", [0, 1.3, 0], [shoulder, 1, 1]);
+          part(new THREE.BoxGeometry(1.22, 0.52, 0.68, 4, 2, 2), torsoColor, "Pelvis", [0, 0.32, 0], [hip / 0.62, 1, 1]);
+        } else {
+          part(capsule(0.62, 0.92), torsoColor, "Chest and abdomen", [0, 1.35, 0], [shoulder, 1, 0.66]);
+          part(new THREE.SphereGeometry(0.62, 34, 24), lowerColor, "Pelvis", [0, 0.28, 0], [hip / 0.62, 0.66, 0.7]);
+        }
+
+        const armX = shoulder + 0.14;
+        for (const side of [-1, 1]) {
+          const label = side < 0 ? "Right arm" : "Left arm";
+          part(capsule(0.18, 0.95), torsoColor, label, [side * armX, 1.35, 0], [1, 1, 0.93], [0, 0, side * 0.08]);
+          part(capsule(0.145, 0.86), styleKey === "scrubs" ? skin : torsoColor, label, [side * (armX + 0.1), 0.38, 0], [1, 1, 0.9], [0, 0, side * 0.05]);
+          part(new THREE.SphereGeometry(0.16, 24, 18), skin, label, [side * (armX + 0.13), -0.2, 0], [0.86, 1.2, 0.62]);
+        }
+
+        for (const side of [-1, 1]) {
+          const legLabel = side < 0 ? "Right leg" : "Left leg";
+          const footLabel = side < 0 ? "Right foot" : "Left foot";
+          part(capsule(palette.scrubs ? 0.28 : 0.24, 1.18), lowerColor, legLabel, [side * 0.34, -0.74, 0], [1, 1, 0.9], [0, 0, side * 0.025]);
+          part(capsule(palette.scrubs ? 0.23 : 0.19, 1.02), lowerColor, legLabel, [side * 0.36, -2.04, 0], [1, 1, 0.88]);
+          part(capsule(0.19, 0.34), palette.accent, footLabel, [side * 0.36, -2.92, 0.17], [1, 1.18, 0.72], [Math.PI / 2.25, 0, 0]);
+        }
+
+        part(new THREE.TorusGeometry(0.48, 0.028, 10, 48), palette.accent, "Waist", [0, 0.66, 0], [1, 1, 0.72], [Math.PI / 2, 0, 0]);
+        applySelectionState();
+      }
+
+      function applySelectionState() {
+        if (!body) return;
+        body.traverse((object) => {
+          if (!object.isMesh || !object.material) return;
+          const highlighted = object === selectedMesh || object === hoveredMesh;
+          object.material.color.set(highlighted ? 0x2f79b8 : object.userData.baseColor);
+          object.material.emissive.set(highlighted ? 0x153d5c : 0x000000);
+          object.material.emissiveIntensity = highlighted ? 0.22 : 0;
+        });
+      }
+
+      function resize() {
+        const width = viewer.clientWidth;
+        const height = viewer.clientHeight;
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        if (body) body.position.x = width > 700 ? 0.72 : 0.12;
+        setResponsiveCamera();
+      }
+
+      function updatePointer(event) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      }
+
+      function hitTest(event) {
+        updatePointer(event);
+        raycaster.setFromCamera(pointer, camera);
+        return raycaster.intersectObjects(body.children, true)[0]?.object || null;
+      }
+
+      canvas.addEventListener("pointerdown", (event) => { pointerDown = { x: event.clientX, y: event.clientY }; });
+      canvas.addEventListener("pointermove", (event) => {
+        if (event.buttons) return;
+        const next = hitTest(event);
+        if (next !== hoveredMesh) {
+          hoveredMesh = next;
+          canvas.style.cursor = next ? "pointer" : "grab";
+          applySelectionState();
+        }
+      });
+      canvas.addEventListener("pointerup", (event) => {
+        if (!pointerDown || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 7) return;
+        selectedMesh = hitTest(event);
+        document.querySelector("#selected-region").textContent = selectedMesh?.userData.region || "None selected";
+        applySelectionState();
+      });
+      canvas.addEventListener("pointerleave", () => { hoveredMesh = null; applySelectionState(); });
+
+      document.querySelectorAll("[data-sex]").forEach((button) => {
+        button.addEventListener("click", () => {
+          sex = button.dataset.sex;
+          document.querySelectorAll("[data-sex]").forEach((item) => item.classList.toggle("active", item === button));
+          document.querySelector("#summary-sex").textContent = sex === "female" ? "Female" : "Male";
+          document.querySelector("#choose-model").classList.remove("saved");
+          document.querySelector("#choose-model").textContent = "Mark as preferred";
+          buildModel();
+        });
+      });
+
+      document.querySelectorAll("[data-style]").forEach((button) => {
+        button.addEventListener("click", () => {
+          styleKey = button.dataset.style;
+          const choice = styles[styleKey];
+          document.querySelectorAll("[data-style]").forEach((item) => item.classList.toggle("active", item === button));
+          document.querySelector("#style-title").textContent = choice.title;
+          document.querySelector("#style-description").textContent = choice.description;
+          document.querySelector("#summary-style").textContent = choice.title;
+          document.querySelector("#choose-model").classList.remove("saved");
+          document.querySelector("#choose-model").textContent = "Mark as preferred";
+          buildModel();
+        });
+      });
+
+      document.querySelector("#reset-view").addEventListener("click", () => {
+        setResponsiveCamera(true);
+        body.rotation.y = -0.18;
+      });
+
+      document.querySelector("#choose-model").addEventListener("click", (event) => {
+        event.currentTarget.classList.add("saved");
+        event.currentTarget.textContent = `${sex === "female" ? "Female" : "Male"} ${styles[styleKey].title} selected`;
+      });
+
+      new ResizeObserver(resize).observe(viewer);
+      buildModel();
+
+      function animate() {
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    </script>
+  </body>
+</html>
