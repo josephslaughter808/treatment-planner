@@ -10,6 +10,8 @@ It is a planning draft, not a completed NIH application. The final structure, pa
 
 NIH Phase I should not be presented as funding to finish an ordinary software product. The application should identify important technical and scientific uncertainties and show how Phase I research will determine whether the proposed approach is feasible.
 
+NLM program feedback received July 6, 2026 reinforced this framing. The proposal should emphasize the underlying informatics research and technical innovation: patient-mediated health information exchange, consent-aware data sharing, clinical data interoperability, structured clinical information models, clinical workflow integration, data provenance, and usability of health information systems. The application should clearly explain how ClearPath relates to existing interoperability standards, especially HL7 FHIR, and what novel capabilities ClearPath provides beyond routine software development.
+
 The current NIH SBIR/STTR application guide asks Phase I applicants to:
 
 - State the technical questions that will determine feasibility.
@@ -42,7 +44,7 @@ The Phase I prototype should be tested with synthetic records. It should not req
 
 ## Central Research Question
 
-Can a patient-controlled, section-level authorization workflow produce an accurate, understandable, efficient, and auditable method for exchanging selected health information across organizations and clinical disciplines?
+Can a consent-aware, patient-mediated informatics model produce an accurate, understandable, efficient, interoperable, and auditable method for exchanging selected health information across organizations and clinical disciplines while preserving provenance and patient authorization scope?
 
 ## Central Hypothesis
 
@@ -54,6 +56,14 @@ A specialty-neutral request workflow combined with plain-language patient author
 - Preserve sufficient provenance and audit information for clinical and operational review.
 
 Phase I is intended to establish feasibility, not to prove improved patient outcomes or nationwide interoperability.
+
+## Standards And FHIR Positioning
+
+ClearPath JSON should be framed as the internal canonical package model for consent scope, provenance, workflow state, audit events, package integrity, and human-readable review. It should not be described as a replacement for HL7 FHIR or as a shortcut around healthcare interoperability standards.
+
+FHIR should be presented as an important standards ecosystem that ClearPath will map to and eventually integrate with. Relevant Phase I mappings may include Patient, Practitioner, PractitionerRole, Organization, Condition, MedicationStatement, AllergyIntolerance, Procedure, DiagnosticReport, DocumentReference, Consent, Provenance, AuditEvent, Bundle, and Composition.
+
+The proposed Phase I research should determine how to bind patient authorization decisions, clinical content, source attribution, package status, revocation, expiration, and review history into a usable exchange model. Full production EHR integration should remain a Phase II or later objective unless the final NOFO, partners, or NLM guidance require otherwise.
 
 ## Technical Questions Phase I Must Answer
 

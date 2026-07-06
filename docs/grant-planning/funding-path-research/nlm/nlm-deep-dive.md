@@ -4,6 +4,16 @@
 
 June 20, 2026
 
+## Program Feedback Update
+
+July 6, 2026
+
+Goutham Reddy, MD, MS responded to the ClearPath concept inquiry and indicated that the concept appears to have potential relevance to NLM's mission in biomedical informatics areas including patient-mediated health information exchange, clinical data interoperability, structured clinical information models, clinical workflow integration, data provenance, and usability of health information systems.
+
+The most important guidance was strategic: the application should emphasize underlying informatics research and technical innovation rather than primarily describing software-product development. The application should clearly explain how ClearPath advances patient-mediated information exchange, consent-aware data sharing, and interoperability. It should also explain how the proposed clinical information model relates to existing interoperability standards, such as HL7 FHIR, and what novel capabilities ClearPath provides.
+
+This feedback strengthens NLM as the primary path, but it also raises the bar for the application narrative. ClearPath must be presented as a research-driven informatics platform with a prototype and feasibility study, not as a request to fund ordinary app development.
+
 ## Executive Summary
 
 The National Library of Medicine is the best current NIH institute for ClearPath. NLM supports biomedical informatics research and commercialization, including software platforms, human-centered informatics, biomedical data infrastructure, and tools that make health information useful and trustworthy.
@@ -155,6 +165,7 @@ Reviewers will look for:
 - A product-development narrative without a research contribution will be weak.
 - HIPAA compliance alone is not innovation or proof of safety.
 - A generic claim that JSON connects every language is not technically sufficient; the proposal must specify schemas, semantics, terminology, validation, versioning, and mappings.
+- The application must explain how ClearPath JSON relates to HL7 FHIR and what ClearPath adds beyond existing interoperability standards.
 
 ## Contact Questions
 
