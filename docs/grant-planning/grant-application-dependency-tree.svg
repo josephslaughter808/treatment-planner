@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc">
+  <title id="title">ClearPath Grant Application Dependency Tree</title>
+  <desc id="desc">A visual dependency tree for the NIH/NLM SBIR Phase I grant application, showing open work, locked requirements, and the submission path.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f6f8fb}
+      .title{font:700 42px Arial,Helvetica,sans-serif;fill:#0b2545}
+      .subtitle{font:400 18px Arial,Helvetica,sans-serif;fill:#5d6a7e}
+      .h{font:700 19px Arial,Helvetica,sans-serif;fill:#0b2545}
+      .h-small{font:700 15px Arial,Helvetica,sans-serif;fill:#0b2545}
+      .status{font:700 12px Arial,Helvetica,sans-serif;fill:#5d6a7e;text-transform:uppercase}
+      .txt{font:400 13px Arial,Helvetica,sans-serif;fill:#253246}
+      .tiny{font:400 12px Arial,Helvetica,sans-serif;fill:#46556b}
+      .strong{font:700 13px Arial,Helvetica,sans-serif;fill:#253246}
+      .root{fill:#dceefa;stroke:#8fb8dc;stroke-width:2}
+      .open{fill:#e7f5ee;stroke:#96c9af;stroke-width:2}
+      .locked{fill:#fff3cf;stroke:#dfc878;stroke-width:2}
+      .late{fill:#fbe6e6;stroke:#e1a4a4;stroke-width:2}
+      .panel{fill:#ffffff;stroke:#c8d6e6;stroke-width:2}
+      .panel-head{fill:#e7f0fa;stroke:#c8d6e6;stroke-width:2}
+      .line{stroke:#91a3ba;stroke-width:3;fill:none}
+      .dash{stroke:#91a3ba;stroke-width:2;stroke-dasharray:7 7;fill:none}
+      .legend{font:700 13px Arial,Helvetica,sans-serif;fill:#5d6a7e}
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="1120"/>
+
+  <text class="title" x="60" y="72">ClearPath Grant Application Dependency Tree</text>
+  <text class="subtitle" x="60" y="105">What can move now, what is locked behind company formation or advisors, and what must feed the NIH/NLM SBIR Phase I submission.</text>
+
+  <rect class="panel" x="1180" y="42" width="350" height="92" rx="10"/>
+  <text class="h-small" x="1202" y="72">Primary target: January 5, 2027</text>
+  <text class="tiny" x="1202" y="96">Backup target: April 5, 2027</text>
+  <text class="tiny" x="1202" y="118">September 2026 is too compressed.</text>
+
+  <circle cx="74" cy="152" r="8" fill="#237a57"/>
+  <text class="legend" x="92" y="157">Open now</text>
+  <circle cx="198" cy="152" r="8" fill="#8a6500"/>
+  <text class="legend" x="216" y="157">Locked by company, money, advisor, or partner</text>
+  <circle cx="548" cy="152" r="8" fill="#a23a3a"/>
+  <text class="legend" x="566" y="157">Locked until final submission cycle</text>
+
+  <rect class="root" x="575" y="185" width="450" height="105" rx="12"/>
+  <text class="h" x="650" y="225">NIH/NLM SBIR Phase I Submission</text>
+  <text class="txt" x="631" y="253">Everything below must eventually feed this application package.</text>
+
+  <path class="line" d="M800 290 L800 345"/>
+  <path class="line" d="M145 345 L1455 345"/>
+
+  <!-- Branch connectors -->
+  <path class="line" d="M145 345 L145 382"/>
+  <path class="line" d="M363 345 L363 382"/>
+  <path class="line" d="M581 345 L581 382"/>
+  <path class="line" d="M800 345 L800 382"/>
+  <path class="line" d="M1019 345 L1019 382"/>
+  <path class="line" d="M1237 345 L1237 382"/>
+  <path class="line" d="M1455 345 L1455 382"/>
+
+  <!-- Top branch cards -->
+  <g transform="translate(40 382)">
+    <rect class="open" width="210" height="190" rx="10"/>
+    <text class="h-small" x="16" y="30">1. Funding Path</text>
+    <text class="status" x="16" y="54">Mostly open now</text>
+    <text class="txt" x="24" y="82">• NLM fit confirmed</text>
+    <text class="txt" x="24" y="108">• PA-27-100 selected</text>
+    <text class="txt" x="24" y="134">• Specific Aims revised</text>
+    <text class="txt" x="24" y="160">• Follow-up packet to NLM</text>
+  </g>
+
+  <g transform="translate(258 382)">
+    <rect class="locked" width="210" height="190" rx="10"/>
+    <text class="h-small" x="16" y="30">2. Company +</text>
+    <text class="h-small" x="16" y="52">Registrations</text>
+    <text class="status" x="16" y="76">Locked by LLC timing</text>
+    <text class="txt" x="24" y="104">• Choose legal name</text>
+    <text class="txt" x="24" y="130">• Form Texas LLC</text>
+    <text class="txt" x="24" y="156">• EIN → SAM/UEI</text>
+    <text class="txt" x="24" y="182">• eRA, Grants.gov, SBA</text>
+  </g>
+
+  <g transform="translate(476 382)">
+    <rect class="open" width="210" height="190" rx="10"/>
+    <text class="h-small" x="16" y="30">3. Research Plan</text>
+    <text class="status" x="16" y="54">Open now</text>
+    <text class="txt" x="24" y="82">• One-page aims</text>
+    <text class="txt" x="24" y="108">• Research Strategy</text>
+    <text class="txt" x="24" y="134">• FHIR positioning</text>
+    <text class="txt" x="24" y="160">• IRB + milestones</text>
+  </g>
+
+  <g transform="translate(695 382)">
+    <rect class="locked" width="210" height="190" rx="10"/>
+    <text class="h-small" x="16" y="30">4. Team + Advisors</text>
+    <text class="status" x="16" y="54">Partly locked</text>
+    <text class="txt" x="24" y="82">• Founder/PI decision</text>
+    <text class="txt" x="24" y="108">• Technical lead plan</text>
+    <text class="txt" x="24" y="134">• Clinical/FHIR advisors</text>
+    <text class="txt" x="24" y="160">• Support letters</text>
+  </g>
+
+  <g transform="translate(914 382)">
+    <rect class="open" width="210" height="190" rx="10"/>
+    <text class="h-small" x="16" y="30">5. Prototype Evidence</text>
+    <text class="status" x="16" y="54">Open now</text>
+    <text class="txt" x="24" y="82">• Provider request</text>
+    <text class="txt" x="24" y="108">• Patient approval</text>
+    <text class="txt" x="24" y="134">• Consent JSON</text>
+    <text class="txt" x="24" y="160">• Provenance + audit</text>
+  </g>
+
+  <g transform="translate(1132 382)">
+    <rect class="locked" width="210" height="190" rx="10"/>
+    <text class="h-small" x="16" y="30">6. Budget + Admin</text>
+    <text class="status" x="16" y="54">Partly locked</text>
+    <text class="txt" x="24" y="82">• Phase I budget</text>
+    <text class="txt" x="24" y="108">• Founder salary</text>
+    <text class="txt" x="24" y="134">• Consultant costs</text>
+    <text class="txt" x="24" y="160">• Biosketch inputs</text>
+  </g>
+
+  <g transform="translate(1350 382)">
+    <rect class="late" width="210" height="190" rx="10"/>
+    <text class="h-small" x="16" y="30">7. Final Submission</text>
+    <text class="status" x="16" y="54">Late-cycle lock</text>
+    <text class="txt" x="24" y="82">• Compliance matrix</text>
+    <text class="txt" x="24" y="108">• Final PDFs/forms</text>
+    <text class="txt" x="24" y="134">• Portal validation</text>
+    <text class="txt" x="24" y="160">• Confirm receipt</text>
+  </g>
+
+  <!-- Lock dependency highlights -->
+  <path class="dash" d="M363 572 C363 625, 363 625, 515 660"/>
+  <path class="dash" d="M581 572 C581 625, 735 625, 800 660"/>
+  <path class="dash" d="M800 572 C800 625, 1135 625, 1455 660"/>
+  <path class="dash" d="M1019 572 C1019 625, 965 625, 800 660"/>
+  <path class="dash" d="M1237 572 C1237 625, 1340 625, 1455 660"/>
+
+  <!-- Lower panels -->
+  <g transform="translate(60 665)">
+    <rect class="panel" width="455" height="320" rx="10"/>
+    <rect class="panel-head" width="455" height="55" rx="10"/>
+    <text class="h" x="18" y="35">Open Now</text>
+    <text class="strong" x="28" y="88">1. Polish the one-page Specific Aims.</text>
+    <text class="strong" x="28" y="124">2. Build the NLM follow-up packet.</text>
+    <text class="strong" x="28" y="160">3. Draft Significance, Innovation, Approach.</text>
+    <text class="strong" x="28" y="196">4. Continue provider request + patient approval.</text>
+    <text class="strong" x="28" y="232">5. Build ClearPath JSON package logic.</text>
+    <text class="strong" x="28" y="268">6. Create advisor and partner outreach lists.</text>
+  </g>
+
+  <g transform="translate(572 665)">
+    <rect class="panel" width="455" height="320" rx="10"/>
+    <rect class="panel-head" width="455" height="55" rx="10"/>
+    <text class="h" x="18" y="35">Company Chain</text>
+    <text class="strong" x="58" y="88">Choose legal name</text>
+    <text class="txt" x="220" y="88">→ Free guidance</text>
+    <text class="strong" x="58" y="132">Form Texas LLC</text>
+    <text class="txt" x="220" y="132">→ Get EIN</text>
+    <text class="strong" x="58" y="176">SAM.gov + UEI</text>
+    <text class="txt" x="220" y="176">→ eRA Commons</text>
+    <text class="strong" x="58" y="220">Grants.gov + SBA</text>
+    <text class="txt" x="220" y="220">→ Registration audit</text>
+    <text class="tiny" x="28" y="275">This chain is why October is the practical company-formation target.</text>
+  </g>
+
+  <g transform="translate(1085 665)">
+    <rect class="panel" width="455" height="320" rx="10"/>
+    <rect class="panel-head" width="455" height="55" rx="10"/>
+    <text class="h" x="18" y="35">People Chain</text>
+    <text class="strong" x="28" y="88">Clinical workflow advisor</text>
+    <text class="strong" x="28" y="124">Informatics / FHIR advisor</text>
+    <text class="strong" x="28" y="160">Human-factors / usability advisor</text>
+    <text class="strong" x="28" y="196">Privacy / security advisor</text>
+    <text class="strong" x="28" y="232">Discovery or pilot partners</text>
+    <text class="tiny" x="28" y="275">These feed credibility, study design, support letters, and Phase II planning.</text>
+  </g>
+
+  <!-- Timeline -->
+  <g transform="translate(60 1022)">
+    <text class="h" x="0" y="0">Month-by-month path:</text>
+    <text class="txt" x="205" y="0">July aims/outreach → August research design → September company prep → October LLC/registrations → November full draft → December final assembly → January submit</text>
+  </g>
+</svg>

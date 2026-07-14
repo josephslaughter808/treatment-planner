@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClearPath Grant Application Dependency Tree</title>
+  <style>
+    :root {
+      --ink: #17233a;
+      --muted: #5d6a7e;
+      --line: #91a3ba;
+      --blue: #1f6fb2;
+      --blue-soft: #e7f0fa;
+      --green: #237a57;
+      --green-soft: #e7f5ee;
+      --gold: #8a6500;
+      --gold-soft: #fff3cf;
+      --red: #a23a3a;
+      --red-soft: #fbe6e6;
+      --paper: #ffffff;
+      --backdrop: #f6f8fb;
+      --shadow: 0 16px 40px rgba(23, 35, 58, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--backdrop);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
+    }
+
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: #0b2545;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 850px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .target-card {
+      width: 310px;
+      padding: 16px;
+      border: 1px solid #c8d6e6;
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .target-card strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #0b2545;
+      font-size: 15px;
+    }
+
+    .target-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 28px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 7px 10px;
+      border: 1px solid #d3deea;
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .dot.open { background: var(--green); }
+    .dot.locked { background: var(--gold); }
+    .dot.late { background: var(--red); }
+
+    .tree-wrap {
+      overflow-x: auto;
+      padding: 8px 0 28px;
+    }
+
+    .tree {
+      min-width: 1280px;
+    }
+
+    .root {
+      position: relative;
+      width: 420px;
+      margin: 0 auto 72px;
+      padding: 22px 24px;
+      border: 2px solid #8fb8dc;
+      border-radius: 8px;
+      background: #dceefa;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .root::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -73px;
+      width: 2px;
+      height: 73px;
+      background: var(--line);
+    }
+
+    .root h2 {
+      margin: 0 0 8px;
+      color: #0b2545;
+      font-size: 23px;
+      letter-spacing: 0;
+    }
+
+    .root p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .level {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 42px;
+      padding-top: 26px;
+    }
+
+    .level::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 7.2%;
+      right: 7.2%;
+      height: 2px;
+      background: var(--line);
+    }
+
+    .branch {
+      position: relative;
+      padding-top: 28px;
+    }
+
+    .branch::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 2px;
+      height: 28px;
+      background: var(--line);
+    }
+
+    .card {
+      min-height: 172px;
+      padding: 14px;
+      border: 1px solid #c9d5e4;
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .card.open {
+      border-color: #96c9af;
+      background: var(--green-soft);
+    }
+
+    .card.locked {
+      border-color: #dfc878;
+      background: var(--gold-soft);
+    }
+
+    .card.late {
+      border-color: #e1a4a4;
+      background: var(--red-soft);
+    }
+
+    .card h3 {
+      margin: 0 0 6px;
+      color: #0b2545;
+      font-size: 16px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .status {
+      display: inline-block;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li {
+      margin: 4px 0;
+      color: #233044;
+      font-size: 12.5px;
+    }
+
+    .deep {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr 1.25fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 24px;
+    }
+
+    .path-panel {
+      border: 1px solid #c8d6e6;
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .path-panel h2 {
+      margin: 0;
+      padding: 14px 16px;
+      border-bottom: 1px solid #d7e2ee;
+      border-radius: 8px 8px 0 0;
+      background: var(--blue-soft);
+      color: #0b2545;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .path-panel ol,
+    .path-panel ul {
+      padding: 14px 22px 16px 36px;
+    }
+
+    .path-panel li {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    .path-panel strong {
+      color: #0b2545;
+    }
+
+    .flow {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px 16px;
+    }
+
+    .flow-step {
+      position: relative;
+      padding: 10px 12px;
+      border: 1px solid #d3deea;
+      border-radius: 8px;
+      background: #fff;
+      color: #243247;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: "↓";
+      position: absolute;
+      left: 50%;
+      bottom: -22px;
+      transform: translateX(-50%);
+      color: var(--line);
+      font-size: 18px;
+      line-height: 1;
+      z-index: 2;
+    }
+
+    .flow-step:not(:last-child) {
+      margin-bottom: 14px;
+    }
+
+    .timeline {
+      margin-top: 28px;
+      border: 1px solid #c8d6e6;
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .timeline h2 {
+      margin: 0;
+      padding: 16px 18px;
+      border-bottom: 1px solid #d7e2ee;
+      color: #0b2545;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    .months {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(130px, 1fr));
+      gap: 0;
+    }
+
+    .month {
+      min-height: 160px;
+      padding: 14px 12px;
+      border-right: 1px solid #d7e2ee;
+    }
+
+    .month:last-child {
+      border-right: 0;
+    }
+
+    .month strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--blue);
+      font-size: 14px;
+    }
+
+    .month p {
+      margin: 0;
+      color: #2b3748;
+      font-size: 12.5px;
+    }
+
+    .print-note {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .target-card {
+        width: 100%;
+      }
+
+      main {
+        padding: 22px 14px 36px;
+      }
+
+      .deep {
+        grid-template-columns: 1fr;
+      }
+
+      .months {
+        grid-template-columns: 1fr;
+      }
+
+      .month {
+        border-right: 0;
+        border-bottom: 1px solid #d7e2ee;
+        min-height: auto;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      main {
+        max-width: none;
+        padding: 0.4in;
+      }
+
+      .tree-wrap {
+        overflow: visible;
+      }
+
+      .tree {
+        transform: scale(0.82);
+        transform-origin: top left;
+        width: 122%;
+      }
+
+      .path-panel,
+      .timeline,
+      .card,
+      .root,
+      .target-card {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>ClearPath Grant Application Dependency Tree</h1>
+        <p class="subtitle">A visual map of what can move now, what is locked behind company formation or outside people, and what must be complete before the NIH/NLM SBIR Phase I submission.</p>
+      </div>
+      <aside class="target-card">
+        <strong>Primary target: January 5, 2027</strong>
+        <span>Backup target: April 5, 2027</span>
+        <span>September 5, 2026 is too compressed for our current setup.</span>
+      </aside>
+    </header>
+
+    <nav class="legend" aria-label="Tree status legend">
+      <span><i class="dot open"></i> Open now</span>
+      <span><i class="dot locked"></i> Locked by money, company, advisor, or partner</span>
+      <span><i class="dot late"></i> Locked until final submission cycle</span>
+      <span><i class="dot"></i> Core grant dependency</span>
+    </nav>
+
+    <section class="tree-wrap" aria-label="Grant dependency tree">
+      <div class="tree">
+        <section class="root">
+          <h2>NIH/NLM SBIR Phase I Submission</h2>
+          <p>Everything below must eventually feed this application package.</p>
+        </section>
+
+        <section class="level">
+          <article class="branch">
+            <div class="card open">
+              <h3>1. Funding Path</h3>
+              <span class="status">Mostly open now</span>
+              <ul>
+                <li>NLM fit confirmed</li>
+                <li>PA-27-100 selected</li>
+                <li>Specific Aims revised</li>
+                <li>Follow-up packet to NLM</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="branch">
+            <div class="card locked">
+              <h3>2. Company + Registrations</h3>
+              <span class="status">Locked by LLC timing</span>
+              <ul>
+                <li>Choose legal name</li>
+                <li>Free business guidance</li>
+                <li>Form Texas LLC</li>
+                <li>Get EIN</li>
+                <li>SAM/UEI, eRA, Grants.gov, SBA</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="branch">
+            <div class="card open">
+              <h3>3. Research Plan</h3>
+              <span class="status">Open now</span>
+              <ul>
+                <li>One-page aims</li>
+                <li>Research Strategy</li>
+                <li>FHIR positioning</li>
+                <li>IRB pathway</li>
+                <li>Milestones</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="branch">
+            <div class="card locked">
+              <h3>4. Team + Advisors</h3>
+              <span class="status">Partly locked</span>
+              <ul>
+                <li>Founder/PI decision</li>
+                <li>Technical lead plan</li>
+                <li>Clinical advisor</li>
+                <li>FHIR advisor</li>
+                <li>Support letters</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="branch">
+            <div class="card open">
+              <h3>5. Prototype Evidence</h3>
+              <span class="status">Open now</span>
+              <ul>
+                <li>Provider request</li>
+                <li>Patient approval</li>
+                <li>Consent-scoped JSON</li>
+                <li>Provenance labels</li>
+                <li>Audit trail</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="branch">
+            <div class="card locked">
+              <h3>6. Budget + Admin</h3>
+              <span class="status">Partly locked</span>
+              <ul>
+                <li>Phase I budget</li>
+                <li>Founder salary</li>
+                <li>Consultant costs</li>
+                <li>Facilities</li>
+                <li>Biosketch inputs</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="branch">
+            <div class="card late">
+              <h3>7. Final Submission</h3>
+              <span class="status">Locked until late cycle</span>
+              <ul>
+                <li>Compliance matrix</li>
+                <li>Final PDFs/forms</li>
+                <li>Portal validation</li>
+                <li>Submit early</li>
+                <li>Confirm receipt</li>
+              </ul>
+            </div>
+          </article>
+        </section>
+      </div>
+    </section>
+
+    <section class="deep" aria-label="Critical paths">
+      <article class="path-panel">
+        <h2>Open Now</h2>
+        <ol>
+          <li><strong>Polish Specific Aims</strong> into one page.</li>
+          <li><strong>Build NLM follow-up packet</strong> for Dr. Reddy.</li>
+          <li><strong>Draft research sections</strong>: Significance, Innovation, Approach.</li>
+          <li><strong>Continue prototype work</strong>: request, approval, JSON, provenance.</li>
+          <li><strong>Create outreach lists</strong> for advisors and pilot/discovery partners.</li>
+        </ol>
+      </article>
+
+      <article class="path-panel">
+        <h2>Company Chain</h2>
+        <div class="flow">
+          <div class="flow-step">Choose legal name</div>
+          <div class="flow-step">Free SBDC/SCORE/legal guidance</div>
+          <div class="flow-step">Form Texas LLC</div>
+          <div class="flow-step">Get EIN</div>
+          <div class="flow-step">SAM.gov + UEI</div>
+          <div class="flow-step">eRA + Grants.gov + SBA</div>
+          <div class="flow-step">Registration audit</div>
+        </div>
+      </article>
+
+      <article class="path-panel">
+        <h2>People Chain</h2>
+        <ol>
+          <li><strong>Clinical workflow advisor</strong> validates real office assumptions.</li>
+          <li><strong>Informatics/FHIR advisor</strong> validates standards positioning.</li>
+          <li><strong>Human-factors advisor</strong> validates research and usability methods.</li>
+          <li><strong>Privacy/security advisor</strong> validates risk and PHI planning.</li>
+          <li><strong>Partner letters</strong> support Phase I discovery and Phase II pilot path.</li>
+        </ol>
+      </article>
+    </section>
+
+    <section class="timeline" aria-label="Timeline">
+      <h2>Month-by-Month Path</h2>
+      <div class="months">
+        <article class="month">
+          <strong>July 2026</strong>
+          <p>Finish aims, NLM packet, advisor lists, and grant-critical prototype planning.</p>
+        </article>
+        <article class="month">
+          <strong>August 2026</strong>
+          <p>Send follow-up if invited, start outreach, draft study materials.</p>
+        </article>
+        <article class="month">
+          <strong>September 2026</strong>
+          <p>Finalize name, complete free guidance, build budget V2.</p>
+        </article>
+        <article class="month">
+          <strong>October 2026</strong>
+          <p>Form LLC if financially safe, get EIN, start registrations.</p>
+        </article>
+        <article class="month">
+          <strong>November 2026</strong>
+          <p>Finish registrations, complete full draft, collect letters.</p>
+        </article>
+        <article class="month">
+          <strong>December 2026</strong>
+          <p>Finalize narratives, budget, forms, attachments, and portal checks.</p>
+        </article>
+        <article class="month">
+          <strong>January 2027</strong>
+          <p>Submit before January 5, confirm receipt, archive package.</p>
+        </article>
+      </div>
+    </section>
+
+    <p class="print-note">Tip: use browser print or export to PDF if you want this as a one-page planning board.</p>
+  </main>
+</body>
+</html>
