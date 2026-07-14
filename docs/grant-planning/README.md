@@ -7,6 +7,7 @@ This folder collects ClearPath grant strategy, budgets, staffing plans, and Phas
 - [Master Grant Application Readiness Checklist](./master-grant-application-readiness-checklist.md) ([Word working document](./clearpath-master-grant-application-readiness-checklist.docx))
 - [Grant Application To-Do Tree](./grant-application-to-do-tree.md) ([visual Word version](./clearpath-grant-application-to-do-tree-visual.docx), [visual tree board](./grant-application-dependency-tree.html), [SVG tree image](./grant-application-dependency-tree.svg), [PNG tree image](./grant-application-dependency-tree.png))
 - [Grant Locked Doors Board](./grant-application-locked-doors-board.html) ([PNG](./grant-application-locked-doors-board.png), [SVG](./grant-application-locked-doors-board.svg))
+- [ClearPath Master Mission Tree](./clearpath-master-mission-tree.html)
 - [Phase I Budget Proposal](./phase-one-budget-proposal.md)
 - [Current Project Summary And Roadmap](./current-project-summary-and-roadmap.md)
 - [NIH Phase I Research Plan](./nih-phase-one-research-plan.md)

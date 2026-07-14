@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClearPath Master Mission Tree</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #06111c;
+      --ink: #eef7ff;
+      --muted: #9fb2c7;
+      --line: rgba(197, 218, 238, 0.48);
+      --line-hot: rgba(242, 198, 75, 0.88);
+      --panel: rgba(8, 19, 31, 0.9);
+      --panel-2: rgba(15, 31, 49, 0.88);
+      --start: #f2c64b;
+      --company: #6ee7b7;
+      --grant: #76d7ff;
+      --product: #b79cff;
+      --people: #ffbe73;
+      --legal: #ff8ca8;
+      --market: #f5e56d;
+      --critical: #ff755f;
+      --open: #65db92;
+      --next: #f2c64b;
+      --later: #9daebe;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 16% 18%, rgba(101, 219, 146, 0.18), transparent 21rem),
+        radial-gradient(circle at 78% 12%, rgba(118, 215, 255, 0.14), transparent 27rem),
+        radial-gradient(circle at 72% 84%, rgba(183, 156, 255, 0.14), transparent 31rem),
+        linear-gradient(135deg, #030811 0%, #071522 54%, #050b14 100%);
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 360px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 90px;
+      padding: 20px 26px;
+      background: linear-gradient(180deg, rgba(4, 10, 18, 0.96), rgba(4, 10, 18, 0.74));
+      border-bottom: 1px solid rgba(197, 218, 238, 0.13);
+      backdrop-filter: blur(16px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      max-width: 620px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border: 1px solid rgba(197, 218, 238, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #dce9f6;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--open);
+      box-shadow: 0 0 16px currentColor;
+    }
+
+    .legend .next { background: var(--next); }
+    .legend .later { background: var(--later); }
+    .legend .critical { background: var(--critical); }
+
+    .viewport {
+      position: fixed;
+      inset: 90px 360px 0 0;
+      overflow: auto;
+      padding: 40px;
+    }
+
+    .tree {
+      position: relative;
+      width: 4300px;
+      height: 3180px;
+      border-radius: 28px;
+      border: 1px solid rgba(197, 218, 238, 0.14);
+      background:
+        linear-gradient(rgba(197, 218, 238, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(197, 218, 238, 0.04) 1px, transparent 1px),
+        radial-gradient(circle at 16% 48%, rgba(110, 231, 183, 0.08), transparent 30rem),
+        radial-gradient(circle at 55% 34%, rgba(118, 215, 255, 0.08), transparent 36rem),
+        radial-gradient(circle at 70% 65%, rgba(255, 140, 168, 0.08), transparent 34rem),
+        rgba(6, 16, 27, 0.66);
+      background-size: 64px 64px, 64px 64px, auto, auto, auto, auto;
+      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.48);
+    }
+
+    .branch {
+      position: absolute;
+      border: 1px solid rgba(197, 218, 238, 0.1);
+      border-radius: 32px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015));
+      box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.018);
+    }
+
+    .branch-title {
+      position: absolute;
+      left: 24px;
+      top: 18px;
+      color: rgba(239, 248, 255, 0.52);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .node {
+      position: absolute;
+      width: 118px;
+      min-height: 154px;
+      transform: translate(-50%, -50%);
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .orb {
+      position: relative;
+      width: 82px;
+      height: 82px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      border: 2px solid color-mix(in srgb, var(--accent), white 18%);
+      background:
+        radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.5), transparent 18%),
+        radial-gradient(circle at 50% 64%, color-mix(in srgb, var(--accent), transparent 22%), rgba(12, 24, 38, 0.98) 62%);
+      box-shadow:
+        0 0 0 7px color-mix(in srgb, var(--accent), transparent 86%),
+        0 0 30px color-mix(in srgb, var(--accent), transparent 52%),
+        0 16px 30px rgba(0, 0, 0, 0.32);
+    }
+
+    .node:hover .orb,
+    .node.selected .orb {
+      box-shadow:
+        0 0 0 9px color-mix(in srgb, var(--accent), transparent 78%),
+        0 0 44px color-mix(in srgb, var(--accent), transparent 32%),
+        0 18px 34px rgba(0, 0, 0, 0.35);
+    }
+
+    .node.later .orb {
+      filter: grayscale(0.34);
+      opacity: 0.86;
+    }
+
+    .node.critical .orb {
+      animation: pulse 2.6s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 7px rgba(255, 117, 95, 0.16), 0 0 30px rgba(255, 117, 95, 0.42), 0 16px 30px rgba(0, 0, 0, 0.32); }
+      50% { box-shadow: 0 0 0 11px rgba(255, 117, 95, 0.25), 0 0 52px rgba(255, 117, 95, 0.62), 0 16px 30px rgba(0, 0, 0, 0.32); }
+    }
+
+    .icon {
+      font-size: 24px;
+      font-weight: 950;
+      letter-spacing: 0;
+      color: #06111c;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .node-title {
+      width: 150px;
+      color: #eef7ff;
+      font-size: 12px;
+      line-height: 1.16;
+      font-weight: 850;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.72);
+    }
+
+    .node-status {
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd9e7;
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    aside {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 360px;
+      z-index: 20;
+      padding: 24px;
+      overflow: auto;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(242, 198, 75, 0.12), transparent 16rem),
+        linear-gradient(180deg, rgba(10, 22, 36, 0.98), rgba(5, 12, 22, 0.98));
+      border-left: 1px solid rgba(197, 218, 238, 0.17);
+      box-shadow: -20px 0 50px rgba(0, 0, 0, 0.28);
+    }
+
+    .panel-kicker {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+    }
+
+    .panel-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 25px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .panel-text {
+      margin: 12px 0 0;
+      color: #c8d7e7;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .panel-section {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(197, 218, 238, 0.14);
+    }
+
+    .panel-section h3 {
+      margin: 0 0 10px;
+      color: #f2f7fc;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .panel-section ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 9px;
+    }
+
+    .panel-section li {
+      position: relative;
+      padding-left: 21px;
+      color: #d8e5f2;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .panel-section li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.42em;
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+      border: 1px solid color-mix(in srgb, var(--panel-accent), white 15%);
+      background: color-mix(in srgb, var(--panel-accent), transparent 66%);
+      box-shadow: 0 0 14px color-mix(in srgb, var(--panel-accent), transparent 54%);
+    }
+
+    .mini-map {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .mini-map button {
+      min-height: 42px;
+      border: 1px solid rgba(197, 218, 238, 0.16);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.055);
+      color: #dce9f6;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mini-map button:hover {
+      border-color: rgba(242, 198, 75, 0.58);
+      background: rgba(242, 198, 75, 0.12);
+    }
+
+    @media (max-width: 1100px) {
+      body {
+        overflow: auto;
+      }
+
+      header,
+      .viewport,
+      aside {
+        position: relative;
+        inset: auto;
+        width: auto;
+        right: auto;
+      }
+
+      header {
+        display: block;
+      }
+
+      .legend {
+        justify-content: flex-start;
+        margin-top: 14px;
+      }
+
+      .viewport {
+        height: 62vh;
+        padding: 18px;
+      }
+
+      aside {
+        min-height: 38vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>ClearPath Master Mission Tree</h1>
+      <p class="subtitle">A visual map from where we are now to a credible SBIR application, polished prototype, team, legal/security plan, and funding path.</p>
+    </div>
+    <div class="legend">
+      <span><i></i>Can start now</span>
+      <span><i class="next"></i>Next focus</span>
+      <span><i class="later"></i>Later branch</span>
+      <span><i class="critical"></i>Critical gate</span>
+    </div>
+  </header>
+
+  <main class="viewport" id="viewport">
+    <section class="tree" id="tree" aria-label="ClearPath visual mission tree">
+      <svg id="links" viewBox="0 0 4300 3180" aria-hidden="true"></svg>
+
+      <div class="branch" style="left: 340px; top: 350px; width: 1760px; height: 430px;">
+        <div class="branch-title">Company + Federal Access</div>
+      </div>
+      <div class="branch" style="left: 340px; top: 830px; width: 2500px; height: 430px;">
+        <div class="branch-title">Grant + Research Application</div>
+      </div>
+      <div class="branch" style="left: 340px; top: 1310px; width: 2380px; height: 430px;">
+        <div class="branch-title">App + Prototype</div>
+      </div>
+      <div class="branch" style="left: 340px; top: 1790px; width: 2040px; height: 390px;">
+        <div class="branch-title">People + Budget</div>
+      </div>
+      <div class="branch" style="left: 340px; top: 2225px; width: 2040px; height: 390px;">
+        <div class="branch-title">Legal + Security</div>
+      </div>
+      <div class="branch" style="left: 340px; top: 2660px; width: 1720px; height: 350px;">
+        <div class="branch-title">Commercialization + Alternate Funding</div>
+      </div>
+    </section>
+  </main>
+
+  <aside id="detail" style="--panel-accent: var(--start)">
+    <p class="panel-kicker">Start here</p>
+    <h2 class="panel-title">Click any node in the tree.</h2>
+    <p class="panel-text">Each circle is a task cluster. The branches show what that task opens next. The right panel keeps the details readable so the map can stay visual instead of turning into a wall of text.</p>
+    <div class="panel-section">
+      <h3>How to read it</h3>
+      <ul>
+        <li>Start from the large ClearPath node.</li>
+        <li>Follow each glowing path outward.</li>
+        <li>Use green/yellow nodes for work we can start soon.</li>
+        <li>Treat red nodes as hard gates before submission or real PHI.</li>
+      </ul>
+    </div>
+    <div class="mini-map" id="miniMap"></div>
+  </aside>
+
+  <script>
+    const colors = {
+      start: "var(--start)",
+      company: "var(--company)",
+      grant: "var(--grant)",
+      product: "var(--product)",
+      people: "var(--people)",
+      legal: "var(--legal)",
+      market: "var(--market)",
+      critical: "var(--critical)"
+    };
+
+    const nodes = [
+      {
+        id: "now", x: 160, y: 260, color: "start", status: "next", icon: "CP", title: "Right Now",
+        kicker: "Where we are standing",
+        summary: "ClearPath is now an interdisciplinary medical communication platform, not a dental app. We have planning documents, an early app/prototype, NLM program feedback, and a large application path to organize.",
+        tasks: ["Keep all project changes committed and pushed", "Use the grant-planning folder as the main command center", "Keep NLM SBIR Phase I as the primary grant path unless new guidance changes that", "Keep the app direction focused on patient-mediated interoffice medical communication"],
+        unlocks: ["Product direction", "Company setup", "Grant research", "Prototype work", "Hiring and advisor outreach"]
+      },
+      {
+        id: "direction", x: 480, y: 180, color: "start", status: "next", icon: "DIR", title: "Product Direction",
+        kicker: "Core identity",
+        summary: "This locks the story: ClearPath is a specialty-neutral, patient-mediated clinical information exchange platform.",
+        tasks: ["Remove dental-first language from docs and app surfaces", "Define patient, provider, office admin, caregiver/guardian, and specialist roles", "Define source attribution and multiple-truth model", "Keep dental as a supported domain, not the company identity"],
+        unlocks: ["Specific Aims", "Data model", "Commercialization plan", "Prototype scope"]
+      },
+      {
+        id: "worksystem", x: 480, y: 340, color: "start", status: "open", icon: "OPS", title: "Work System",
+        kicker: "Project control",
+        summary: "This keeps the project from becoming scattered.",
+        tasks: ["Maintain a master checklist", "Track decisions, risks, expenses, outreach, advisor conversations, and open questions", "Organize legal, grant, product, research, and investor materials", "Set a weekly review rhythm"],
+        unlocks: ["Cleaner grant writing", "Cleaner hiring", "Cleaner application assembly"]
+      },
+
+      { id: "name", x: 520, y: 560, color: "company", status: "open", icon: "NM", title: "Name + Guidance", kicker: "Company", summary: "Before spending filing money, narrow the company identity and get free/low-cost advice.", tasks: ["Pick 3-5 name candidates", "Check Texas name availability", "Check domain availability", "Do a basic USPTO trademark search", "Contact SCORE, SBDC, law school clinic, or startup clinic"], unlocks: ["Entity decision", "Formation documents", "Consistent federal registration name"] },
+      { id: "entity", x: 830, y: 520, color: "company", status: "next", icon: "ENT", title: "Entity Choice", kicker: "Company", summary: "Decide what the company should legally be before federal registration.", tasks: ["Compare Texas LLC, Delaware LLC, and corporation options", "Ask startup attorney/free advisor about SBIR and investor implications", "Decide ownership structure", "Decide founder role and PI possibility"], unlocks: ["Formation", "Founder documents", "Grant eligibility path"] },
+      { id: "formation", x: 1140, y: 580, color: "company", status: "later", icon: "LLC", title: "Form Company", kicker: "Company", summary: "Create the legal applicant entity that can apply for SBIR.", tasks: ["File formation documents", "Choose registered agent", "Create operating agreement or founder docs", "Save certificate and records"], unlocks: ["EIN", "Bank account", "SAM.gov", "SBA registration"] },
+      { id: "ein", x: 1450, y: 520, color: "company", status: "later", icon: "EIN", title: "EIN + Bank", kicker: "Company", summary: "Set up the tax and financial identity of the business.", tasks: ["Get EIN from IRS", "Open company bank account", "Set up bookkeeping", "Track founder effort and grant-related expenses"], unlocks: ["SAM.gov registration", "Budget credibility", "Financial controls"] },
+      { id: "sam", x: 1760, y: 590, color: "critical", status: "critical", icon: "UEI", title: "SAM.gov + UEI", kicker: "Critical gate", summary: "This is one of the biggest administrative gates because it can take weeks.", tasks: ["Register in SAM.gov", "Validate legal name and address", "Receive/activate UEI", "Keep SAM active through submission and award"], unlocks: ["Grants.gov organization account", "eRA Commons organization account", "Federal submission pathway"] },
+      { id: "federal", x: 2050, y: 500, color: "critical", status: "critical", icon: "FED", title: "Federal Accounts", kicker: "Critical gate", summary: "These accounts let the company actually submit the application.", tasks: ["Register organization in Grants.gov", "Register organization in eRA Commons", "Create PI and signing official roles", "Register in SBA Company Registry", "Save SBA Control ID"], unlocks: ["Submission validation", "Final application upload"] },
+
+      { id: "grantpath", x: 520, y: 1040, color: "grant", status: "open", icon: "NOFO", title: "Funding Path", kicker: "Grant", summary: "Confirm that NLM SBIR Phase I remains the best target and keep alternatives alive.", tasks: ["Confirm active NOFO", "Confirm mechanism, ceiling, project period, due dates, and eligibility", "Track AHRQ, NIBIB, NIA, NSF, ARPA-H, HRSA, CDC, VA, DoD, PCORI, Texas HHSC, and NIDILRR"], unlocks: ["Specific Aims", "Budget limits", "Application requirements"] },
+      { id: "aims", x: 820, y: 950, color: "grant", status: "next", icon: "AIM", title: "Specific Aims", kicker: "Grant", summary: "This is the one-page scientific story that anchors the whole application.", tasks: ["Frame as informatics research", "Emphasize patient-mediated exchange, consent-aware sharing, provenance, interoperability, workflow integration, and usability", "Explain ClearPath JSON as internal model", "Explain FHIR relationship"], unlocks: ["NLM follow-up", "Research strategy", "Advisor conversations"] },
+      { id: "po", x: 1120, y: 1070, color: "grant", status: "next", icon: "NLM", title: "NLM Feedback", kicker: "Grant", summary: "Use Dr. Reddy's positive signal carefully and ask focused questions after revising the aims.", tasks: ["Send revised one-page aims when ready", "Ask SBIR vs STTR question", "Ask FHIR depth question", "Ask human-subjects/usability framing question", "Save correspondence"], unlocks: ["Sharper application", "Reduced reviewer-fit risk"] },
+      { id: "research", x: 1440, y: 970, color: "grant", status: "later", icon: "RES", title: "Research Model", kicker: "Research", summary: "Convert the product into a Phase I feasibility study.", tasks: ["Define core research question", "Define technical and scientific uncertainties", "Define success criteria", "Define Phase II go/no-go criteria", "Define synthetic/de-identified data posture"], unlocks: ["Study design", "Research Strategy", "Budget justification"] },
+      { id: "study", x: 1760, y: 1080, color: "grant", status: "later", icon: "STD", title: "Study Design", kicker: "Research", summary: "Describe what will be tested and how we will know whether it worked.", tasks: ["Create synthetic patient scenarios", "Design provider workflow interviews", "Design patient comprehension testing", "Define participant types and sample size", "Define metrics and analysis plan", "Determine IRB/human-subjects needs"], unlocks: ["Research Strategy", "Participant materials", "Pilot plan"] },
+      { id: "docs", x: 2120, y: 960, color: "grant", status: "later", icon: "DOC", title: "Application Docs", kicker: "Grant", summary: "The full SBIR package comes together here.", tasks: ["Specific Aims", "Research Strategy", "Abstract and narrative", "Commercialization Plan", "Facilities/resources", "Budget and justification", "Biosketches", "Letters", "Human-subjects/data-sharing sections if required"], unlocks: ["Final validation", "Submission"] },
+      { id: "validate", x: 2520, y: 1080, color: "critical", status: "critical", icon: "VAL", title: "Validate Package", kicker: "Critical gate", summary: "The application is not done until Grants.gov and eRA Commons accept it without errors.", tasks: ["Final PDF formatting check", "Upload through Grants.gov", "Check eRA Commons validations", "Correct warnings/errors before deadline"], unlocks: ["Actual submission"] },
+
+      { id: "auth", x: 520, y: 1520, color: "product", status: "next", icon: "AUTH", title: "App Stability", kicker: "Product", summary: "The demo has to be accessible and credible before anyone reviews it.", tasks: ["Fix production login/auth fully", "Confirm Vercel deployment works", "Confirm mobile access works", "Decide whether Supabase remains the long-term backend", "Keep demo mode controlled and documented"], unlocks: ["Prototype evidence", "Advisor demos", "Developer onboarding"] },
+      { id: "datamodel", x: 830, y: 1440, color: "product", status: "next", icon: "JSON", title: "Data Model", kicker: "Product", summary: "ClearPath needs a structured internal model that can map outward to standards.", tasks: ["Define objects for patient, provider, organization, request, consent, audit, provenance, document, diagnosis, medication, allergy, procedure, and treatment", "Map relevant objects to FHIR resources", "Define active/resolved/history status model"], unlocks: ["Request workflow", "Medical details", "FHIR positioning"] },
+      { id: "workflow", x: 1160, y: 1540, color: "product", status: "later", icon: "FLOW", title: "Request Flow", kicker: "Product", summary: "This is the heart of the interoffice communication platform.", tasks: ["Provider creates request", "Patient approves, denies, limits, revokes, or lets request expire", "Source office responds", "Receiving provider reviews package", "All actions create audit/provenance events"], unlocks: ["Consent UI", "Provider review", "Demo scenarios"] },
+      { id: "medical", x: 1490, y: 1430, color: "product", status: "next", icon: "MED", title: "Specific Details", kicker: "Product", summary: "Broad questionnaire answers need drill-down detail so the product feels like a real medical passport.", tasks: ["Turn broad medical questions into specific records", "Example: heart disease opens heart attack date, provider, treatment, medications, and current status", "Support patient-entered and provider-verified states", "Tie medications and treatments to diagnoses"], unlocks: ["Condition list", "3D health map", "Better grant demo"] },
+      { id: "bodymap", x: 1830, y: 1560, color: "product", status: "next", icon: "3D", title: "3D Health Map", kicker: "Product", summary: "This should be polished, non-explicit, usable by teens/kids, and not the only way to read the chart.", tasks: ["Keep body map in its own visible tab on mobile and desktop patient side", "Select non-explicit male and female model assets with usable licensing", "Use a neutral gray clinical style", "Tap body regions to see current, resolved, and complete history", "Provide list/timeline fallback for systemic conditions"], unlocks: ["Visual demo", "Patient-facing differentiation", "Usability testing"] },
+      { id: "audit", x: 2160, y: 1440, color: "product", status: "later", icon: "SRC", title: "Source + Audit UI", kicker: "Product", summary: "Trust depends on showing who entered or verified every record.", tasks: ["Show patient-entered, provider-entered, imported, provider-verified, and patient-confirmed labels", "Show consent scope and expiration", "Show revocation and access history", "Show package provenance"], unlocks: ["Reviewer trust", "Security story", "Research metrics"] },
+      { id: "demo", x: 2520, y: 1530, color: "product", status: "later", icon: "DEMO", title: "Prototype Evidence", kicker: "Product", summary: "Turn the prototype into evidence reviewers can understand quickly.", tasks: ["Create interdisciplinary demo scenarios", "Take screenshots", "Record short walkthrough", "Create architecture, workflow, and data model diagrams", "Show JSON/FHIR mapping and provenance evidence"], unlocks: ["Application support", "Advisor buy-in", "Investor material"] },
+
+      { id: "devplan", x: 520, y: 1980, color: "people", status: "open", icon: "DEV", title: "Developer Plan", kicker: "People", summary: "Define the person who can lead the technical build after grant funding.", tasks: ["Write technical lead/fractional CTO role", "Decide employee vs contractor", "Define compensation range", "Define equity possibility", "Define deliverables, testing, documentation, and deployment expectations"], unlocks: ["Candidate search", "Budget line item", "Grant team plan"] },
+      { id: "hire", x: 820, y: 1900, color: "people", status: "later", icon: "HIRE", title: "Hire Developer", kicker: "People", summary: "Bring in someone who can own engineering quality.", tasks: ["Source candidates", "Review healthcare/FHIR/security experience", "Check portfolio and references", "Use confidentiality and IP assignment agreements"], unlocks: ["Prototype acceleration", "Stronger Phase I execution plan"] },
+      { id: "advisors", x: 1140, y: 2020, color: "people", status: "next", icon: "ADV", title: "Advisors", kicker: "People", summary: "Reviewers need to believe the team can do informatics research, not only app building.", tasks: ["Find informatics/FHIR advisor", "Find clinician advisor", "Find human-factors/usability advisor", "Find privacy/security advisor", "Collect roles, bios, rates, and availability"], unlocks: ["Letters", "Budget", "Research credibility"] },
+      { id: "partners", x: 1460, y: 1900, color: "people", status: "next", icon: "CLN", title: "Clinical Partners", kicker: "People", summary: "Real clinical workflow input makes the application more believable.", tasks: ["Find at least two provider offices from different disciplines", "Ask for workflow interviews", "Ask for synthetic prototype feedback", "Discuss Phase II pilot interest without promising live PHI too early"], unlocks: ["Letters of support", "Study recruitment path", "Market evidence"] },
+      { id: "letters", x: 1780, y: 2020, color: "people", status: "later", icon: "LTR", title: "Letters + Bios", kicker: "People", summary: "These become proof that the team and environment are real.", tasks: ["Collect letters of support", "Collect advisor biosketches", "Collect consultant scopes", "Document team credibility"], unlocks: ["Application documents", "Budget justification"] },
+      { id: "budget", x: 2100, y: 1900, color: "people", status: "next", icon: "$", title: "Budget", kicker: "People + money", summary: "The budget must make the work believable and stay allowable.", tasks: ["Founder salary near $80,000 and effort level", "Developer cost", "Advisor/consultant costs", "Legal/security/IRB/participant/cloud/tool costs", "Indirect cost calculation", "Budget justification for every line"], unlocks: ["Application budget", "Grant reviewer confidence"] },
+
+      { id: "startupLegal", x: 520, y: 2340, color: "legal", status: "open", icon: "LAW", title: "Startup Legal", kicker: "Legal", summary: "This protects the company, ownership, contractors, and IP.", tasks: ["Find startup attorney", "Review entity structure", "Prepare founder ownership documents", "Prepare contractor/advisor agreements", "Use IP assignment language"], unlocks: ["Cleaner hiring", "Investor readiness", "Company records"] },
+      { id: "hipaa", x: 840, y: 2420, color: "legal", status: "next", icon: "HIP", title: "HIPAA + Privacy", kicker: "Legal", summary: "Phase I can likely use synthetic data, but the product must be designed responsibly.", tasks: ["Consult healthcare/HIPAA attorney", "Review HIPAA, FTC health data, Texas/state privacy issues", "Create Phase I synthetic-data posture", "Plan BAAs before real PHI", "Review minors/guardian policy"], unlocks: ["Policies", "Security plan", "Phase II readiness"] },
+      { id: "policies", x: 1160, y: 2340, color: "legal", status: "later", icon: "POL", title: "Policies", kicker: "Legal", summary: "These describe how ClearPath handles users, data, corrections, retention, and risk.", tasks: ["Privacy policy", "Terms of use", "Patient/provider participation language", "Correction, deletion, retention, breach, emergency access, and account policies"], unlocks: ["Application risk plan", "Production readiness"] },
+      { id: "security", x: 1480, y: 2420, color: "legal", status: "next", icon: "SEC", title: "Security Design", kicker: "Security", summary: "Security needs to be designed into the architecture before real PHI.", tasks: ["Threat model", "Role-based access control", "Encryption and session management", "Secrets management", "Dependency scanning", "Supabase RLS review if staying on Supabase"], unlocks: ["Phase I security review", "Pen testing scope"] },
+      { id: "securityReview", x: 1800, y: 2340, color: "legal", status: "later", icon: "REV", title: "Security Review", kicker: "Security", summary: "Phase I should include architecture review and remediation planning.", tasks: ["Review architecture before claiming feasibility", "Document risks", "Document remediations", "Define Phase II production security work"], unlocks: ["Application security section", "Pen testing plan"] },
+      { id: "pentest", x: 2120, y: 2420, color: "critical", status: "critical", icon: "PEN", title: "Pen Test + Risk Analysis", kicker: "Before real PHI", summary: "This likely belongs in Phase II unless real PHI is required earlier.", tasks: ["Run third-party penetration test before real-PHI pilot", "Complete formal HIPAA security risk analysis", "Create incident response and production compliance program"], unlocks: ["Real-PHI pilot readiness", "Phase II deployment confidence"] },
+
+      { id: "commercial", x: 520, y: 2850, color: "market", status: "open", icon: "COM", title: "Commercial Plan", kicker: "Commercial", summary: "The SBIR reviewers need to see a path beyond research funding.", tasks: ["Define customer, buyer, user, payer, and pricing", "Compare patient portals, HIEs, EHR interoperability, health record apps, and fax/manual exchange", "Explain adoption path and Phase III plan"], unlocks: ["Commercialization Plan", "Investor story"] },
+      { id: "market", x: 870, y: 2940, color: "market", status: "next", icon: "MKT", title: "Market Evidence", kicker: "Commercial", summary: "Interview evidence helps prove the pain is real.", tasks: ["Document provider pain points", "Document patient/caregiver pain points", "Estimate market size and buyer economics", "Collect workflow examples and quotes"], unlocks: ["Commercialization Plan", "Investor deck", "Product prioritization"] },
+      { id: "investor", x: 1220, y: 2850, color: "market", status: "later", icon: "INV", title: "Investor Backup", kicker: "Alternate funding", summary: "This is not the primary route, but it gives us optionality.", tasks: ["Understand SAFEs, convertible notes, and priced rounds", "Estimate valuation and dilution", "Create pitch deck, demo, traction evidence, and use-of-funds", "Talk with attorney before signing anything"], unlocks: ["Pre-seed option", "Bridge funding option"] },
+
+      { id: "submit", x: 3140, y: 1380, color: "critical", status: "critical", icon: "SUB", title: "Submit SBIR", kicker: "Final convergence", summary: "This is the destination: a credible Phase I application, not just a product pitch.", tasks: ["Company and federal registrations are active", "Application documents are complete", "Budget is justified and allowable", "Team/advisors/partners are credible", "Prototype evidence supports feasibility", "Legal/security plan is responsible", "Commercialization path is believable"], unlocks: ["Submitted application", "Phase I review", "Backup cycle revisions if needed"] }
+    ];
+
+    const edges = [
+      ["now", "direction"], ["now", "worksystem"], ["now", "name"], ["now", "grantpath"], ["now", "auth"], ["now", "devplan"], ["now", "startupLegal"], ["now", "commercial"],
+      ["direction", "aims"], ["direction", "datamodel"], ["direction", "medical"], ["direction", "commercial"],
+      ["worksystem", "docs"], ["worksystem", "budget"],
+      ["name", "entity"], ["entity", "formation"], ["formation", "ein"], ["ein", "sam"], ["sam", "federal"], ["federal", "validate"],
+      ["grantpath", "aims"], ["aims", "po"], ["po", "research"], ["research", "study"], ["study", "docs"], ["docs", "validate"], ["validate", "submit"],
+      ["auth", "workflow"], ["datamodel", "workflow"], ["workflow", "medical"], ["medical", "bodymap"], ["workflow", "audit"], ["bodymap", "demo"], ["audit", "demo"], ["demo", "submit"],
+      ["devplan", "hire"], ["hire", "budget"], ["advisors", "letters"], ["partners", "letters"], ["letters", "docs"], ["budget", "docs"], ["budget", "submit"],
+      ["startupLegal", "policies"], ["hipaa", "policies"], ["policies", "docs"], ["security", "securityReview"], ["securityReview", "docs"], ["securityReview", "pentest"], ["pentest", "submit"],
+      ["commercial", "market"], ["market", "docs"], ["commercial", "submit"], ["investor", "market"]
+    ];
+
+    const tree = document.getElementById("tree");
+    const svg = document.getElementById("links");
+    const detail = document.getElementById("detail");
+    const miniMap = document.getElementById("miniMap");
+    const nodeById = Object.fromEntries(nodes.map((node) => [node.id, node]));
+
+    function makeNode(node) {
+      const el = document.createElement("button");
+      el.className = `node ${node.status}`;
+      el.id = node.id;
+      el.type = "button";
+      el.style.left = `${node.x}px`;
+      el.style.top = `${node.y}px`;
+      el.style.setProperty("--accent", colors[node.color]);
+      el.innerHTML = `
+        <span class="orb"><span class="icon">${node.icon}</span></span>
+        <span class="node-title">${node.title}</span>
+        <span class="node-status">${node.status === "open" ? "start now" : node.status === "next" ? "next focus" : node.status === "critical" ? "critical" : "later"}</span>
+      `;
+      el.addEventListener("click", () => selectNode(node.id));
+      tree.appendChild(el);
+    }
+
+    function drawEdges() {
+      svg.innerHTML = `
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="coloredBlur"></feMergeNode>
+              <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+          </filter>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8.6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(236, 246, 255, 0.74)"></path>
+          </marker>
+        </defs>
+      `;
+
+      edges.forEach(([fromId, toId]) => {
+        const from = nodeById[fromId];
+        const to = nodeById[toId];
+        const midX = (from.x + to.x) / 2;
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", `M ${from.x} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x} ${to.y}`);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", from.color === "critical" || to.color === "critical" ? "rgba(255, 117, 95, 0.58)" : "rgba(197, 218, 238, 0.43)");
+        path.setAttribute("stroke-width", "3");
+        path.setAttribute("filter", "url(#glow)");
+        path.setAttribute("marker-end", "url(#arrow)");
+        svg.appendChild(path);
+      });
+    }
+
+    function list(items) {
+      return items.map((item) => `<li>${item}</li>`).join("");
+    }
+
+    function selectNode(id) {
+      const node = nodeById[id];
+      document.querySelectorAll(".node.selected").forEach((el) => el.classList.remove("selected"));
+      document.getElementById(id).classList.add("selected");
+      detail.style.setProperty("--panel-accent", colors[node.color]);
+      detail.innerHTML = `
+        <p class="panel-kicker">${node.kicker}</p>
+        <h2 class="panel-title">${node.title}</h2>
+        <p class="panel-text">${node.summary}</p>
+        <div class="panel-section">
+          <h3>Tasks</h3>
+          <ul>${list(node.tasks)}</ul>
+        </div>
+        <div class="panel-section">
+          <h3>What this opens</h3>
+          <ul>${list(node.unlocks)}</ul>
+        </div>
+        <div class="panel-section">
+          <h3>Jump to branch</h3>
+          <div class="mini-map" id="miniMap"></div>
+        </div>
+      `;
+      buildMiniMap();
+    }
+
+    function buildMiniMap() {
+      const target = document.getElementById("miniMap");
+      if (!target) return;
+      const branchButtons = [
+        ["name", "Company"], ["grantpath", "Grant"], ["auth", "App"], ["devplan", "People"], ["startupLegal", "Legal"], ["commercial", "Market"], ["submit", "Submit"]
+      ];
+      target.innerHTML = branchButtons.map(([id, label]) => `<button type="button" data-jump="${id}">${label}</button>`).join("");
+      target.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const node = nodeById[button.dataset.jump];
+          document.getElementById("viewport").scrollTo({ left: Math.max(node.x - 420, 0), top: Math.max(node.y - 320, 0), behavior: "smooth" });
+          selectNode(button.dataset.jump);
+        });
+      });
+    }
+
+    nodes.forEach(makeNode);
+    drawEdges();
+    buildMiniMap();
+    selectNode("now");
+  </script>
+</body>
+</html>
