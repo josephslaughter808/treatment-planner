@@ -16,8 +16,12 @@ export function isSupabaseBrowserConfigured() {
   );
 }
 
+export function isLocalAuthAllowedInBrowser() {
+  return process.env.NEXT_PUBLIC_CLEARPATH_ALLOW_LOCAL_AUTH === "true";
+}
+
 export function isSupabaseRequiredInBrowser() {
-  if (process.env.NEXT_PUBLIC_CLEARPATH_ALLOW_LOCAL_AUTH === "true") {
+  if (isLocalAuthAllowedInBrowser()) {
     return false;
   }
 

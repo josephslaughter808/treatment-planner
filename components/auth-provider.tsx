@@ -21,6 +21,7 @@ import {
   clearSupabaseProxySession,
   getSupabaseBrowserClient,
   getSupabaseAuthHeaders,
+  isLocalAuthAllowedInBrowser,
   isSupabaseBrowserConfigured,
   isSupabaseRequiredInBrowser,
   storeSupabaseProxySession
@@ -64,11 +65,13 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 type AuthMode = AuthContextValue["authMode"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const authMode: AuthMode = isSupabaseBrowserConfigured()
-    ? "supabase"
-    : isSupabaseRequiredInBrowser()
-      ? "unconfigured"
-      : "local";
+  const authMode: AuthMode = isLocalAuthAllowedInBrowser()
+    ? "local"
+    : isSupabaseBrowserConfigured()
+      ? "supabase"
+      : isSupabaseRequiredInBrowser()
+        ? "unconfigured"
+        : "local";
   const [accounts, setAccounts] = useState<AccountProfile[]>(readStoredAccounts);
   const [currentUser, setCurrentUser] = useState<AccountProfile | null>(() =>
     authMode === "local" ? readInitialLocalCurrentUser() : null

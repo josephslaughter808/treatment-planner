@@ -53,6 +53,17 @@ export async function POST(request: NextRequest) {
   });
 
   if (error || !data.user || !data.session) {
+    if (isSupabaseConnectivityError(error)) {
+      return authFailure(
+        request,
+        isFormSubmission,
+        "auth-unavailable",
+        "ClearPath cannot reach Supabase right now. Check the Supabase project URL/key in Vercel or whether the Supabase project is paused.",
+        503,
+        email
+      );
+    }
+
     return authFailure(request, isFormSubmission, "invalid-login", error?.message || "Unable to sign in.", 401, email);
   }
 
@@ -141,4 +152,18 @@ function getRequestOrigin(request: NextRequest) {
   const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
   const protocol = request.headers.get("x-forwarded-proto") || request.nextUrl.protocol.replace(":", "") || "http";
   return host ? `${protocol}://${host}` : request.nextUrl.origin;
+}
+
+function isSupabaseConnectivityError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || "");
+  const status = typeof error === "object" && error && "status" in error ? Number(error.status) : 0;
+
+  return (
+    status >= 500 ||
+    message.toLowerCase().includes("fetch") ||
+    message.toLowerCase().includes("network") ||
+    message.toLowerCase().includes("timeout") ||
+    message.toLowerCase().includes("dns") ||
+    message.toLowerCase().includes("unreachable")
+  );
 }
