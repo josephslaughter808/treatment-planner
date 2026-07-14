@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1780" viewBox="0 0 1800 1780" role="img" aria-labelledby="title desc">
+<title id="title">ClearPath Grant Locked Doors Board</title>
+<desc id="desc">Each locked door shows keys needed and tasks unlocked.</desc>
+<style>
+.bg{fill:#f6f8fb} .title{font:700 48px Arial,Helvetica,sans-serif;fill:#0b2545} .sub{font:400 20px Arial,Helvetica,sans-serif;fill:#607087}
+.cardTitle{font:700 23px Arial,Helvetica,sans-serif;fill:#0b2545} .meta{font:700 14px Arial,Helvetica,sans-serif;fill:#607087} .section{font:700 15px Arial,Helvetica,sans-serif;fill:#0b2545}
+.txt{font:400 14px Arial,Helvetica,sans-serif;fill:#253246} .small{font:400 13px Arial,Helvetica,sans-serif;fill:#344258} .line{stroke:#9aacbf;stroke-width:3;fill:none;marker-end:url(#arrow)}
+</style>
+<defs><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#9aacbf"/></marker></defs>
+<rect class="bg" width="1800" height="1780"/>
+<text class="title" x="60" y="74">ClearPath Grant Locked Doors Board</text>
+<text class="sub" x="60" y="110">Each door shows what is blocking us, the keys needed, and what becomes possible after it opens.</text>
+
+<g transform="translate(60 180)">
+<rect width="500" height="410" rx="16" fill="#e7f5ee" stroke="#96c9af" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 1 · Open now, no LLC fee yet</text>
+<text class="cardTitle" x="24" y="68">Working Legal Name + Free</text><text class="cardTitle" x="24" y="95">Guidance</text>
+<text class="small" x="24" y="138">Why locked: We should not spend filing money until the</text><text class="small" x="24" y="156">name and structure are good enough.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Pick 3-5 name candidates</text>
+<text class="txt" x="30" y="247">• Check Texas name</text>
+<text class="txt" x="30" y="264">availability</text>
+<text class="txt" x="30" y="281">• Contact SCORE/SBDC or</text>
+<text class="txt" x="30" y="298">legal clinic</text>
+<text class="txt" x="30" y="315">• Decide Texas LLC unless</text>
+<text class="txt" x="30" y="332">counsel says otherwise</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• File Texas LLC</text>
+<text class="txt" x="264" y="247">• Use one consistent name</text>
+<text class="txt" x="264" y="264">for EIN and registrations</text>
+<text class="txt" x="264" y="281">• Create company records</text>
+<text class="txt" x="264" y="298">folder</text>
+<text class="txt" x="264" y="315">• Start clean business</text>
+<text class="txt" x="264" y="332">identity</text>
+</g>
+<g transform="translate(620 180)">
+<rect width="500" height="410" rx="16" fill="#fff3cf" stroke="#dfc878" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 2 · Locked by $300 filing fee and timing</text>
+<text class="cardTitle" x="24" y="68">Texas LLC Formed</text>
+<text class="small" x="24" y="111">Why locked: NIH SBIR needs a real eligible small business</text><text class="small" x="24" y="129">applicant, not just an individual idea.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• File Certificate of</text>
+<text class="txt" x="30" y="247">Formation</text>
+<text class="txt" x="30" y="264">• Registered agent decision</text>
+<text class="txt" x="30" y="281">• Basic operating agreement</text>
+<text class="txt" x="30" y="298">• Save formation documents</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• EIN application</text>
+<text class="txt" x="264" y="247">• Business bank account</text>
+<text class="txt" x="264" y="264">• Company-owned grant</text>
+<text class="txt" x="264" y="281">applicant identity</text>
+<text class="txt" x="264" y="298">• Federal registration</text>
+<text class="txt" x="264" y="315">sequence</text>
+</g>
+<g transform="translate(1180 180)">
+<rect width="500" height="410" rx="16" fill="#fff3cf" stroke="#dfc878" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 3 · Locked behind LLC formation</text>
+<text class="cardTitle" x="24" y="68">EIN Received</text>
+<text class="small" x="24" y="111">Why locked: Federal systems, banks, and grant records need</text><text class="small" x="24" y="129">the company tax ID.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Apply directly through IRS</text>
+<text class="txt" x="30" y="247">• Save EIN confirmation</text>
+<text class="txt" x="30" y="264">letter</text>
+<text class="txt" x="30" y="281">• Match legal name exactly</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• SAM.gov registration</text>
+<text class="txt" x="264" y="247">• SBA Company Registry</text>
+<text class="txt" x="264" y="264">• Bank account</text>
+<text class="txt" x="264" y="281">• Budget and payment details</text>
+</g>
+<g transform="translate(60 670)">
+<rect width="500" height="410" rx="16" fill="#fbe6e6" stroke="#e1a4a4" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 4 · Critical registration lock</text>
+<text class="cardTitle" x="24" y="68">SAM.gov + UEI Active</text>
+<text class="small" x="24" y="111">Why locked: SAM/UEI is the federal identity that other</text><text class="small" x="24" y="129">submission systems depend on.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Complete SAM entity</text>
+<text class="txt" x="30" y="247">registration</text>
+<text class="txt" x="30" y="264">• Validate address and</text>
+<text class="txt" x="30" y="281">identity</text>
+<text class="txt" x="30" y="298">• Receive/activate UEI</text>
+<text class="txt" x="30" y="315">• Keep SAM active</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• eRA Commons organization</text>
+<text class="txt" x="264" y="247">account</text>
+<text class="txt" x="264" y="264">• Grants.gov organization</text>
+<text class="txt" x="264" y="281">account</text>
+<text class="txt" x="264" y="298">• AOR/SO roles</text>
+<text class="txt" x="264" y="315">• Submission validation path</text>
+</g>
+<g transform="translate(620 670)">
+<rect width="500" height="410" rx="16" fill="#e7f5ee" stroke="#96c9af" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 5 · Open once one-page aims are polished</text>
+<text class="cardTitle" x="24" y="68">NLM Feedback On Revised Aims</text>
+<text class="small" x="24" y="111">Why locked: Dr. Reddy already gave a positive fit signal;</text><text class="small" x="24" y="129">now we need the research framing checked.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Polish one-page Specific</text>
+<text class="txt" x="30" y="247">Aims</text>
+<text class="txt" x="30" y="264">• Include FHIR/ClearPath</text>
+<text class="txt" x="30" y="281">JSON positioning</text>
+<text class="txt" x="30" y="298">• Ask 2-3 focused questions</text>
+<text class="txt" x="30" y="315">• Send only if/when</text>
+<text class="txt" x="30" y="332">appropriate</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• Final aims language</text>
+<text class="txt" x="264" y="247">• FHIR depth decision</text>
+<text class="txt" x="264" y="264">• SBIR vs STTR confidence</text>
+<text class="txt" x="264" y="281">•</text>
+<text class="txt" x="264" y="298">Human-subjects/clinical-trial</text>
+</g>
+<g transform="translate(1180 670)">
+<rect width="500" height="410" rx="16" fill="#fff3cf" stroke="#dfc878" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 6 · Locked by outside people</text>
+<text class="cardTitle" x="24" y="68">Advisor + Partner Commitments</text>
+<text class="small" x="24" y="111">Why locked: Reviewers need to believe the team can do</text><text class="small" x="24" y="129">informatics research, not only build an app.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Informatics/FHIR advisor</text>
+<text class="txt" x="30" y="247">• Clinical workflow advisor</text>
+<text class="txt" x="30" y="264">• Human-factors advisor</text>
+<text class="txt" x="30" y="281">• Privacy/security advisor</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• Letters of support</text>
+<text class="txt" x="264" y="247">• Stronger research methods</text>
+<text class="txt" x="264" y="264">• Credible team section</text>
+<text class="txt" x="264" y="281">• Consultant scopes and</text>
+<text class="txt" x="264" y="298">budget support</text>
+</g>
+<g transform="translate(60 1160)">
+<rect width="500" height="410" rx="16" fill="#e7f5ee" stroke="#96c9af" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 7 · Open now, build in parallel</text>
+<text class="cardTitle" x="24" y="68">Grant-Critical Prototype</text><text class="cardTitle" x="24" y="95">Evidence</text>
+<text class="small" x="24" y="138">Why locked: The prototype should prove the research story:</text><text class="small" x="24" y="156">request, consent, provenance, package, audit.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Provider request workflow</text>
+<text class="txt" x="30" y="247">• Patient approve/limit/deny</text>
+<text class="txt" x="30" y="264">workflow</text>
+<text class="txt" x="30" y="281">• Consent-scoped JSON</text>
+<text class="txt" x="30" y="298">package</text>
+<text class="txt" x="30" y="315">• Provenance/source labels</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• Technical feasibility</text>
+<text class="txt" x="264" y="247">evidence</text>
+<text class="txt" x="264" y="264">• Screenshots/demo for</text>
+<text class="txt" x="264" y="281">advisors</text>
+<text class="txt" x="264" y="298">• Synthetic test plan</text>
+<text class="txt" x="264" y="315">• Stronger Research Strategy</text>
+<text class="txt" x="264" y="332">Approach section</text>
+</g>
+<g transform="translate(620 1160)">
+<rect width="500" height="410" rx="16" fill="#fff3cf" stroke="#dfc878" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 8 · Partly locked by advisors and scope</text>
+<text class="cardTitle" x="24" y="68">Budget Inputs Are Real</text>
+<text class="small" x="24" y="111">Why locked: The budget cannot be final until the aims,</text><text class="small" x="24" y="129">team, consultants, and project period are believable.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Founder effort and salary</text>
+<text class="txt" x="30" y="247">plan</text>
+<text class="txt" x="30" y="264">• Technical lead cost</text>
+<text class="txt" x="30" y="281">• Advisor/consultant</text>
+<text class="txt" x="30" y="298">estimates</text>
+<text class="txt" x="30" y="315">• Legal/privacy/security</text>
+<text class="txt" x="30" y="332">costs</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• Final Phase I budget</text>
+<text class="txt" x="264" y="247">• Budget justification</text>
+<text class="txt" x="264" y="264">• Salary allowability</text>
+<text class="txt" x="264" y="281">questions</text>
+<text class="txt" x="264" y="298">• Consultant/subaward</text>
+<text class="txt" x="264" y="315">documentation</text>
+</g>
+<g transform="translate(1180 1160)">
+<rect width="500" height="410" rx="16" fill="#fbe6e6" stroke="#e1a4a4" stroke-width="3"/>
+<text class="meta" x="24" y="34">Door 9 · Locked until everything above is ready</text>
+<text class="cardTitle" x="24" y="68">Final Assembly + Portal</text><text class="cardTitle" x="24" y="95">Validation</text>
+<text class="small" x="24" y="138">Why locked: This is the last door. You cannot upload</text><text class="small" x="24" y="156">cleanly until registrations, documents, budget, and forms</text><text class="small" x="24" y="174">line up.</text>
+<line x1="24" y1="176" x2="476" y2="176" stroke="#c7d4e3" stroke-width="2"/>
+<text class="section" x="24" y="204">Keys needed</text>
+<text class="txt" x="30" y="230">• Active registrations</text>
+<text class="txt" x="30" y="247">• Final PDFs and forms</text>
+<text class="txt" x="30" y="264">• Letters and biosketches</text>
+<text class="txt" x="30" y="281">• Budget and justification</text>
+<text class="section" x="258" y="204">Unlocks</text>
+<text class="txt" x="264" y="230">• Grants.gov submission</text>
+<text class="txt" x="264" y="247">• eRA Commons assembled</text>
+<text class="txt" x="264" y="264">application review</text>
+<text class="txt" x="264" y="281">• Receipt confirmation</text>
+<text class="txt" x="264" y="298">• January 5 submission goal</text>
+</g>
+<path class="line" d="M560 385 C585 385, 595 385, 610 385"/>
+<path class="line" d="M1120 385 C1145 385, 1155 385, 1170 385"/>
+<path class="line" d="M560 875 C585 875, 595 875, 610 875"/>
+<path class="line" d="M1120 875 C1145 875, 1155 875, 1170 875"/>
+<path class="line" d="M560 1365 C585 1365, 595 1365, 610 1365"/>
+<path class="line" d="M1120 1365 C1145 1365, 1155 1365, 1170 1365"/>
+<text class="sub" x="60" y="1695">Critical sequence: Name/guidance → LLC → EIN → SAM/UEI → eRA/Grants.gov/SBA → final package validation → submit.</text>
+</svg>

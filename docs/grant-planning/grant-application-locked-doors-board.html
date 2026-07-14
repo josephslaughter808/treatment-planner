@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClearPath Grant Locked Doors Board</title>
+  <style>
+    :root {
+      --ink: #17233a; --muted: #607087; --paper: #fff; --back: #f5f7fb;
+      --blue: #1f6fb2; --blue-soft:#e7f0fa; --green:#237a57; --green-soft:#e7f5ee;
+      --gold:#8a6500; --gold-soft:#fff3cf; --red:#a23a3a; --red-soft:#fbe6e6;
+      --line:#c7d4e3; --shadow: 0 14px 36px rgba(23,35,58,.08);
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--back); color:var(--ink); font-family:Arial,Helvetica,sans-serif; line-height:1.45; }
+    main { max-width: 1380px; margin:0 auto; padding:32px 22px 54px; }
+    header { margin-bottom:24px; }
+    h1 { margin:0 0 8px; font-size:clamp(30px,4vw,48px); line-height:1.05; letter-spacing:0; color:#0b2545; }
+    .lede { max-width:980px; margin:0; color:var(--muted); font-size:18px; }
+    .legend { display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 28px; }
+    .legend span { padding:8px 12px; border:1px solid var(--line); border-radius:999px; background:var(--paper); color:var(--muted); font-weight:700; font-size:13px; }
+    .board { display:grid; grid-template-columns:repeat(3,minmax(280px,1fr)); gap:18px; }
+    .door-card { border:1px solid var(--line); border-radius:10px; background:var(--paper); box-shadow:var(--shadow); overflow:hidden; }
+    .door-card.open .door-head { background:var(--green-soft); }
+    .door-card.locked .door-head { background:var(--gold-soft); }
+    .door-card.critical .door-head, .door-card.final .door-head { background:var(--red-soft); }
+    .door-head { min-height:132px; padding:16px; border-bottom:1px solid var(--line); position:relative; }
+    .door-head::after { content:""; position:absolute; right:18px; bottom:14px; width:46px; height:62px; border:3px solid #0b2545; border-radius:20px 20px 6px 6px; opacity:.18; }
+    .door-head span { display:block; color:var(--muted); font-weight:800; font-size:12px; text-transform:uppercase; margin-bottom:8px; }
+    .door-head strong { display:block; max-width:78%; color:#0b2545; font-size:20px; line-height:1.15; }
+    .door-head em { display:block; margin-top:10px; color:var(--muted); font-style:normal; font-size:13px; font-weight:700; }
+    .why { margin:0; padding:14px 16px; min-height:82px; color:#344258; font-size:14px; border-bottom:1px solid #e0e7ef; }
+    .door-grid { display:grid; grid-template-columns:1fr 1fr; }
+    .door-grid section { padding:14px 16px 16px; }
+    .door-grid section:first-child { border-right:1px solid #e0e7ef; }
+    .door-grid h3 { margin:0 0 8px; color:#0b2545; font-size:14px; letter-spacing:0; }
+    ul { margin:0; padding-left:18px; }
+    li { margin:6px 0; color:#253246; font-size:13px; }
+    .unlocks { background:#fbfdff; }
+    .bottom-note { margin-top:24px; padding:16px 18px; border:1px solid var(--line); border-radius:10px; background:#fff; color:#344258; }
+    .bottom-note strong { color:#0b2545; }
+    @media (max-width: 1000px) { .board { grid-template-columns:1fr; } .door-grid { grid-template-columns:1fr; } .door-grid section:first-child { border-right:0; border-bottom:1px solid #e0e7ef; } }
+    @media print { body{background:#fff} main{max-width:none;padding:.4in} .door-card{box-shadow:none;break-inside:avoid} .board{grid-template-columns:repeat(3,1fr);gap:12px} }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>ClearPath Grant Locked Doors Board</h1>
+      <p class="lede">Each card shows one locked door, the keys needed to open it, and the exact tasks that become possible afterward.</p>
+    </header>
+    <nav class="legend" aria-label="Status legend">
+      <span>Open now: can work before LLC exists</span>
+      <span>Locked: needs money, company, advisor, or partner</span>
+      <span>Critical/final: controls submission readiness</span>
+    </nav>
+    <section class="board">
+      
+      <article class="door-card open">
+        <div class="door-head">
+          <span>Door 1</span>
+          <strong>Working Legal Name + Free Guidance</strong>
+          <em>Open now, no LLC fee yet</em>
+        </div>
+        <p class="why">We should not spend filing money until the name and structure are good enough.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Pick 3-5 name candidates</li><li>Check Texas name availability</li><li>Contact SCORE/SBDC or legal clinic</li><li>Decide Texas LLC unless counsel says otherwise</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>File Texas LLC</li><li>Use one consistent name for EIN and registrations</li><li>Create company records folder</li><li>Start clean business identity</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card locked">
+        <div class="door-head">
+          <span>Door 2</span>
+          <strong>Texas LLC Formed</strong>
+          <em>Locked by $300 filing fee and timing</em>
+        </div>
+        <p class="why">NIH SBIR needs a real eligible small business applicant, not just an individual idea.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>File Certificate of Formation</li><li>Registered agent decision</li><li>Basic operating agreement</li><li>Save formation documents</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>EIN application</li><li>Business bank account</li><li>Company-owned grant applicant identity</li><li>Federal registration sequence</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card locked">
+        <div class="door-head">
+          <span>Door 3</span>
+          <strong>EIN Received</strong>
+          <em>Locked behind LLC formation</em>
+        </div>
+        <p class="why">Federal systems, banks, and grant records need the company tax ID.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Apply directly through IRS</li><li>Save EIN confirmation letter</li><li>Match legal name exactly</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>SAM.gov registration</li><li>SBA Company Registry</li><li>Bank account</li><li>Budget and payment details</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card critical">
+        <div class="door-head">
+          <span>Door 4</span>
+          <strong>SAM.gov + UEI Active</strong>
+          <em>Critical registration lock</em>
+        </div>
+        <p class="why">SAM/UEI is the federal identity that other submission systems depend on.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Complete SAM entity registration</li><li>Validate address and identity</li><li>Receive/activate UEI</li><li>Keep SAM active</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>eRA Commons organization account</li><li>Grants.gov organization account</li><li>AOR/SO roles</li><li>Submission validation path</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card open">
+        <div class="door-head">
+          <span>Door 5</span>
+          <strong>NLM Feedback On Revised Aims</strong>
+          <em>Open once one-page aims are polished</em>
+        </div>
+        <p class="why">Dr. Reddy already gave a positive fit signal; now we need the research framing checked.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Polish one-page Specific Aims</li><li>Include FHIR/ClearPath JSON positioning</li><li>Ask 2-3 focused questions</li><li>Send only if/when appropriate</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>Final aims language</li><li>FHIR depth decision</li><li>SBIR vs STTR confidence</li><li>Human-subjects/clinical-trial framing</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card locked">
+        <div class="door-head">
+          <span>Door 6</span>
+          <strong>Advisor + Partner Commitments</strong>
+          <em>Locked by outside people</em>
+        </div>
+        <p class="why">Reviewers need to believe the team can do informatics research, not only build an app.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Informatics/FHIR advisor</li><li>Clinical workflow advisor</li><li>Human-factors advisor</li><li>Privacy/security advisor</li><li>Discovery or pilot partners</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>Letters of support</li><li>Stronger research methods</li><li>Credible team section</li><li>Consultant scopes and budget support</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card open">
+        <div class="door-head">
+          <span>Door 7</span>
+          <strong>Grant-Critical Prototype Evidence</strong>
+          <em>Open now, build in parallel</em>
+        </div>
+        <p class="why">The prototype should prove the research story: request, consent, provenance, package, audit.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Provider request workflow</li><li>Patient approve/limit/deny workflow</li><li>Consent-scoped JSON package</li><li>Provenance/source labels</li><li>Audit trail and synthetic scenarios</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>Technical feasibility evidence</li><li>Screenshots/demo for advisors</li><li>Synthetic test plan</li><li>Stronger Research Strategy Approach section</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card locked">
+        <div class="door-head">
+          <span>Door 8</span>
+          <strong>Budget Inputs Are Real</strong>
+          <em>Partly locked by advisors and scope</em>
+        </div>
+        <p class="why">The budget cannot be final until the aims, team, consultants, and project period are believable.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Founder effort and salary plan</li><li>Technical lead cost</li><li>Advisor/consultant estimates</li><li>Legal/privacy/security costs</li><li>Research participant and software costs</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>Final Phase I budget</li><li>Budget justification</li><li>Salary allowability questions</li><li>Consultant/subaward documentation</li></ul>
+          </section>
+        </div>
+      </article>
+    
+      <article class="door-card final">
+        <div class="door-head">
+          <span>Door 9</span>
+          <strong>Final Assembly + Portal Validation</strong>
+          <em>Locked until everything above is ready</em>
+        </div>
+        <p class="why">This is the last door. You cannot upload cleanly until registrations, documents, budget, and forms line up.</p>
+        <div class="door-grid">
+          <section>
+            <h3>Keys Needed</h3>
+            <ul><li>Active registrations</li><li>Final PDFs and forms</li><li>Letters and biosketches</li><li>Budget and justification</li><li>Compliance matrix complete</li></ul>
+          </section>
+          <section class="unlocks">
+            <h3>Unlocks</h3>
+            <ul><li>Grants.gov submission</li><li>eRA Commons assembled application review</li><li>Receipt confirmation</li><li>January 5 submission goal</li></ul>
+          </section>
+        </div>
+      </article>
+    
+    </section>
+    <p class="bottom-note"><strong>Plain-English rule:</strong> writing, planning, prototype work, and outreach drafts can move now. Federal registrations are locked behind the LLC and EIN. Scientific credibility is locked behind advisors and partners. Submission is locked until registrations, documents, budget, and portal validation all line up.</p>
+  </main>
+</body>
+</html>
