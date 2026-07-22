@@ -385,8 +385,8 @@ Current proposed Phase I budget:
 
 | Category | Budget |
 | --- | ---: |
-| Founder / PI salary plus fringe and payroll burden | $80,000 |
-| Lead developer / technical lead | $130,000 |
+| Founder / PI salary plus fringe and payroll burden | $90,000 |
+| Lead developer / technical lead | $125,000 |
 | HIPAA and privacy legal consult | $10,000 |
 | Security architecture review | $7,500 |
 | Clinical and interoperability advisor | $12,500 |
@@ -394,10 +394,10 @@ Current proposed Phase I budget:
 | Cloud, development tools, and prototype infrastructure | $10,000 |
 | Grant administration, accounting, payroll, and insurance | $10,000 |
 | Pilot/demo/user discovery expenses | $7,500 |
-| Indirect and operating reserve | $20,000 |
+| Indirect and operating reserve | $15,000 |
 | **Total** | **$300,000** |
 
-The $80,000 founder/PI salary is feasible if justified as project labor:
+The $90,000 founder/PI salary is feasible if justified as full-time or near full-time project labor:
 
 - Grant execution
 - Workflow design

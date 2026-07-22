@@ -82,7 +82,7 @@ Awards may be grants or cooperative agreements. Cost sharing, indirect costs, sa
 
 ## Founder Salary And Developer Costs
 
-Reasonable salary and technical costs may be allowable when they directly support approved program activities and are adequately documented. HRSA will not fund an $80,000 founder salary merely because the founder needs to leave a job. The application must tie effort, duties, rate, and outcomes to the funded program.
+Reasonable salary and technical costs may be allowable when they directly support approved program activities and are adequately documented. HRSA will not fund a $90,000 founder salary merely because the founder needs to leave a job. The application must tie effort, duties, rate, and outcomes to the funded program.
 
 General startup development, investor work, sales, unrelated features, and commercial operations are not chargeable to an award.
 

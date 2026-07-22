@@ -341,7 +341,7 @@ A founder's salary may potentially be included when:
 - The cost is allowable under the specific NOFO, HHS policy, and subcontract.
 - The amount remains within any applicable salary cap.
 
-The current proposed $80,000 founder salary is not automatically allowable merely because it appears in a budget. Under an AHRQ partnership, it would likely need to be part of ClearPath's subcontract budget or an eligible lead-organization appointment.
+The current proposed $90,000 founder salary is not automatically allowable merely because it appears in a budget. Under an AHRQ partnership, it would likely need to be part of ClearPath's subcontract budget or an eligible lead-organization appointment.
 
 ### Technical Lead
 

@@ -230,7 +230,7 @@ Priority labels used below:
 - [ ] **BLOCKER - Identify expertise gaps.** Cover biomedical informatics, interoperability, clinical workflow, human factors, research methods, privacy, and security.
 - [ ] **BLOCKER - Prepare consultant scopes and rates.** Include deliverables, hours, rate basis, travel, and letters.
 - [ ] **BLOCKER - Prepare recruitment contingencies.** Explain how the project proceeds if the named technical lead or advisor is unavailable.
-- [ ] **BLOCKER - Confirm sufficient PI commitment.** Reconcile the proposed $80,000 founder compensation with project months, effort, base salary, fringe, and agency rules.
+- [ ] **BLOCKER - Confirm sufficient PI commitment.** Reconcile the proposed $90,000 founder compensation with project months, effort, base salary, fringe, and agency rules.
 - [ ] **STRENGTHENER - Identify a grants accountant or administrator.** Define pre-award and post-award responsibilities.
 - [ ] **STRENGTHENER - Create an advisory cadence.** Schedule clinical, research, security, and commercialization reviews by milestone.
 - [ ] **CONDITIONAL - Prepare multiple-PI or senior/key-person leadership plans.** Complete only if the structure requires them.

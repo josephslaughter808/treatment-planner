@@ -26,10 +26,10 @@ The goal is to confirm fit, allowable costs, documentation expectations, and whe
 
 ## Budget
 
-1. Is founder/PI salary allowable at approximately $80,000 for Phase I?
+1. Is founder/PI salary allowable at approximately $90,000 for Phase I if tied to documented full-time or near full-time project effort?
 2. Should the founder/PI salary be listed as salary, consultant cost, or another category based on company structure?
 3. Are fringe, payroll taxes, and payroll processing costs allowable?
-4. Is a $130,000 lead developer budget reasonable for the technical scope?
+4. Is a $125,000 lead developer budget reasonable for the technical scope?
 5. Can HIPAA legal review be included as a project-specific compliance cost?
 6. Can security architecture review be included in Phase I?
 7. Can grant accounting, payroll, insurance, and administrative support be included?

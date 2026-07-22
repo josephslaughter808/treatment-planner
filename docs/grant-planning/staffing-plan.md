@@ -16,7 +16,7 @@ A working prototype that demonstrates patient-mediated interoffice record reques
 
 ### Founder / Principal Investigator / Product And Clinical Workflow Lead
 
-Budget: $80,000
+Budget: $90,000
 
 Primary responsibilities:
 
@@ -35,7 +35,7 @@ The founder/PI role is necessary because ClearPath is not only a coding project.
 
 ### Lead Developer / Technical Lead
 
-Budget: $130,000
+Budget: $125,000
 
 Primary responsibilities:
 
