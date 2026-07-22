@@ -327,7 +327,7 @@ This is not yet a full HIPAA-ready production system. It is a strong prototype/s
 
 Grant planning docs:
 
-- `docs/grant-planning/phase-one-budget-proposal.md`
+- `docs/grant-planning/phase-one-budget-proposal.docx`
 - `docs/grant-planning/phase-one-scope-and-milestones.md`
 - `docs/grant-planning/phase-two-roadmap.md`
 - `docs/grant-planning/staffing-plan.md`
