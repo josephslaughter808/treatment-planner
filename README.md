@@ -1,55 +1,60 @@
 # ClearPath Care
 
-A Next.js app for a first-launch medical check-in workflow. The launch scope is focused on reusable patient medical history, medications, allergies, insurance updates, and office confirmation records.
+ClearPath Care is a secure patient intake and health information platform designed to reduce repeated medical paperwork and give patients greater control over how their information is shared with care teams.
 
-## First launch scope
+**Live application:** [clearpath-care.vercel.app](https://clearpath-care.vercel.app)
 
-- Patient health profile for medical conditions, medications, allergies, and insurance.
-- Provider check-in screen for confirming history and insurance before visits.
-- Office check-in records tied to practice and patient identity.
-- Supabase Auth, database, RLS, and private storage for the pilot workflow.
-- Application-level encryption for sensitive patient vault snapshots and office check-in notes.
+> ClearPath Care is an active prototype and is not intended for production use with real patient information.
 
-## Supabase foundation
+## Product vision
 
-This repo now includes:
+Patients are frequently asked to repeat the same medical history, medication, allergy, insurance, and consent information. ClearPath Care explores a reusable patient profile that can support office check in, structured provider review, and controlled information sharing.
 
-- `.env.example` for required Supabase environment variables
-- `supabase/schema.sql` with tables for practices, users, patients, vaults, share links, check-ins, audit logs, and future treatment-planning records
-- `app/api/patient-vault/route.ts` for saving patient medical history and insurance profiles
-- `app/api/check-ins/route.ts` for saving office check-in confirmations
-- `lib/persistence.ts` and `lib/supabase.ts` for server-side persistence helpers
-- `lib/field-encryption.ts` for AES-256-GCM field encryption before sensitive snapshots are stored
+## Current capabilities
 
-Production should run with Supabase and field encryption enabled. Local development can still show clear setup messages if required credentials are missing.
+- Patient account creation and authenticated sessions
+- Structured medical history, medication, allergy, insurance, and profile workflows
+- Reusable patient vault and office check in records
+- Provider patient database and new patient intake views
+- Patient controlled sharing links and package previews
+- Family, emergency card, document, timeline, and care team experiences
+- Health map and diagnosis detail interfaces
+- Practice settings, integration hub, and team directory views
+- Application level encryption for sensitive vault snapshots and check in notes
 
-## Encryption
+## Architecture and security work
 
-Set `CLEARPATH_FIELD_ENCRYPTION_KEY` before using this with real patient information. Generate a key with:
+- Next.js App Router with server side API routes
+- Supabase authentication, database services, row level security, and private storage
+- AES 256 GCM field encryption for sensitive stored snapshots
+- Request authentication and session cookie handling
+- Structured database schema for practices, users, patients, vaults, check ins, share links, case files, and audit records
+- React Three Fiber and Three.js for interactive health visualization work
 
-```bash
-openssl rand -base64 32
-```
+## Technology
 
-Store it as:
-
-```bash
-CLEARPATH_FIELD_ENCRYPTION_KEY=base64:generated-value
-CLEARPATH_REQUIRE_FIELD_ENCRYPTION=true
-```
-
-The app encrypts patient vault JSON snapshots and office check-in notes before writing them to Supabase. Existing plaintext development rows still read correctly during migration.
-
-## Next build steps
-
-1. Finish pilot QA for patient health-profile save/load and provider check-in review.
-2. Add audit log writes for vault reads, vault updates, and office confirmations.
-3. Add patient invite/resend workflow for the pilot office.
-4. Run the single-office pilot before re-enabling diagnosis and treatment education flows.
+- Next.js 16 and React 19
+- TypeScript
+- Supabase
+- React Three Fiber, Drei, and Three.js
+- Vercel
 
 ## Run locally
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
+
+Then open [http://localhost:3000](http://localhost:3000).
+
+Local development can display setup guidance when required Supabase or encryption credentials are missing. Never use real patient information in an unreviewed development environment.
+
+## Development status
+
+The hosted application demonstrates the current product direction and interface. Work remains on pilot quality assurance, audit logging, patient invitations, provider workflows, security review, and production compliance before real clinical use.
+
+## Author
+
+Designed and developed by [Joseph Slaughter](https://github.com/josephslaughter808) as an independent healthcare software project.
